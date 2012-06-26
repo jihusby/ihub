@@ -1,0 +1,83 @@
+{
+    "items": [
+        {
+            "id": 1,
+            "name": "7. september",
+            "ingress": "Focusing on programming techniques and technical info. Among the topics are sessions about Java SE 8, continous delivery and HTML5.",
+            "description": "",
+            "items": [
+                {
+                    "id": 2,
+                    "name": "Presentation Patterns & Anti-Patterns",
+                    "start": "1347001200000",
+                    "startTime": "09:00",
+                    "ingress": "A different approach to how to build presentations",
+                    "description": "This session takes a different approach to how to build presentations, by providing patterns and anti-patterns you can use to make sure you’re getting the most leverage from your presentations. Don’t take a knife to a gunfight! The ability to create compelling presentations that explain your point is one of the things that keeps your job from disappearing.",
+                    "place": "Sal 1",
+                    "dateCreated": "1325032800000",
+                    "leaf": true
+                },
+                {
+                    "id": 3,
+                    "name": " Java SE 7 has been released, what about Java SE 8?",
+                    "start": "1347004800000",
+                    "startTime": "10:00",
+                    "ingress": "Discussing changes in Java SE 8",
+                    "description": "Java SE 7 was launched officially on 28th of July this year; the first new version of the Java platform in nearly five years. Now that various issues have been resolved, Oracle are keen to maintain the momentum of Java as a platform. In this session we'll talk briefly about Java SE 7 before discussing some of the changes being made to the JCP to provide a more transparent development of new Java specifications.",
+                    "place": "",
+                    "dateCreated": "1325032800000",
+                    "leaf": true
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name": "8. september",
+            "ingress": "Workshops",
+            "description": "",
+            "items": [
+                {
+                    "id": 5,
+                    "name": "Workshop med Uncle Bob",
+                    "start": "1347091200000",
+                    "startTime": "09:00",
+                    "ingress": "TDD and Extreme programming with Robert C. Martin",
+                    "description": "Robert C. Martin - Uncle Bob - has been a software professional since 1970. In the last 35 years, he has worked in various capacities on literally hundreds of software projects. He has authored 'landmark' books on Agile Programming, Extreme Programming, UML, Object-Oriented Programming, and C++ Programming.",
+                    "place": "",
+                    "dateCreated": "1325032800000",
+                    "leaf": true
+                },
+                {
+                    "id": 6,
+                    "name": "Workshop med Kent Beck",
+                    "start": "1347091200000",
+                    "startTime": "12:00",
+                    "ingress": "Kent Beck was one of the 17 original signatories of the Agile Manifesto in 2001",
+                    "description": "Kent Beck is an American software engineer and the creator of the Extreme Programming[1] and Test Driven Development software development methodologies, also named agile software development. Beck was one of the 17 original signatories of the Agile Manifesto in 2001.",
+                    "place": "",
+                    "dateCreated": "1325032800000",
+                    "leaf": true
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "name": "9. september",
+            "ingress": "Lyntaler fra kjente utviklere ",
+            "description": "",
+            "items": [
+                {
+                    "id": 8,
+                    "name": "Avslutning",
+                    "start": "1347174000000",
+                    "startTime": "09:00",
+                    "ingress": "",
+                    "description": "...",
+                    "place": "",
+                    "dateCreated": "1325032800000",
+                    "leaf": true
+                }
+            ]
+        }
+    ]		
+}

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html manifest="cache.manifest">
+<head>
+    <meta charset="UTF-8">
+    <title>Rica Nidelven</title>
+    <meta name="viewport"
+          content="initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+
+    <style type="text/css">
+            /**
+            * Example of an initial loading indicator.
+            * It is recommended to keep this as minimal as possible to provide instant feedback
+            * while other resources are still being loaded for the first time
+            */
+        html, body {
+            height: 100%;
+        }
+
+        #appLoadingIndicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -10px;
+            margin-left: -50px;
+            width: 100px;
+            height: 20px;
+        }
+
+        #appLoadingIndicator > * {
+            background-color: #FFFFFF;
+            float: left;
+            height: 20px;
+            margin-left: 11px;
+            width: 20px;
+            -webkit-animation-name: appLoadingIndicator;
+            -webkit-border-radius: 13px;
+            -webkit-animation-duration: 0.8s;
+            -webkit-animation-iteration-count: infinite;
+            -webkit-animation-direction: linear;
+            opacity: 0.3
+        }
+
+        #appLoadingIndicator > :nth-child(1) {
+            -webkit-animation-delay: 0.18s;
+        }
+
+        #appLoadingIndicator > :nth-child(2) {
+            -webkit-animation-delay: 0.42s;
+        }
+
+        #appLoadingIndicator > :nth-child(3) {
+            -webkit-animation-delay: 0.54s;
+        }
+
+        @-webkit-keyframes appLoadingIndicator{
+            0% {
+                opacity: 0.3
+            }
+
+            50% {
+                opacity: 1;
+                background-color:#782069
+            }
+
+            100% {
+                opacity:0.3
+            }
+        }
+    </style>
+    <!--<script id="microloader" type="text/javascript" src="sdk/microloader/production.js"></script>-->
+    <script src="sdk/sencha-touch-debug.js"></script>
+    <script type="application/javascript" src="resources/script/add2home.js" charset="utf-8"></script>
+    <script type="application/javascript" src="resources/script/utils.js" charset="utf-8"></script>
+    <script src="app.js"></script>
+    <link rel="stylesheet" href="resources/css/add2home.css">
+    <link rel="stylesheet" href="resources/css/app.css">
+
+</head>
+<body>
+
+<div id="appLoadingIndicator">
+    <div></div>
+    <div></div>
+    <div></div>
+</div>
+</body>
+</html>
