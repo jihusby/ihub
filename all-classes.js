@@ -4966,21 +4966,6 @@ Ext.define('Ext.fx.animation.Fade', {
 /**
  * @private
  */
-Ext.define('Ext.fx.animation.FadeOut', {
-    extend: 'Ext.fx.animation.Fade',
-    alias: 'animation.fadeOut',
-
-    config: {
-        // @hide
-        out: true,
-
-        before: {}
-    }
-});
-
-/**
- * @private
- */
 Ext.define('Ext.fx.animation.Flip', {
     extend: 'Ext.fx.animation.Abstract',
 
@@ -5073,6 +5058,21 @@ Ext.define('Ext.fx.animation.Flip', {
         });
 
         return this.callParent(arguments);
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.animation.FadeOut', {
+    extend: 'Ext.fx.animation.Fade',
+    alias: 'animation.fadeOut',
+
+    config: {
+        // @hide
+        out: true,
+
+        before: {}
     }
 });
 
@@ -29453,17 +29453,17 @@ Ext.define('App.view.Detail', {
         
         items: [
             {
-                id: 'description',
-                html: ''
-            },
-            
-            {
                 id: 'productBtn',
                 xtype: 'button',
                 ui: 'confirm',
-                margin: 5,
-                text: 'Legg til i huskeliste',
+                margin: 0,
+                text: 'Legg til som favoritt',
                 handler: this.onAddEventButtonTap
+            },
+            
+            {
+                id: 'description',
+                html: ''
             }
         ]
     },
@@ -29538,14 +29538,12 @@ Ext.define('App.controller.Main', {
     launch: function() {
         this.callParent(arguments);
         Ext.getStore("Events").load();
-        console.log("Launch");
     },
 
     init: function() {
         // Setup start history point
         this.setHistory(this.getApplication().getHistory());
         this.callParent(arguments);
-        console.log("Init");
     },
 
     addToHistory: function(id) {
@@ -29563,7 +29561,7 @@ Ext.define('App.controller.Main', {
         
         // Get and update description
         var descriptionField = card.down('#description');
-        descriptionField.setHtml('<div class="textBlock"><b>'+record.get('startTime')+'&nbsp;-&nbsp;' + record.get('name') + '</b></div><div class="textBlock">' + record.get('description') + '</div>');
+        descriptionField.setHtml(getFormattedDetailCard(record));
         
         // Get and update product button
         var detailBtn = card.down('#productBtn');
@@ -29675,7 +29673,6 @@ Ext.define('App.controller.Main', {
     },
 
     onEditEventCommand: function(list, record) {
-        console.log("viewing record: " + record);
         this.activateEventEditor(record);
     },
 
@@ -29689,8 +29686,7 @@ Ext.define('App.controller.Main', {
     },
 
     activateEventEditor: function (record) {
-        var startTime = new Date(record.data.start*1).toTimeString();
-        var body = "<b>"+ startTime +"</b><br>" + record.data.description;
+        var body = "<b>"+ record.data.start +"</b><br>" + record.data.description;
         Ext.Msg.alert(record.data.name, body);
         // Doesn't work. Commented out, temporarily replaced with view dialog.
         // var eventEditor = this.getEventEditor();
@@ -32418,285 +32414,355 @@ Ext.define('Ext.util.Grouper', {
     }
 });
 /**
- * @private
- */
-Ext.define('Ext.mixin.Filterable', {
-    extend: 'Ext.mixin.Mixin',
-
-    requires: [
-        'Ext.util.Filter'
-    ],
-
-    mixinConfig: {
-        id: 'filterable'
-    },
-
-    config: {
-        /**
-         * @cfg {Array} filters
-         * An array with filters. A filter can be an instance of Ext.util.Filter,
-         * an object representing an Ext.util.Filter configuration, or a filter function.
-         */
-        filters: null,
-
-        /**
-         * @cfg {String} filterRoot
-         * The root inside each item in which the properties exist that we want to filter on.
-         * This is useful for filtering records in which the data exists inside a 'data' property.
-         */
-        filterRoot: null
-    },
-
-    /**
-     * @property {Boolean} dirtyFilterFn
-     * A flag indicating wether the currently cashed filter function is still valid. Read-only.
-     */
-    dirtyFilterFn: false,
-
-    /**
-     * @property currentSortFn
-     * This is the cached sorting function which is a generated function that calls all the
-     * configured sorters in the correct order. This is a read-only property.
-     */
-    filterFn: null,
-
-    /**
-     * @property {Boolean} filtered
-     * A read-only flag indicating if this object is filtered
-     */
-    filtered: false,
-
-    applyFilters: function(filters, collection) {
-        if (!collection) {
-            collection = this.createFiltersCollection();
-        }
-
-        collection.clear();
-
-        this.filtered = false;
-        this.dirtyFilterFn = true;
-
-        if (filters) {
-            this.addFilters(filters);
-        }
-
-        return collection;
-    },
-
-    createFiltersCollection: function() {
-        this._filters = Ext.create('Ext.util.Collection', function(filter) {
-            return filter.getId();
-        });
-        return this._filters;
-    },
-
-    /**
-     * This method adds a filter.
-     * @param {Ext.util.Sorter/Function/Object} filter Can be an instance of Ext.util.Filter,
-     * an object representing an Ext.util.Filter configuration, or a filter function.
-     */
-    addFilter: function(filter) {
-        this.addFilters([filter]);
-    },
-
-    /**
-     * This method adds all the filters in a passed array.
-     * @param {Array} filters An array with filters. A filter can be an instance of Ext.util.Filter,
-     * an object representing an Ext.util.Filter configuration, or a filter function.
-     */
-    addFilters: function(filters) {
-        var currentFilters = this.getFilters();
-        return this.insertFilters(currentFilters ? currentFilters.length : 0, filters);
-    },
-
-    /**
-     * This method adds a filter at a given index.
-     * @param {Number} index The index at which to insert the filter.
-     * @param {Ext.util.Sorter/Function/Object} filter Can be an instance of Ext.util.Filter,
-     * an object representing an Ext.util.Filter configuration, or a filter function.
-     */
-    insertFilter: function(index, filter) {
-        return this.insertFilters(index, [filter]);
-    },
-
-    /**
-     * This method inserts all the filters in the passed array at the given index.
-     * @param {Number} index The index at which to insert the filters.
-     * @param {Array} filters Each filter can be an instance of Ext.util.Filter,
-     * an object representing an Ext.util.Filter configuration, or a filter function.
-     */
-    insertFilters: function(index, filters) {
-        // We begin by making sure we are dealing with an array of sorters
-        if (!Ext.isArray(filters)) {
-            filters = [filters];
-        }
-
-        var ln = filters.length,
-            filterRoot = this.getFilterRoot(),
-            currentFilters = this.getFilters(),
-            newFilters = [],
-            filterConfig, i, filter;
-
-        if (!currentFilters) {
-            currentFilters = this.createFiltersCollection();
-        }
-
-        // We first have to convert every sorter into a proper Sorter instance
-        for (i = 0; i < ln; i++) {
-            filter = filters[i];
-            filterConfig = {
-                root: filterRoot
-            };
-
-            if (Ext.isFunction(filter)) {
-                filterConfig.filterFn = filter;
-            }
-            // If we are dealing with an object, we assume its a Sorter configuration. In this case
-            // we create an instance of Sorter passing this configuration.
-            else if (Ext.isObject(filter)) {
-                if (!filter.isFilter) {
-                    if (filter.fn) {
-                        filter.filterFn = filter.fn;
-                        delete filter.fn;
-                    }
-
-                    filterConfig = Ext.apply(filterConfig, filter);
-                }
-                else {
-                    newFilters.push(filter);
-                    if (!filter.getRoot()) {
-                        filter.setRoot(filterRoot);
-                    }
-                    continue;
-                }
-            }
-            // Finally we get to the point where it has to be invalid
-            else {
-                Ext.Logger.warn('Invalid filter specified:', filter);
-            }
-
-            // If a sorter config was created, make it an instance
-            filter = Ext.create('Ext.util.Filter', filterConfig);
-            newFilters.push(filter);
-        }
-
-        // Now lets add the newly created sorters.
-        for (i = 0, ln = newFilters.length; i < ln; i++) {
-            currentFilters.insert(index + i, newFilters[i]);
-        }
-
-        this.dirtyFilterFn = true;
-
-        if (currentFilters.length) {
-            this.filtered = true;
-        }
-
-        return currentFilters;
-    },
-
-    /**
-     * This method removes all the filters in a passed array.
-     * @param {Array} filters Each value in the array can be a string (property name),
-     * function (sorterFn), an object containing a property and value keys or
-     * {@link Ext.util.Sorter Sorter} instance.
-     */
-    removeFilters: function(filters) {
-        // We begin by making sure we are dealing with an array of sorters
-        if (!Ext.isArray(filters)) {
-            filters = [filters];
-        }
-
-        var ln = filters.length,
-            currentFilters = this.getFilters(),
-            i, filter;
-
-        for (i = 0; i < ln; i++) {
-            filter = filters[i];
-
-            if (typeof filter === 'string') {
-                currentFilters.each(function(item) {
-                    if (item.getProperty() === filter) {
-                        currentFilters.remove(item);
-                    }
-                });
-            }
-            else if (typeof filter === 'function') {
-                currentFilters.each(function(item) {
-                    if (item.getFilterFn() === filter) {
-                        currentFilters.remove(item);
-                    }
-                });
-            }
-            else {
-                if (filter.isFilter) {
-                    currentFilters.remove(filter);
-                }
-                else if (filter.property !== undefined && filter.value !== undefined) {
-                    currentFilters.each(function(item) {
-                        if (item.getProperty() === filter.property && item.getValue() === filter.value) {
-                            currentFilters.remove(item);
-                        }
-                    });
-                }
-            }
-        }
-
-        if (!currentFilters.length) {
-            this.filtered = false;
-        }
-    },
-
-    /**
-     * This updates the cached sortFn based on the current sorters.
-     * @return {Function} sortFn The generated sort function.
-     * @private
-     */
-    updateFilterFn: function() {
-        var filters = this.getFilters().items;
-
-        this.filterFn = function(item) {
-            var isMatch = true,
-                length = filters.length,
-                i;
-
-            for (i = 0; i < length; i++) {
-                var filter = filters[i],
-                    fn     = filter.getFilterFn(),
-                    scope  = filter.getScope() || this;
-
-                isMatch = isMatch && fn.call(scope, item);
-            }
-
-            return isMatch;
-        };
-
-        this.dirtyFilterFn = false;
-        return this.filterFn;
-    },
-
-    /**
-     * This method will sort an array based on the currently configured {@link Ext.data.Store#sorters sorters}.
-     * @param {Array} data The array you want to have sorted
-     * @return {Array} The array you passed after it is sorted
-     */
-    filter: function(data) {
-        return this.getFilters().length ? Ext.Array.filter(data, this.getFilterFn()) : data;
-    },
-
-    isFiltered: function(item) {
-        return this.getFilters().length ? !this.getFilterFn()(item) : false;
-    },
-
-    /**
-     * Returns an up to date sort function.
-     * @return {Function} sortFn The sort function.
-     */
-    getFilterFn: function() {
-        if (this.dirtyFilterFn) {
-            return this.updateFilterFn();
-        }
-        return this.filterFn;
+ * @class Ext.data.SortTypes
+ * This class defines a series of static methods that are used on a
+ * {@link Ext.data.Field} for performing sorting. The methods cast the
+ * underlying values into a data type that is appropriate for sorting on
+ * that particular field.  If a {@link Ext.data.Field#type} is specified,
+ * the sortType will be set to a sane default if the sortType is not
+ * explicitly defined on the field. The sortType will make any necessary
+ * modifications to the value and return it.
+ * <ul>
+ * <li><b>asText</b> - Removes any tags and converts the value to a string</li>
+ * <li><b>asUCText</b> - Removes any tags and converts the value to an uppercase string</li>
+ * <li><b>asUCText</b> - Converts the value to an uppercase string</li>
+ * <li><b>asDate</b> - Converts the value into Unix epoch time</li>
+ * <li><b>asFloat</b> - Converts the value to a floating point number</li>
+ * <li><b>asInt</b> - Converts the value to an integer number</li>
+ * </ul>
+ * <p>
+ * It is also possible to create a custom sortType that can be used throughout
+ * an application.
+ * <pre><code>
+Ext.apply(Ext.data.SortTypes, {
+    asPerson: function(person){
+        // expects an object with a first and last name property
+        return person.lastName.toUpperCase() + person.firstName.toLowerCase();
     }
+});
+
+Ext.define('Employee', {
+    extend: 'Ext.data.Model',
+    config: {
+        fields: [{
+            name: 'person',
+            sortType: 'asPerson'
+        }, {
+            name: 'salary',
+            type: 'float' // sortType set to asFloat
+        }]
+    }
+});
+ * </code></pre>
+ * </p>
+ * @singleton
+ * @docauthor Evan Trimboli <evan@sencha.com>
+ */
+Ext.define('Ext.data.SortTypes', {
+    singleton: true,
+
+    /**
+     * The regular expression used to strip tags
+     * @type {RegExp}
+     * @property
+     */
+    stripTagsRE : /<\/?[^>]+>/gi,
+
+    /**
+     * Default sort that does nothing
+     * @param {Object} value The value being converted
+     * @return {Object} The comparison value
+     */
+    none : function(value) {
+        return value;
+    },
+
+    /**
+     * Strips all HTML tags to sort on text only
+     * @param {Object} value The value being converted
+     * @return {String} The comparison value
+     */
+    asText : function(value) {
+        return String(value).replace(this.stripTagsRE, "");
+    },
+
+    /**
+     * Strips all HTML tags to sort on text only - Case insensitive
+     * @param {Object} value The value being converted
+     * @return {String} The comparison value
+     */
+    asUCText : function(value) {
+        return String(value).toUpperCase().replace(this.stripTagsRE, "");
+    },
+
+    /**
+     * Case insensitive string
+     * @param {Object} value The value being converted
+     * @return {String} The comparison value
+     */
+    asUCString : function(value) {
+        return String(value).toUpperCase();
+    },
+
+    /**
+     * Date sorting
+     * @param {Object} value The value being converted
+     * @return {Number} The comparison value
+     */
+    asDate : function(value) {
+        if (!value) {
+            return 0;
+        }
+        if (Ext.isDate(value)) {
+            return value.getTime();
+        }
+        return Date.parse(String(value));
+    },
+
+    /**
+     * Float sorting
+     * @param {Object} value The value being converted
+     * @return {Number} The comparison value
+     */
+    asFloat : function(value) {
+        value = parseFloat(String(value).replace(/,/g, ""));
+        return isNaN(value) ? 0 : value;
+    },
+
+    /**
+     * Integer sorting
+     * @param {Object} value The value being converted
+     * @return {Number} The comparison value
+     */
+    asInt : function(value) {
+        value = parseInt(String(value).replace(/,/g, ""), 10);
+        return isNaN(value) ? 0 : value;
+    }
+});
+/**
+ * @class Ext.data.Types
+ * <p>This is s static class containing the system-supplied data types which may be given to a {@link Ext.data.Field Field}.<p/>
+ * <p>The properties in this class are used as type indicators in the {@link Ext.data.Field Field} class, so to
+ * test whether a Field is of a certain type, compare the {@link Ext.data.Field#type type} property against properties
+ * of this class.</p>
+ * <p>Developers may add their own application-specific data types to this class. Definition names must be UPPERCASE.
+ * each type definition must contain three properties:</p>
+ * <div class="mdetail-params"><ul>
+ * <li><code>convert</code> : <i>Function</i><div class="sub-desc">A function to convert raw data values from a data block into the data
+ * to be stored in the Field. The function is passed the collowing parameters:
+ * <div class="mdetail-params"><ul>
+ * <li><b>v</b> : Mixed<div class="sub-desc">The data value as read by the Reader, if undefined will use
+ * the configured <tt>{@link Ext.data.Field#defaultValue defaultValue}</tt>.</div></li>
+ * <li><b>rec</b> : Mixed<div class="sub-desc">The data object containing the row as read by the Reader.
+ * Depending on the Reader type, this could be an Array ({@link Ext.data.reader.Array ArrayReader}), an object
+ * ({@link Ext.data.reader.Json JsonReader}), or an XML element.</div></li>
+ * </ul></div></div></li>
+ * <li><code>sortType</code> : <i>Function</i> <div class="sub-desc">A function to convert the stored data into comparable form, as defined by {@link Ext.data.SortTypes}.</div></li>
+ * <li><code>type</code> : <i>String</i> <div class="sub-desc">A textual data type name.</div></li>
+ * </ul></div>
+ * <p>For example, to create a VELatLong field (See the Microsoft Bing Mapping API) containing the latitude/longitude value of a datapoint on a map from a JsonReader data block
+ * which contained the properties <code>lat</code> and <code>long</code>, you would define a new data type like this:</p>
+ *<pre><code>
+// Add a new Field data type which stores a VELatLong object in the Record.
+Ext.data.Types.VELATLONG = {
+    convert: function(v, data) {
+        return new VELatLong(data.lat, data.long);
+    },
+    sortType: function(v) {
+        return v.Latitude;  // When sorting, order by latitude
+    },
+    type: 'VELatLong'
+};
+</code></pre>
+ * <p>Then, when declaring a Model, use <pre><code>
+var types = Ext.data.Types; // allow shorthand type access
+Ext.define('Unit', {
+    extend: 'Ext.data.Model',
+    config: {
+        fields: [
+            { name: 'unitName', mapping: 'UnitName' },
+            { name: 'curSpeed', mapping: 'CurSpeed', type: types.INT },
+            { name: 'latitude', mapping: 'lat', type: types.FLOAT },
+            { name: 'position', type: types.VELATLONG }
+        ]
+    }
+});
+</code></pre>
+ * @singleton
+ */
+Ext.define('Ext.data.Types', {
+    singleton: true,
+    requires: ['Ext.data.SortTypes'],
+
+    /**
+     * @property {RegExp} stripRe
+     * A regular expression for stripping non-numeric characters from a numeric value. Defaults to <tt>/[\$,%]/g</tt>.
+     * This should be overridden for localization.
+     */
+    stripRe: /[\$,%]/g,
+    dashesRe: /-/g,
+    iso8601TestRe: /\d\dT\d\d/,
+    iso8601SplitRe: /[- :T\.Z\+]/
+
+}, function() {
+    var Types = this,
+        sortTypes = Ext.data.SortTypes;
+
+    Ext.apply(Types, {
+        /**
+         * @property {Object} AUTO
+         * This data type means that no conversion is applied to the raw data before it is placed into a Record.
+         */
+        AUTO: {
+            convert: function(value) {
+                return value;
+            },
+            sortType: sortTypes.none,
+            type: 'auto'
+        },
+
+        /**
+         * @property {Object} STRING
+         * This data type means that the raw data is converted into a String before it is placed into a Record.
+         */
+        STRING: {
+            convert: function(value) {
+                // 'this' is the actual field that calls this convert method
+                return (value === undefined || value === null)
+                    ? (this.getAllowNull() ? null : '')
+                    : String(value);
+            },
+            sortType: sortTypes.asUCString,
+            type: 'string'
+        },
+
+        /**
+         * @property {Object} INT
+         * This data type means that the raw data is converted into an integer before it is placed into a Record.
+         * <p>The synonym <code>INTEGER</code> is equivalent.</p>
+         */
+        INT: {
+            convert: function(value) {
+                return (value !== undefined && value !== null && value !== '')
+                    ? ((typeof value === 'number')
+                        ? parseInt(value, 10)
+                        : parseInt(String(value).replace(Types.stripRe, ''), 10)
+                    )
+                    : (this.getAllowNull() ? null : 0);
+            },
+            sortType: sortTypes.none,
+            type: 'int'
+        },
+
+        /**
+         * @property {Object} FLOAT
+         * This data type means that the raw data is converted into a number before it is placed into a Record.
+         * <p>The synonym <code>NUMBER</code> is equivalent.</p>
+         */
+        FLOAT: {
+            convert: function(value) {
+                return (value !== undefined && value !== null && value !== '')
+                    ? ((typeof value === 'number')
+                        ? value
+                        : parseFloat(String(value).replace(Types.stripRe, ''), 10)
+                    )
+                    : (this.getAllowNull() ? null : 0);
+            },
+            sortType: sortTypes.none,
+            type: 'float'
+        },
+
+        /**
+         * @property {Object} BOOL
+         * <p>This data type means that the raw data is converted into a boolean before it is placed into
+         * a Record. The string "true" and the number 1 are converted to boolean <code>true</code>.</p>
+         * <p>The synonym <code>BOOLEAN</code> is equivalent.</p>
+         */
+        BOOL: {
+            convert: function(value) {
+                if ((value === undefined || value === null || value === '') && this.getAllowNull()) {
+                    return null;
+                }
+                return value === true || value === 'true' || value == 1;
+            },
+            sortType: sortTypes.none,
+            type: 'bool'
+        },
+
+        /**
+         * @property {Object} DATE
+         * This data type means that the raw data is converted into a Date before it is placed into a Record.
+         * The date format is specified in the constructor of the {@link Ext.data.Field} to which this type is
+         * being applied.
+         */
+        DATE: {
+            convert: function(value) {
+                var dateFormat = this.getDateFormat(),
+                    parsed;
+
+                if (!value) {
+                    return null;
+                }
+                if (Ext.isDate(value)) {
+                    return value;
+                }
+                if (dateFormat) {
+                    if (dateFormat == 'timestamp') {
+                        return new Date(value*1000);
+                    }
+                    if (dateFormat == 'time') {
+                        return new Date(parseInt(value, 10));
+                    }
+                    return Ext.Date.parse(value, dateFormat);
+                }
+
+                parsed = new Date(Date.parse(value));
+                if (isNaN(parsed)) {
+                    // Dates with ISO 8601 format are not well supported by mobile devices, this can work around the issue.
+                    if (Types.iso8601TestRe.test(value)) {
+                        parsed = value.split(Types.iso8601SplitRe);
+                        parsed = new Date(parsed[0], parsed[1]-1, parsed[2], parsed[3], parsed[4], parsed[5]);
+                    }
+                    if (isNaN(parsed)) {
+                        // Dates with the format "2012-01-20" fail, but "2012/01/20" work in some browsers. We'll try and
+                        // get around that.
+                        parsed = new Date(Date.parse(value.replace(this.dashesRe, "/")));
+                        if (isNaN(parsed)) {
+                            Ext.Logger.warn("Cannot parse the passed value (" + value + ") into a valid date");
+                        }
+                    }
+                }
+
+                return isNaN(parsed) ? null : parsed;
+            },
+            sortType: sortTypes.asDate,
+            type: 'date'
+        }
+    });
+
+    Ext.apply(Types, {
+        /**
+         * @property {Object} BOOLEAN
+         * <p>This data type means that the raw data is converted into a boolean before it is placed into
+         * a Record. The string "true" and the number 1 are converted to boolean <code>true</code>.</p>
+         * <p>The synonym <code>BOOL</code> is equivalent.</p>
+         */
+        BOOLEAN: this.BOOL,
+
+        /**
+         * @property {Object} INTEGER
+         * This data type means that the raw data is converted into an integer before it is placed into a Record.
+         * <p>The synonym <code>INT</code> is equivalent.</p>
+         */
+        INTEGER: this.INT,
+
+        /**
+         * @property {Object} NUMBER
+         * This data type means that the raw data is converted into a number before it is placed into a Record.
+         * <p>The synonym <code>FLOAT</code> is equivalent.</p>
+         */
+        NUMBER: this.FLOAT
+    });
 });
 
 /**
@@ -33040,131 +33106,287 @@ Ext.define('Ext.mixin.Sortable', {
 });
 
 /**
- * @class Ext.data.SortTypes
- * This class defines a series of static methods that are used on a
- * {@link Ext.data.Field} for performing sorting. The methods cast the
- * underlying values into a data type that is appropriate for sorting on
- * that particular field.  If a {@link Ext.data.Field#type} is specified,
- * the sortType will be set to a sane default if the sortType is not
- * explicitly defined on the field. The sortType will make any necessary
- * modifications to the value and return it.
- * <ul>
- * <li><b>asText</b> - Removes any tags and converts the value to a string</li>
- * <li><b>asUCText</b> - Removes any tags and converts the value to an uppercase string</li>
- * <li><b>asUCText</b> - Converts the value to an uppercase string</li>
- * <li><b>asDate</b> - Converts the value into Unix epoch time</li>
- * <li><b>asFloat</b> - Converts the value to a floating point number</li>
- * <li><b>asInt</b> - Converts the value to an integer number</li>
- * </ul>
- * <p>
- * It is also possible to create a custom sortType that can be used throughout
- * an application.
- * <pre><code>
-Ext.apply(Ext.data.SortTypes, {
-    asPerson: function(person){
-        // expects an object with a first and last name property
-        return person.lastName.toUpperCase() + person.firstName.toLowerCase();
-    }
-});
-
-Ext.define('Employee', {
-    extend: 'Ext.data.Model',
-    config: {
-        fields: [{
-            name: 'person',
-            sortType: 'asPerson'
-        }, {
-            name: 'salary',
-            type: 'float' // sortType set to asFloat
-        }]
-    }
-});
- * </code></pre>
- * </p>
- * @singleton
- * @docauthor Evan Trimboli <evan@sencha.com>
+ * @private
  */
-Ext.define('Ext.data.SortTypes', {
-    singleton: true,
+Ext.define('Ext.mixin.Filterable', {
+    extend: 'Ext.mixin.Mixin',
 
-    /**
-     * The regular expression used to strip tags
-     * @type {RegExp}
-     * @property
-     */
-    stripTagsRE : /<\/?[^>]+>/gi,
+    requires: [
+        'Ext.util.Filter'
+    ],
 
-    /**
-     * Default sort that does nothing
-     * @param {Object} value The value being converted
-     * @return {Object} The comparison value
-     */
-    none : function(value) {
-        return value;
+    mixinConfig: {
+        id: 'filterable'
+    },
+
+    config: {
+        /**
+         * @cfg {Array} filters
+         * An array with filters. A filter can be an instance of Ext.util.Filter,
+         * an object representing an Ext.util.Filter configuration, or a filter function.
+         */
+        filters: null,
+
+        /**
+         * @cfg {String} filterRoot
+         * The root inside each item in which the properties exist that we want to filter on.
+         * This is useful for filtering records in which the data exists inside a 'data' property.
+         */
+        filterRoot: null
     },
 
     /**
-     * Strips all HTML tags to sort on text only
-     * @param {Object} value The value being converted
-     * @return {String} The comparison value
+     * @property {Boolean} dirtyFilterFn
+     * A flag indicating wether the currently cashed filter function is still valid. Read-only.
      */
-    asText : function(value) {
-        return String(value).replace(this.stripTagsRE, "");
-    },
+    dirtyFilterFn: false,
 
     /**
-     * Strips all HTML tags to sort on text only - Case insensitive
-     * @param {Object} value The value being converted
-     * @return {String} The comparison value
+     * @property currentSortFn
+     * This is the cached sorting function which is a generated function that calls all the
+     * configured sorters in the correct order. This is a read-only property.
      */
-    asUCText : function(value) {
-        return String(value).toUpperCase().replace(this.stripTagsRE, "");
-    },
+    filterFn: null,
 
     /**
-     * Case insensitive string
-     * @param {Object} value The value being converted
-     * @return {String} The comparison value
+     * @property {Boolean} filtered
+     * A read-only flag indicating if this object is filtered
      */
-    asUCString : function(value) {
-        return String(value).toUpperCase();
-    },
+    filtered: false,
 
-    /**
-     * Date sorting
-     * @param {Object} value The value being converted
-     * @return {Number} The comparison value
-     */
-    asDate : function(value) {
-        if (!value) {
-            return 0;
+    applyFilters: function(filters, collection) {
+        if (!collection) {
+            collection = this.createFiltersCollection();
         }
-        if (Ext.isDate(value)) {
-            return value.getTime();
+
+        collection.clear();
+
+        this.filtered = false;
+        this.dirtyFilterFn = true;
+
+        if (filters) {
+            this.addFilters(filters);
         }
-        return Date.parse(String(value));
+
+        return collection;
+    },
+
+    createFiltersCollection: function() {
+        this._filters = Ext.create('Ext.util.Collection', function(filter) {
+            return filter.getId();
+        });
+        return this._filters;
     },
 
     /**
-     * Float sorting
-     * @param {Object} value The value being converted
-     * @return {Number} The comparison value
+     * This method adds a filter.
+     * @param {Ext.util.Sorter/Function/Object} filter Can be an instance of Ext.util.Filter,
+     * an object representing an Ext.util.Filter configuration, or a filter function.
      */
-    asFloat : function(value) {
-        value = parseFloat(String(value).replace(/,/g, ""));
-        return isNaN(value) ? 0 : value;
+    addFilter: function(filter) {
+        this.addFilters([filter]);
     },
 
     /**
-     * Integer sorting
-     * @param {Object} value The value being converted
-     * @return {Number} The comparison value
+     * This method adds all the filters in a passed array.
+     * @param {Array} filters An array with filters. A filter can be an instance of Ext.util.Filter,
+     * an object representing an Ext.util.Filter configuration, or a filter function.
      */
-    asInt : function(value) {
-        value = parseInt(String(value).replace(/,/g, ""), 10);
-        return isNaN(value) ? 0 : value;
+    addFilters: function(filters) {
+        var currentFilters = this.getFilters();
+        return this.insertFilters(currentFilters ? currentFilters.length : 0, filters);
+    },
+
+    /**
+     * This method adds a filter at a given index.
+     * @param {Number} index The index at which to insert the filter.
+     * @param {Ext.util.Sorter/Function/Object} filter Can be an instance of Ext.util.Filter,
+     * an object representing an Ext.util.Filter configuration, or a filter function.
+     */
+    insertFilter: function(index, filter) {
+        return this.insertFilters(index, [filter]);
+    },
+
+    /**
+     * This method inserts all the filters in the passed array at the given index.
+     * @param {Number} index The index at which to insert the filters.
+     * @param {Array} filters Each filter can be an instance of Ext.util.Filter,
+     * an object representing an Ext.util.Filter configuration, or a filter function.
+     */
+    insertFilters: function(index, filters) {
+        // We begin by making sure we are dealing with an array of sorters
+        if (!Ext.isArray(filters)) {
+            filters = [filters];
+        }
+
+        var ln = filters.length,
+            filterRoot = this.getFilterRoot(),
+            currentFilters = this.getFilters(),
+            newFilters = [],
+            filterConfig, i, filter;
+
+        if (!currentFilters) {
+            currentFilters = this.createFiltersCollection();
+        }
+
+        // We first have to convert every sorter into a proper Sorter instance
+        for (i = 0; i < ln; i++) {
+            filter = filters[i];
+            filterConfig = {
+                root: filterRoot
+            };
+
+            if (Ext.isFunction(filter)) {
+                filterConfig.filterFn = filter;
+            }
+            // If we are dealing with an object, we assume its a Sorter configuration. In this case
+            // we create an instance of Sorter passing this configuration.
+            else if (Ext.isObject(filter)) {
+                if (!filter.isFilter) {
+                    if (filter.fn) {
+                        filter.filterFn = filter.fn;
+                        delete filter.fn;
+                    }
+
+                    filterConfig = Ext.apply(filterConfig, filter);
+                }
+                else {
+                    newFilters.push(filter);
+                    if (!filter.getRoot()) {
+                        filter.setRoot(filterRoot);
+                    }
+                    continue;
+                }
+            }
+            // Finally we get to the point where it has to be invalid
+            else {
+                Ext.Logger.warn('Invalid filter specified:', filter);
+            }
+
+            // If a sorter config was created, make it an instance
+            filter = Ext.create('Ext.util.Filter', filterConfig);
+            newFilters.push(filter);
+        }
+
+        // Now lets add the newly created sorters.
+        for (i = 0, ln = newFilters.length; i < ln; i++) {
+            currentFilters.insert(index + i, newFilters[i]);
+        }
+
+        this.dirtyFilterFn = true;
+
+        if (currentFilters.length) {
+            this.filtered = true;
+        }
+
+        return currentFilters;
+    },
+
+    /**
+     * This method removes all the filters in a passed array.
+     * @param {Array} filters Each value in the array can be a string (property name),
+     * function (sorterFn), an object containing a property and value keys or
+     * {@link Ext.util.Sorter Sorter} instance.
+     */
+    removeFilters: function(filters) {
+        // We begin by making sure we are dealing with an array of sorters
+        if (!Ext.isArray(filters)) {
+            filters = [filters];
+        }
+
+        var ln = filters.length,
+            currentFilters = this.getFilters(),
+            i, filter;
+
+        for (i = 0; i < ln; i++) {
+            filter = filters[i];
+
+            if (typeof filter === 'string') {
+                currentFilters.each(function(item) {
+                    if (item.getProperty() === filter) {
+                        currentFilters.remove(item);
+                    }
+                });
+            }
+            else if (typeof filter === 'function') {
+                currentFilters.each(function(item) {
+                    if (item.getFilterFn() === filter) {
+                        currentFilters.remove(item);
+                    }
+                });
+            }
+            else {
+                if (filter.isFilter) {
+                    currentFilters.remove(filter);
+                }
+                else if (filter.property !== undefined && filter.value !== undefined) {
+                    currentFilters.each(function(item) {
+                        if (item.getProperty() === filter.property && item.getValue() === filter.value) {
+                            currentFilters.remove(item);
+                        }
+                    });
+                }
+            }
+        }
+
+        if (!currentFilters.length) {
+            this.filtered = false;
+        }
+    },
+
+    /**
+     * This updates the cached sortFn based on the current sorters.
+     * @return {Function} sortFn The generated sort function.
+     * @private
+     */
+    updateFilterFn: function() {
+        var filters = this.getFilters().items;
+
+        this.filterFn = function(item) {
+            var isMatch = true,
+                length = filters.length,
+                i;
+
+            for (i = 0; i < length; i++) {
+                var filter = filters[i],
+                    fn     = filter.getFilterFn(),
+                    scope  = filter.getScope() || this;
+
+                isMatch = isMatch && fn.call(scope, item);
+            }
+
+            return isMatch;
+        };
+
+        this.dirtyFilterFn = false;
+        return this.filterFn;
+    },
+
+    /**
+     * This method will sort an array based on the currently configured {@link Ext.data.Store#sorters sorters}.
+     * @param {Array} data The array you want to have sorted
+     * @return {Array} The array you passed after it is sorted
+     */
+    filter: function(data) {
+        return this.getFilters().length ? Ext.Array.filter(data, this.getFilterFn()) : data;
+    },
+
+    isFiltered: function(item) {
+        return this.getFilters().length ? !this.getFilterFn()(item) : false;
+    },
+
+    /**
+     * Returns an up to date sort function.
+     * @return {Function} sortFn The sort function.
+     */
+    getFilterFn: function() {
+        if (this.dirtyFilterFn) {
+            return this.updateFilterFn();
+        }
+        return this.filterFn;
     }
 });
+
 /**
  * <p>General purpose inflector class that {@link #pluralize pluralizes}, {@link #singularize singularizes} and 
  * {@link #ordinalize ordinalizes} words. Sample usage:</p>
@@ -33618,6 +33840,305 @@ Ext.define('Ext.tab.Tab', {
             this.setActive(false);
         }
     });
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.dataview.element.Container', {
+    extend: 'Ext.Component',
+
+    /**
+     * @event itemtouchstart
+     * Fires whenever an item is touched
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item touched
+     * @param {Number} index The index of the item touched
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemtouchmove
+     * Fires whenever an item is moved
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item moved
+     * @param {Number} index The index of the item moved
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemtouchend
+     * Fires whenever an item is touched
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item touched
+     * @param {Number} index The index of the item touched
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemtap
+     * Fires whenever an item is tapped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item tapped
+     * @param {Number} index The index of the item tapped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemtaphold
+     * Fires whenever an item is tapped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item tapped
+     * @param {Number} index The index of the item tapped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemsingletap
+     * Fires whenever an item is doubletapped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item singletapped
+     * @param {Number} index The index of the item singletapped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemdoubletap
+     * Fires whenever an item is doubletapped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item doubletapped
+     * @param {Number} index The index of the item doubletapped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemswipe
+     * Fires whenever an item is swiped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item swiped
+     * @param {Number} index The index of the item swiped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    doInitialize: function() {
+        this.element.on({
+            touchstart: 'onItemTouchStart',
+            touchend: 'onItemTouchEnd',
+            tap: 'onItemTap',
+            taphold: 'onItemTapHold',
+            touchmove: 'onItemTouchMove',
+            singletap: 'onItemSingleTap',
+            doubletap: 'onItemDoubleTap',
+            swipe: 'onItemSwipe',
+            delegate: '> div',
+            scope: this
+        });
+    },
+
+    //@private
+    initialize: function() {
+        this.callParent();
+        this.doInitialize();
+    },
+
+    updateBaseCls: function(newBaseCls, oldBaseCls) {
+        var me = this;
+
+        me.callParent([newBaseCls + '-container', oldBaseCls]);
+    },
+
+    onItemTouchStart: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        Ext.get(target).on({
+            touchmove: 'onItemTouchMove',
+            scope   : me,
+            single: true
+        });
+
+        me.fireEvent('itemtouchstart', me, Ext.get(target), index, e);
+    },
+
+    onItemTouchEnd: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        Ext.get(target).un({
+            touchmove: 'onItemTouchMove',
+            scope   : me
+        });
+
+        me.fireEvent('itemtouchend', me, Ext.get(target), index, e);
+    },
+
+    onItemTouchMove: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemtouchmove', me, Ext.get(target), index, e);
+    },
+
+    onItemTap: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemtap', me, Ext.get(target), index, e);
+    },
+
+    onItemTapHold: function(e) {
+        var me     = this,
+            target = e.getTarget(),
+            index  = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemtaphold', me, Ext.get(target), index, e);
+    },
+
+    onItemDoubleTap: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemdoubletap', me, Ext.get(target), index, e);
+    },
+
+    onItemSingleTap: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemsingletap', me, Ext.get(target), index, e);
+    },
+
+    onItemSwipe: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemswipe', me,  Ext.get(target), index, e);
+    },
+
+    updateListItem: function(record, item) {
+        var me = this,
+            dataview = me.dataview,
+            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record);
+        item.innerHTML = me.dataview.getItemTpl().apply(data);
+    },
+
+    addListItem: function(index, record) {
+        var me = this,
+            dataview = me.dataview,
+            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record),
+            element = me.element,
+            childNodes = element.dom.childNodes,
+            ln = childNodes.length,
+            wrapElement;
+
+        wrapElement = Ext.Element.create(this.getItemElementConfig(index, data));
+
+        if (!ln || index == ln) {
+            wrapElement.appendTo(element);
+        } else {
+            wrapElement.insertBefore(childNodes[index]);
+        }
+    },
+
+    getItemElementConfig: function(index, data) {
+        var dataview = this.dataview,
+            itemCls = dataview.getItemCls(),
+            cls = dataview.getBaseCls() + '-item';
+
+        if (itemCls) {
+            cls += ' ' + itemCls;
+        }
+        return {
+            cls: cls,
+            html: dataview.getItemTpl().apply(data)
+        };
+    },
+
+    doRemoveItemCls: function(cls) {
+        var elements = this.getViewItems(),
+            ln = elements.length,
+            i = 0;
+
+        for (; i < ln; i++) {
+            Ext.fly(elements[i]).removeCls(cls);
+        }
+    },
+
+    doAddItemCls: function(cls) {
+        var elements = this.getViewItems(),
+            ln = elements.length,
+            i = 0;
+
+        for (; i < ln; i++) {
+            Ext.fly(elements[i]).addCls(cls);
+        }
+    },
+
+    // Remove
+    moveItemsToCache: function(from, to) {
+        var me = this,
+            items = me.getViewItems(),
+            i = to - from,
+            item;
+
+        for (; i >= 0; i--) {
+            item = items[from + i];
+            item.parentNode.removeChild(item);
+        }
+        if (me.getViewItems().length == 0) {
+            this.dataview.showEmptyText();
+        }
+    },
+
+    // Add
+    moveItemsFromCache: function(records) {
+        var me = this,
+            dataview = me.dataview,
+            store = dataview.getStore(),
+            ln = records.length,
+            i, record;
+
+        if (ln) {
+            dataview.hideEmptyText();
+        }
+
+        for (i = 0; i < ln; i++) {
+            records[i]._tmpIndex = store.indexOf(records[i]);
+        }
+
+        Ext.Array.sort(records, function(record1, record2) {
+            return record1._tmpIndex > record2._tmpIndex ? 1 : -1;
+        });
+
+        for (i = 0; i < ln; i++) {
+            record = records[i];
+            me.addListItem(record._tmpIndex, record);
+            delete record._tmpIndex;
+        }
+    },
+
+    // Transform ChildNodes into a proper Array so we can do indexOf...
+    getViewItems: function() {
+        return Array.prototype.slice.call(this.element.dom.childNodes);
+    },
+
+    destroy: function() {
+        var elements = this.getViewItems(),
+            ln = elements.length,
+            i = 0;
+
+        for (; i < ln; i++) {
+            Ext.removeNode(elements[i]);
+        }
+        this.callParent();
+    }
 });
 
 /**
@@ -34191,305 +34712,6 @@ Ext.define('Ext.mixin.Selectable', {
         clearSelections: 'deselectAll',
         getCount: 'getSelectionCount'
     });
-});
-
-/**
- * @private
- */
-Ext.define('Ext.dataview.element.Container', {
-    extend: 'Ext.Component',
-
-    /**
-     * @event itemtouchstart
-     * Fires whenever an item is touched
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item touched
-     * @param {Number} index The index of the item touched
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemtouchmove
-     * Fires whenever an item is moved
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item moved
-     * @param {Number} index The index of the item moved
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemtouchend
-     * Fires whenever an item is touched
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item touched
-     * @param {Number} index The index of the item touched
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemtap
-     * Fires whenever an item is tapped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item tapped
-     * @param {Number} index The index of the item tapped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemtaphold
-     * Fires whenever an item is tapped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item tapped
-     * @param {Number} index The index of the item tapped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemsingletap
-     * Fires whenever an item is doubletapped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item singletapped
-     * @param {Number} index The index of the item singletapped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemdoubletap
-     * Fires whenever an item is doubletapped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item doubletapped
-     * @param {Number} index The index of the item doubletapped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemswipe
-     * Fires whenever an item is swiped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item swiped
-     * @param {Number} index The index of the item swiped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    doInitialize: function() {
-        this.element.on({
-            touchstart: 'onItemTouchStart',
-            touchend: 'onItemTouchEnd',
-            tap: 'onItemTap',
-            taphold: 'onItemTapHold',
-            touchmove: 'onItemTouchMove',
-            singletap: 'onItemSingleTap',
-            doubletap: 'onItemDoubleTap',
-            swipe: 'onItemSwipe',
-            delegate: '> div',
-            scope: this
-        });
-    },
-
-    //@private
-    initialize: function() {
-        this.callParent();
-        this.doInitialize();
-    },
-
-    updateBaseCls: function(newBaseCls, oldBaseCls) {
-        var me = this;
-
-        me.callParent([newBaseCls + '-container', oldBaseCls]);
-    },
-
-    onItemTouchStart: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        Ext.get(target).on({
-            touchmove: 'onItemTouchMove',
-            scope   : me,
-            single: true
-        });
-
-        me.fireEvent('itemtouchstart', me, Ext.get(target), index, e);
-    },
-
-    onItemTouchEnd: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        Ext.get(target).un({
-            touchmove: 'onItemTouchMove',
-            scope   : me
-        });
-
-        me.fireEvent('itemtouchend', me, Ext.get(target), index, e);
-    },
-
-    onItemTouchMove: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemtouchmove', me, Ext.get(target), index, e);
-    },
-
-    onItemTap: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemtap', me, Ext.get(target), index, e);
-    },
-
-    onItemTapHold: function(e) {
-        var me     = this,
-            target = e.getTarget(),
-            index  = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemtaphold', me, Ext.get(target), index, e);
-    },
-
-    onItemDoubleTap: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemdoubletap', me, Ext.get(target), index, e);
-    },
-
-    onItemSingleTap: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemsingletap', me, Ext.get(target), index, e);
-    },
-
-    onItemSwipe: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemswipe', me,  Ext.get(target), index, e);
-    },
-
-    updateListItem: function(record, item) {
-        var me = this,
-            dataview = me.dataview,
-            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record);
-        item.innerHTML = me.dataview.getItemTpl().apply(data);
-    },
-
-    addListItem: function(index, record) {
-        var me = this,
-            dataview = me.dataview,
-            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record),
-            element = me.element,
-            childNodes = element.dom.childNodes,
-            ln = childNodes.length,
-            wrapElement;
-
-        wrapElement = Ext.Element.create(this.getItemElementConfig(index, data));
-
-        if (!ln || index == ln) {
-            wrapElement.appendTo(element);
-        } else {
-            wrapElement.insertBefore(childNodes[index]);
-        }
-    },
-
-    getItemElementConfig: function(index, data) {
-        var dataview = this.dataview,
-            itemCls = dataview.getItemCls(),
-            cls = dataview.getBaseCls() + '-item';
-
-        if (itemCls) {
-            cls += ' ' + itemCls;
-        }
-        return {
-            cls: cls,
-            html: dataview.getItemTpl().apply(data)
-        };
-    },
-
-    doRemoveItemCls: function(cls) {
-        var elements = this.getViewItems(),
-            ln = elements.length,
-            i = 0;
-
-        for (; i < ln; i++) {
-            Ext.fly(elements[i]).removeCls(cls);
-        }
-    },
-
-    doAddItemCls: function(cls) {
-        var elements = this.getViewItems(),
-            ln = elements.length,
-            i = 0;
-
-        for (; i < ln; i++) {
-            Ext.fly(elements[i]).addCls(cls);
-        }
-    },
-
-    // Remove
-    moveItemsToCache: function(from, to) {
-        var me = this,
-            items = me.getViewItems(),
-            i = to - from,
-            item;
-
-        for (; i >= 0; i--) {
-            item = items[from + i];
-            item.parentNode.removeChild(item);
-        }
-        if (me.getViewItems().length == 0) {
-            this.dataview.showEmptyText();
-        }
-    },
-
-    // Add
-    moveItemsFromCache: function(records) {
-        var me = this,
-            dataview = me.dataview,
-            store = dataview.getStore(),
-            ln = records.length,
-            i, record;
-
-        if (ln) {
-            dataview.hideEmptyText();
-        }
-
-        for (i = 0; i < ln; i++) {
-            records[i]._tmpIndex = store.indexOf(records[i]);
-        }
-
-        Ext.Array.sort(records, function(record1, record2) {
-            return record1._tmpIndex > record2._tmpIndex ? 1 : -1;
-        });
-
-        for (i = 0; i < ln; i++) {
-            record = records[i];
-            me.addListItem(record._tmpIndex, record);
-            delete record._tmpIndex;
-        }
-    },
-
-    // Transform ChildNodes into a proper Array so we can do indexOf...
-    getViewItems: function() {
-        return Array.prototype.slice.call(this.element.dom.childNodes);
-    },
-
-    destroy: function() {
-        var elements = this.getViewItems(),
-            ln = elements.length,
-            i = 0;
-
-        for (; i < ln; i++) {
-            Ext.removeNode(elements[i]);
-        }
-        this.callParent();
-    }
 });
 
 /**
@@ -36819,15 +37041,22 @@ Ext.define("App.view.Homepage", {
 
         items: [
             {
-                styleHtmlContent: true,
-                title: 'Velkommen til oss!',
+                // styleHtmlContent: true,
+                title: 'Rica Nidelven',
                 maxWidth: 750,
                 xtype: 'dataview',
                 itemTpl: [
                     '<div class="textBlock">',
-                    '<p class="header">{header}</p>',
-                    '</p>{content.content1}</p>',
-                    '<p class="footer">{footer}</p></div>'
+                    '<div class="header">{header}</div>',
+                    '<div class="contentText">{content.content1}</div>',
+                    '<div class="contentText">{content.content2}</div>',
+                    '<div class="contentText">{content.content3}</div>',
+                    '<div class="contentText">{content.content4}</div>',
+                    '<div class="contentText">{content.content5}</div>',
+                    '<div class="contentText">{content.content6}</div>',
+                    '<div class="contentText">{content.content7}</div>',
+                    '<div class="contentText">{content.content8}</div>',
+                    '<div class="footer">{footer}</div></div>'
                 ],
 
                 store: {
@@ -36842,7 +37071,8 @@ Ext.define("App.view.Homepage", {
                         }
                     }
                 }
-            }]
+            }
+        ]
 
     }
 
@@ -36857,22 +37087,22 @@ Ext.define("App.view.Info", {
 
     config: {
         scrollable: true,
-
         items: [
             {
-                styleHtmlContent: true,
-                title: 'Informasjon',
+                //styleHtmlContent: true,
+                title: 'XP2010',
                 maxWidth: 750,
                 xtype: 'dataview',
+                ui: 'light',
                 itemTpl: [
                     '<div class="textBlock">',
-                    '<p class="header">{header}</p>',
-                    '</p>{content.content1}</p>',
-                    '</p>{content.content2}</p>',
-                    '</p>{content.content3}</p>',
-                    '</p>{content.content4}</p>',
-                    '</p>{content.content5}</p>',
-                    '<p class="footer">{footer}</p></div>'
+                    '<div class="contentText">{content.content1}</div>',
+                    '<div class="contentText">{content.content2}</div>',
+                    '<div class="contentText">{content.content3}</div>',
+                    '<div class="contentText">{content.content4}</div>',
+                    '<div class="contentText">{content.content5}</div>',
+                    '<div class="contentText">{content.content6}</div>',
+                    '<div class="footer">{footer}</div></div>'
                 ],
 
                 store: {
@@ -36889,6 +37119,393 @@ Ext.define("App.view.Info", {
             }
         }]
     }
+});
+
+/**
+ * @author Ed Spencer
+ * @aside guide models
+ *
+ * Fields are used to define what a Model is. They aren't instantiated directly - instead, when we create a class that
+ * extends {@link Ext.data.Model}, it will automatically create a Field instance for each field configured in a {@link
+ * Ext.data.Model Model}. For example, we might set up a model like this:
+ *
+ *     Ext.define('User', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 'name', 'email',
+ *                 {name: 'age', type: 'int'},
+ *                 {name: 'gender', type: 'string', defaultValue: 'Unknown'}
+ *             ]
+ *         }
+ *     });
+ *
+ * Four fields will have been created for the User Model - name, email, age and gender. Note that we specified a couple
+ * of different formats here; if we only pass in the string name of the field (as with name and email), the field is set
+ * up with the 'auto' type. It's as if we'd done this instead:
+ *
+ *     Ext.define('User', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 {name: 'name', type: 'auto'},
+ *                 {name: 'email', type: 'auto'},
+ *                 {name: 'age', type: 'int'},
+ *                 {name: 'gender', type: 'string', defaultValue: 'Unknown'}
+ *             ]
+ *         }
+ *     });
+ *
+ * # Types and conversion
+ *
+ * The {@link #type} is important - it's used to automatically convert data passed to the field into the correct format.
+ * In our example above, the name and email fields used the 'auto' type and will just accept anything that is passed
+ * into them. The 'age' field had an 'int' type however, so if we passed 25.4 this would be rounded to 25.
+ *
+ * Sometimes a simple type isn't enough, or we want to perform some processing when we load a Field's data. We can do
+ * this using a {@link #convert} function. Here, we're going to create a new field based on another:
+ *
+ *     Ext.define('User', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 'name', 'email',
+ *                 {name: 'age', type: 'int'},
+ *                 {name: 'gender', type: 'string', defaultValue: 'Unknown'},
+ *
+ *                 {
+ *                     name: 'firstName',
+ *                     convert: function(value, record) {
+ *                         var fullName  = record.get('name'),
+ *                             splits    = fullName.split(" "),
+ *                             firstName = splits[0];
+ *
+ *                         return firstName;
+ *                     }
+ *                 }
+ *             ]
+ *         }
+ *     });
+ *
+ * Now when we create a new User, the firstName is populated automatically based on the name:
+ *
+ *     var ed = Ext.create('User', {name: 'Ed Spencer'});
+ *
+ *     console.log(ed.get('firstName')); //logs 'Ed', based on our convert function
+ *
+ * In fact, if we log out all of the data inside ed, we'll see this:
+ *
+ *     console.log(ed.data);
+ *
+ *     //outputs this:
+ *     {
+ *         age: 0,
+ *         email: "",
+ *         firstName: "Ed",
+ *         gender: "Unknown",
+ *         name: "Ed Spencer"
+ *     }
+ *
+ * The age field has been given a default of zero because we made it an int type. As an auto field, email has defaulted
+ * to an empty string. When we registered the User model we set gender's {@link #defaultValue} to 'Unknown' so we see
+ * that now. Let's correct that and satisfy ourselves that the types work as we expect:
+ *
+ *     ed.set('gender', 'Male');
+ *     ed.get('gender'); //returns 'Male'
+ *
+ *     ed.set('age', 25.4);
+ *     ed.get('age'); //returns 25 - we wanted an int, not a float, so no decimal places allowed
+ */
+Ext.define('Ext.data.Field', {
+    requires: ['Ext.data.Types', 'Ext.data.SortTypes'],
+    alias: 'data.field',
+
+    isField: true,
+
+    config: {
+        /**
+         * @cfg {String} name
+         *
+         * The name by which the field is referenced within the Model. This is referenced by, for example, the `dataIndex`
+         * property in column definition objects passed to Ext.grid.property.HeaderContainer.
+         *
+         * Note: In the simplest case, if no properties other than `name` are required, a field definition may consist of
+         * just a String for the field name.
+         */
+        name: null,
+
+        /**
+         * @cfg {String/Object} type
+         *
+         * The data type for automatic conversion from received data to the *stored* value if
+         * `{@link Ext.data.Field#convert convert}` has not been specified. This may be specified as a string value.
+         * Possible values are
+         *
+         * - auto (Default, implies no conversion)
+         * - string
+         * - int
+         * - float
+         * - boolean
+         * - date
+         *
+         * This may also be specified by referencing a member of the {@link Ext.data.Types} class.
+         *
+         * Developers may create their own application-specific data types by defining new members of the {@link
+         * Ext.data.Types} class.
+         */
+        type: 'auto',
+
+        /**
+         * @cfg {Function} convert
+         *
+         * A function which converts the value provided by the Reader into an object that will be stored in the Model.
+         * It is passed the following parameters:
+         *
+         * - **v** : Mixed
+         *
+         *   The data value as read by the Reader, if undefined will use the configured `{@link Ext.data.Field#defaultValue
+         *   defaultValue}`.
+         *
+         * - **rec** : Ext.data.Model
+         *
+         *   The data object containing the Model as read so far by the Reader. Note that the Model may not be fully populated
+         *   at this point as the fields are read in the order that they are defined in your
+         *   {@link Ext.data.Model#cfg-fields fields} array.
+         *
+         * Example of convert functions:
+         *
+         *     function fullName(v, record) {
+         *         return record.name.last + ', ' + record.name.first;
+         *     }
+         *
+         *     function location(v, record) {
+         *         return !record.city ? '' : (record.city + ', ' + record.state);
+         *     }
+         *
+         *     Ext.define('Dude', {
+         *         extend: 'Ext.data.Model',
+         *         fields: [
+         *             {name: 'fullname',  convert: fullName},
+         *             {name: 'firstname', mapping: 'name.first'},
+         *             {name: 'lastname',  mapping: 'name.last'},
+         *             {name: 'city', defaultValue: 'homeless'},
+         *             'state',
+         *             {name: 'location',  convert: location}
+         *         ]
+         *     });
+         *
+         *     // create the data store
+         *     var store = Ext.create('Ext.data.Store', {
+         *         reader: {
+         *             type: 'json',
+         *             model: 'Dude',
+         *             idProperty: 'key',
+         *             rootProperty: 'daRoot',
+         *             totalProperty: 'total'
+         *         }
+         *     });
+         *
+         *     var myData = [
+         *         { key: 1,
+         *           name: { first: 'Fat',    last:  'Albert' }
+         *           // notice no city, state provided in data2 object
+         *         },
+         *         { key: 2,
+         *           name: { first: 'Barney', last:  'Rubble' },
+         *           city: 'Bedrock', state: 'Stoneridge'
+         *         },
+         *         { key: 3,
+         *           name: { first: 'Cliff',  last:  'Claven' },
+         *           city: 'Boston',  state: 'MA'
+         *         }
+         *     ];
+         */
+        convert: undefined,
+
+        /**
+         * @cfg {String} dateFormat
+         *
+         * Used when converting received data into a Date when the {@link #type} is specified as `"date"`.
+         *
+         * A format string for the {@link Ext.Date#parse Ext.Date.parse} function, or "timestamp" if the value provided by
+         * the Reader is a UNIX timestamp, or "time" if the value provided by the Reader is a javascript millisecond
+         * timestamp. See {@link Ext.Date}.
+         */
+        dateFormat: null,
+
+        /**
+         * @cfg {Boolean} allowNull
+         *
+         * Use when converting received data into a boolean, string or number type (either int or float). If the value cannot be
+         * parsed, null will be used if allowNull is true, otherwise the value will be 0. Defaults to true.
+         */
+        allowNull: true,
+
+        /**
+         * @cfg {Object} defaultValue
+         *
+         * The default value used **when a Model is being created by a {@link Ext.data.reader.Reader Reader}**
+         * when the item referenced by the `{@link Ext.data.Field#mapping mapping}` does not exist in the data object
+         * (i.e. undefined). Defaults to "".
+         */
+        defaultValue: undefined,
+
+        /**
+         * @cfg {String/Number} mapping
+         *
+         * (Optional) A path expression for use by the {@link Ext.data.reader.Reader} implementation that is creating the
+         * {@link Ext.data.Model Model} to extract the Field value from the data object. If the path expression is the same
+         * as the field name, the mapping may be omitted.
+         *
+         * The form of the mapping expression depends on the Reader being used.
+         *
+         * - {@link Ext.data.reader.Json}
+         *
+         *   The mapping is a string containing the javascript expression to reference the data from an element of the data2
+         *   item's {@link Ext.data.reader.Json#rootProperty rootProperty} Array. Defaults to the field name.
+         *
+         * - {@link Ext.data.reader.Xml}
+         *
+         *   The mapping is an {@link Ext.DomQuery} path to the data item relative to the DOM element that represents the
+         *   {@link Ext.data.reader.Xml#record record}. Defaults to the field name.
+         *
+         * - {@link Ext.data.reader.Array}
+         *
+         *   The mapping is a number indicating the Array index of the field's value. Defaults to the field specification's
+         *   Array position.
+         *
+         * If a more complex value extraction strategy is required, then configure the Field with a {@link #convert}
+         * function. This is passed the whole row object, and may interrogate it in whatever way is necessary in order to
+         * return the desired data.
+         */
+        mapping: null,
+
+        /**
+         * @cfg {Function} sortType
+         *
+         * A function which converts a Field's value to a comparable value in order to ensure correct sort ordering.
+         * Predefined functions are provided in {@link Ext.data.SortTypes}. A custom sort example:
+         *
+         *     // current sort     after sort we want
+         *     // +-+------+          +-+------+
+         *     // |1|First |          |1|First |
+         *     // |2|Last  |          |3|Second|
+         *     // |3|Second|          |2|Last  |
+         *     // +-+------+          +-+------+
+         *
+         *     sortType: function(value) {
+         *        switch (value.toLowerCase()) // native toLowerCase():
+         *        {
+         *           case 'first': return 1;
+         *           case 'second': return 2;
+         *           default: return 3;
+         *        }
+         *     }
+         */
+        sortType : undefined,
+
+        /**
+         * @cfg {String} sortDir
+         *
+         * Initial direction to sort (`"ASC"` or `"DESC"`). Defaults to `"ASC"`.
+         */
+        sortDir : "ASC",
+
+        /**
+         * @cfg {Boolean} allowBlank
+         * @private
+         *
+         * Used for validating a {@link Ext.data.Model model}. Defaults to true. An empty value here will cause
+         * {@link Ext.data.Model}.{@link Ext.data.Model#isValid isValid} to evaluate to false.
+         */
+        allowBlank : true,
+
+        /**
+         * @cfg {Boolean} persist
+         *
+         * False to exclude this field from being synchronized with the server or localstorage.
+         * This option is useful when model fields are used to keep state on the client but do
+         * not need to be persisted to the server. Defaults to true.
+         */
+        persist: true,
+
+        // Used in LocalStorage stuff
+        encode: null,
+        decode: null
+    },
+
+    constructor : function(config) {
+        // This adds support for just passing a string used as the field name
+        if (Ext.isString(config)) {
+            config = {name: config};
+        }
+
+        this.initConfig(config);
+    },
+
+    applyType: function(type) {
+        var types = Ext.data.Types,
+            autoType = types.AUTO;
+
+        if (type) {
+            if (Ext.isString(type)) {
+                return types[type.toUpperCase()] || autoType;
+            } else {
+                // At this point we expect an actual type
+                return type;
+            }
+        }
+
+        return autoType;
+    },
+
+    updateType: function(newType, oldType) {
+        var convert = this.getConvert();
+        if (oldType && convert === oldType.convert) {
+            this.setConvert(newType.convert);
+        }
+    },
+
+    applySortType: function(sortType) {
+        var sortTypes = Ext.data.SortTypes,
+            type = this.getType(),
+            defaultSortType = type.sortType;
+
+        if (sortType) {
+            if (Ext.isString(sortType)) {
+                return sortTypes[sortType] || defaultSortType;
+            } else {
+                // At this point we expect a function
+                return sortType;
+            }
+        }
+
+        return defaultSortType;
+    },
+
+    applyConvert: function(convert) {
+        var defaultConvert = this.getType().convert;
+        if (convert && convert !== defaultConvert) {
+            this._hasCustomConvert = true;
+            return convert;
+        } else {
+            this._hasCustomConvert = false;
+            return defaultConvert;
+        }
+    },
+
+    hasCustomConvert: function() {
+        return this._hasCustomConvert;
+    }
+
+}, function() {
+    /**
+     * @member Ext.data.Field
+     * @cfg {Boolean} useNull
+     * @inheritdoc Ext.data.Field#allowNull
+     * @deprecated 2.0.0 Please use {@link #allowNull} instead.
+     */
+    Ext.deprecateProperty(this, 'useNull', 'allowNull');
 });
 
 /**
@@ -38447,17 +39064,20 @@ Ext.define("App.view.Main", {
     
     config: {
         tabBarPosition: 'bottom',
-        
         defaults: {
             layout: 'fit'
+            /*layout: {
+                type: 'auto',
+                align: 'stretch'
+            }*/
+            
         },
 
         items: [
             {
                 id: 'home',
-                title: 'Velkommen',
+                title: 'Rica',
                 iconCls: 'home',
-                
                 items: [
                     {
                         xtype: 'homepage'
@@ -38466,9 +39086,8 @@ Ext.define("App.view.Main", {
             },
             {
                 id: 'info',
-                title: 'Info',
-                iconCls: 'info',
-
+                title: 'XP2010',
+                iconCls: 'team',
                 items: [
                     {
                         xtype: 'info'
@@ -38478,9 +39097,8 @@ Ext.define("App.view.Main", {
 
             {
                 id: 'sections',
-                title: 'Konferanse',
+                title: 'Agenda',
                 iconCls: 'bookmarks',
-                
                 items: [
                     {
                         xtype: 'sectionslist'
@@ -38490,7 +39108,7 @@ Ext.define("App.view.Main", {
 
             {
                 id: 'eventlist',
-                title: 'Huskeliste',
+                title: 'Min huskeliste',
                 iconCls: 'star',
 
                 items: [
@@ -39833,619 +40451,6 @@ Ext.define("App.view.EventEditor", {
 
 });
 /**
- * @class Ext.data.Types
- * <p>This is s static class containing the system-supplied data types which may be given to a {@link Ext.data.Field Field}.<p/>
- * <p>The properties in this class are used as type indicators in the {@link Ext.data.Field Field} class, so to
- * test whether a Field is of a certain type, compare the {@link Ext.data.Field#type type} property against properties
- * of this class.</p>
- * <p>Developers may add their own application-specific data types to this class. Definition names must be UPPERCASE.
- * each type definition must contain three properties:</p>
- * <div class="mdetail-params"><ul>
- * <li><code>convert</code> : <i>Function</i><div class="sub-desc">A function to convert raw data values from a data block into the data
- * to be stored in the Field. The function is passed the collowing parameters:
- * <div class="mdetail-params"><ul>
- * <li><b>v</b> : Mixed<div class="sub-desc">The data value as read by the Reader, if undefined will use
- * the configured <tt>{@link Ext.data.Field#defaultValue defaultValue}</tt>.</div></li>
- * <li><b>rec</b> : Mixed<div class="sub-desc">The data object containing the row as read by the Reader.
- * Depending on the Reader type, this could be an Array ({@link Ext.data.reader.Array ArrayReader}), an object
- * ({@link Ext.data.reader.Json JsonReader}), or an XML element.</div></li>
- * </ul></div></div></li>
- * <li><code>sortType</code> : <i>Function</i> <div class="sub-desc">A function to convert the stored data into comparable form, as defined by {@link Ext.data.SortTypes}.</div></li>
- * <li><code>type</code> : <i>String</i> <div class="sub-desc">A textual data type name.</div></li>
- * </ul></div>
- * <p>For example, to create a VELatLong field (See the Microsoft Bing Mapping API) containing the latitude/longitude value of a datapoint on a map from a JsonReader data block
- * which contained the properties <code>lat</code> and <code>long</code>, you would define a new data type like this:</p>
- *<pre><code>
-// Add a new Field data type which stores a VELatLong object in the Record.
-Ext.data.Types.VELATLONG = {
-    convert: function(v, data) {
-        return new VELatLong(data.lat, data.long);
-    },
-    sortType: function(v) {
-        return v.Latitude;  // When sorting, order by latitude
-    },
-    type: 'VELatLong'
-};
-</code></pre>
- * <p>Then, when declaring a Model, use <pre><code>
-var types = Ext.data.Types; // allow shorthand type access
-Ext.define('Unit', {
-    extend: 'Ext.data.Model',
-    config: {
-        fields: [
-            { name: 'unitName', mapping: 'UnitName' },
-            { name: 'curSpeed', mapping: 'CurSpeed', type: types.INT },
-            { name: 'latitude', mapping: 'lat', type: types.FLOAT },
-            { name: 'position', type: types.VELATLONG }
-        ]
-    }
-});
-</code></pre>
- * @singleton
- */
-Ext.define('Ext.data.Types', {
-    singleton: true,
-    requires: ['Ext.data.SortTypes'],
-
-    /**
-     * @property {RegExp} stripRe
-     * A regular expression for stripping non-numeric characters from a numeric value. Defaults to <tt>/[\$,%]/g</tt>.
-     * This should be overridden for localization.
-     */
-    stripRe: /[\$,%]/g,
-    dashesRe: /-/g,
-    iso8601TestRe: /\d\dT\d\d/,
-    iso8601SplitRe: /[- :T\.Z\+]/
-
-}, function() {
-    var Types = this,
-        sortTypes = Ext.data.SortTypes;
-
-    Ext.apply(Types, {
-        /**
-         * @property {Object} AUTO
-         * This data type means that no conversion is applied to the raw data before it is placed into a Record.
-         */
-        AUTO: {
-            convert: function(value) {
-                return value;
-            },
-            sortType: sortTypes.none,
-            type: 'auto'
-        },
-
-        /**
-         * @property {Object} STRING
-         * This data type means that the raw data is converted into a String before it is placed into a Record.
-         */
-        STRING: {
-            convert: function(value) {
-                // 'this' is the actual field that calls this convert method
-                return (value === undefined || value === null)
-                    ? (this.getAllowNull() ? null : '')
-                    : String(value);
-            },
-            sortType: sortTypes.asUCString,
-            type: 'string'
-        },
-
-        /**
-         * @property {Object} INT
-         * This data type means that the raw data is converted into an integer before it is placed into a Record.
-         * <p>The synonym <code>INTEGER</code> is equivalent.</p>
-         */
-        INT: {
-            convert: function(value) {
-                return (value !== undefined && value !== null && value !== '')
-                    ? ((typeof value === 'number')
-                        ? parseInt(value, 10)
-                        : parseInt(String(value).replace(Types.stripRe, ''), 10)
-                    )
-                    : (this.getAllowNull() ? null : 0);
-            },
-            sortType: sortTypes.none,
-            type: 'int'
-        },
-
-        /**
-         * @property {Object} FLOAT
-         * This data type means that the raw data is converted into a number before it is placed into a Record.
-         * <p>The synonym <code>NUMBER</code> is equivalent.</p>
-         */
-        FLOAT: {
-            convert: function(value) {
-                return (value !== undefined && value !== null && value !== '')
-                    ? ((typeof value === 'number')
-                        ? value
-                        : parseFloat(String(value).replace(Types.stripRe, ''), 10)
-                    )
-                    : (this.getAllowNull() ? null : 0);
-            },
-            sortType: sortTypes.none,
-            type: 'float'
-        },
-
-        /**
-         * @property {Object} BOOL
-         * <p>This data type means that the raw data is converted into a boolean before it is placed into
-         * a Record. The string "true" and the number 1 are converted to boolean <code>true</code>.</p>
-         * <p>The synonym <code>BOOLEAN</code> is equivalent.</p>
-         */
-        BOOL: {
-            convert: function(value) {
-                if ((value === undefined || value === null || value === '') && this.getAllowNull()) {
-                    return null;
-                }
-                return value === true || value === 'true' || value == 1;
-            },
-            sortType: sortTypes.none,
-            type: 'bool'
-        },
-
-        /**
-         * @property {Object} DATE
-         * This data type means that the raw data is converted into a Date before it is placed into a Record.
-         * The date format is specified in the constructor of the {@link Ext.data.Field} to which this type is
-         * being applied.
-         */
-        DATE: {
-            convert: function(value) {
-                var dateFormat = this.getDateFormat(),
-                    parsed;
-
-                if (!value) {
-                    return null;
-                }
-                if (Ext.isDate(value)) {
-                    return value;
-                }
-                if (dateFormat) {
-                    if (dateFormat == 'timestamp') {
-                        return new Date(value*1000);
-                    }
-                    if (dateFormat == 'time') {
-                        return new Date(parseInt(value, 10));
-                    }
-                    return Ext.Date.parse(value, dateFormat);
-                }
-
-                parsed = new Date(Date.parse(value));
-                if (isNaN(parsed)) {
-                    // Dates with ISO 8601 format are not well supported by mobile devices, this can work around the issue.
-                    if (Types.iso8601TestRe.test(value)) {
-                        parsed = value.split(Types.iso8601SplitRe);
-                        parsed = new Date(parsed[0], parsed[1]-1, parsed[2], parsed[3], parsed[4], parsed[5]);
-                    }
-                    if (isNaN(parsed)) {
-                        // Dates with the format "2012-01-20" fail, but "2012/01/20" work in some browsers. We'll try and
-                        // get around that.
-                        parsed = new Date(Date.parse(value.replace(this.dashesRe, "/")));
-                        if (isNaN(parsed)) {
-                            Ext.Logger.warn("Cannot parse the passed value (" + value + ") into a valid date");
-                        }
-                    }
-                }
-
-                return isNaN(parsed) ? null : parsed;
-            },
-            sortType: sortTypes.asDate,
-            type: 'date'
-        }
-    });
-
-    Ext.apply(Types, {
-        /**
-         * @property {Object} BOOLEAN
-         * <p>This data type means that the raw data is converted into a boolean before it is placed into
-         * a Record. The string "true" and the number 1 are converted to boolean <code>true</code>.</p>
-         * <p>The synonym <code>BOOL</code> is equivalent.</p>
-         */
-        BOOLEAN: this.BOOL,
-
-        /**
-         * @property {Object} INTEGER
-         * This data type means that the raw data is converted into an integer before it is placed into a Record.
-         * <p>The synonym <code>INT</code> is equivalent.</p>
-         */
-        INTEGER: this.INT,
-
-        /**
-         * @property {Object} NUMBER
-         * This data type means that the raw data is converted into a number before it is placed into a Record.
-         * <p>The synonym <code>FLOAT</code> is equivalent.</p>
-         */
-        NUMBER: this.FLOAT
-    });
-});
-
-/**
- * @author Ed Spencer
- * @aside guide models
- *
- * Fields are used to define what a Model is. They aren't instantiated directly - instead, when we create a class that
- * extends {@link Ext.data.Model}, it will automatically create a Field instance for each field configured in a {@link
- * Ext.data.Model Model}. For example, we might set up a model like this:
- *
- *     Ext.define('User', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 'name', 'email',
- *                 {name: 'age', type: 'int'},
- *                 {name: 'gender', type: 'string', defaultValue: 'Unknown'}
- *             ]
- *         }
- *     });
- *
- * Four fields will have been created for the User Model - name, email, age and gender. Note that we specified a couple
- * of different formats here; if we only pass in the string name of the field (as with name and email), the field is set
- * up with the 'auto' type. It's as if we'd done this instead:
- *
- *     Ext.define('User', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 {name: 'name', type: 'auto'},
- *                 {name: 'email', type: 'auto'},
- *                 {name: 'age', type: 'int'},
- *                 {name: 'gender', type: 'string', defaultValue: 'Unknown'}
- *             ]
- *         }
- *     });
- *
- * # Types and conversion
- *
- * The {@link #type} is important - it's used to automatically convert data passed to the field into the correct format.
- * In our example above, the name and email fields used the 'auto' type and will just accept anything that is passed
- * into them. The 'age' field had an 'int' type however, so if we passed 25.4 this would be rounded to 25.
- *
- * Sometimes a simple type isn't enough, or we want to perform some processing when we load a Field's data. We can do
- * this using a {@link #convert} function. Here, we're going to create a new field based on another:
- *
- *     Ext.define('User', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 'name', 'email',
- *                 {name: 'age', type: 'int'},
- *                 {name: 'gender', type: 'string', defaultValue: 'Unknown'},
- *
- *                 {
- *                     name: 'firstName',
- *                     convert: function(value, record) {
- *                         var fullName  = record.get('name'),
- *                             splits    = fullName.split(" "),
- *                             firstName = splits[0];
- *
- *                         return firstName;
- *                     }
- *                 }
- *             ]
- *         }
- *     });
- *
- * Now when we create a new User, the firstName is populated automatically based on the name:
- *
- *     var ed = Ext.create('User', {name: 'Ed Spencer'});
- *
- *     console.log(ed.get('firstName')); //logs 'Ed', based on our convert function
- *
- * In fact, if we log out all of the data inside ed, we'll see this:
- *
- *     console.log(ed.data);
- *
- *     //outputs this:
- *     {
- *         age: 0,
- *         email: "",
- *         firstName: "Ed",
- *         gender: "Unknown",
- *         name: "Ed Spencer"
- *     }
- *
- * The age field has been given a default of zero because we made it an int type. As an auto field, email has defaulted
- * to an empty string. When we registered the User model we set gender's {@link #defaultValue} to 'Unknown' so we see
- * that now. Let's correct that and satisfy ourselves that the types work as we expect:
- *
- *     ed.set('gender', 'Male');
- *     ed.get('gender'); //returns 'Male'
- *
- *     ed.set('age', 25.4);
- *     ed.get('age'); //returns 25 - we wanted an int, not a float, so no decimal places allowed
- */
-Ext.define('Ext.data.Field', {
-    requires: ['Ext.data.Types', 'Ext.data.SortTypes'],
-    alias: 'data.field',
-
-    isField: true,
-
-    config: {
-        /**
-         * @cfg {String} name
-         *
-         * The name by which the field is referenced within the Model. This is referenced by, for example, the `dataIndex`
-         * property in column definition objects passed to Ext.grid.property.HeaderContainer.
-         *
-         * Note: In the simplest case, if no properties other than `name` are required, a field definition may consist of
-         * just a String for the field name.
-         */
-        name: null,
-
-        /**
-         * @cfg {String/Object} type
-         *
-         * The data type for automatic conversion from received data to the *stored* value if
-         * `{@link Ext.data.Field#convert convert}` has not been specified. This may be specified as a string value.
-         * Possible values are
-         *
-         * - auto (Default, implies no conversion)
-         * - string
-         * - int
-         * - float
-         * - boolean
-         * - date
-         *
-         * This may also be specified by referencing a member of the {@link Ext.data.Types} class.
-         *
-         * Developers may create their own application-specific data types by defining new members of the {@link
-         * Ext.data.Types} class.
-         */
-        type: 'auto',
-
-        /**
-         * @cfg {Function} convert
-         *
-         * A function which converts the value provided by the Reader into an object that will be stored in the Model.
-         * It is passed the following parameters:
-         *
-         * - **v** : Mixed
-         *
-         *   The data value as read by the Reader, if undefined will use the configured `{@link Ext.data.Field#defaultValue
-         *   defaultValue}`.
-         *
-         * - **rec** : Ext.data.Model
-         *
-         *   The data object containing the Model as read so far by the Reader. Note that the Model may not be fully populated
-         *   at this point as the fields are read in the order that they are defined in your
-         *   {@link Ext.data.Model#cfg-fields fields} array.
-         *
-         * Example of convert functions:
-         *
-         *     function fullName(v, record) {
-         *         return record.name.last + ', ' + record.name.first;
-         *     }
-         *
-         *     function location(v, record) {
-         *         return !record.city ? '' : (record.city + ', ' + record.state);
-         *     }
-         *
-         *     Ext.define('Dude', {
-         *         extend: 'Ext.data.Model',
-         *         fields: [
-         *             {name: 'fullname',  convert: fullName},
-         *             {name: 'firstname', mapping: 'name.first'},
-         *             {name: 'lastname',  mapping: 'name.last'},
-         *             {name: 'city', defaultValue: 'homeless'},
-         *             'state',
-         *             {name: 'location',  convert: location}
-         *         ]
-         *     });
-         *
-         *     // create the data store
-         *     var store = Ext.create('Ext.data.Store', {
-         *         reader: {
-         *             type: 'json',
-         *             model: 'Dude',
-         *             idProperty: 'key',
-         *             rootProperty: 'daRoot',
-         *             totalProperty: 'total'
-         *         }
-         *     });
-         *
-         *     var myData = [
-         *         { key: 1,
-         *           name: { first: 'Fat',    last:  'Albert' }
-         *           // notice no city, state provided in data2 object
-         *         },
-         *         { key: 2,
-         *           name: { first: 'Barney', last:  'Rubble' },
-         *           city: 'Bedrock', state: 'Stoneridge'
-         *         },
-         *         { key: 3,
-         *           name: { first: 'Cliff',  last:  'Claven' },
-         *           city: 'Boston',  state: 'MA'
-         *         }
-         *     ];
-         */
-        convert: undefined,
-
-        /**
-         * @cfg {String} dateFormat
-         *
-         * Used when converting received data into a Date when the {@link #type} is specified as `"date"`.
-         *
-         * A format string for the {@link Ext.Date#parse Ext.Date.parse} function, or "timestamp" if the value provided by
-         * the Reader is a UNIX timestamp, or "time" if the value provided by the Reader is a javascript millisecond
-         * timestamp. See {@link Ext.Date}.
-         */
-        dateFormat: null,
-
-        /**
-         * @cfg {Boolean} allowNull
-         *
-         * Use when converting received data into a boolean, string or number type (either int or float). If the value cannot be
-         * parsed, null will be used if allowNull is true, otherwise the value will be 0. Defaults to true.
-         */
-        allowNull: true,
-
-        /**
-         * @cfg {Object} defaultValue
-         *
-         * The default value used **when a Model is being created by a {@link Ext.data.reader.Reader Reader}**
-         * when the item referenced by the `{@link Ext.data.Field#mapping mapping}` does not exist in the data object
-         * (i.e. undefined). Defaults to "".
-         */
-        defaultValue: undefined,
-
-        /**
-         * @cfg {String/Number} mapping
-         *
-         * (Optional) A path expression for use by the {@link Ext.data.reader.Reader} implementation that is creating the
-         * {@link Ext.data.Model Model} to extract the Field value from the data object. If the path expression is the same
-         * as the field name, the mapping may be omitted.
-         *
-         * The form of the mapping expression depends on the Reader being used.
-         *
-         * - {@link Ext.data.reader.Json}
-         *
-         *   The mapping is a string containing the javascript expression to reference the data from an element of the data2
-         *   item's {@link Ext.data.reader.Json#rootProperty rootProperty} Array. Defaults to the field name.
-         *
-         * - {@link Ext.data.reader.Xml}
-         *
-         *   The mapping is an {@link Ext.DomQuery} path to the data item relative to the DOM element that represents the
-         *   {@link Ext.data.reader.Xml#record record}. Defaults to the field name.
-         *
-         * - {@link Ext.data.reader.Array}
-         *
-         *   The mapping is a number indicating the Array index of the field's value. Defaults to the field specification's
-         *   Array position.
-         *
-         * If a more complex value extraction strategy is required, then configure the Field with a {@link #convert}
-         * function. This is passed the whole row object, and may interrogate it in whatever way is necessary in order to
-         * return the desired data.
-         */
-        mapping: null,
-
-        /**
-         * @cfg {Function} sortType
-         *
-         * A function which converts a Field's value to a comparable value in order to ensure correct sort ordering.
-         * Predefined functions are provided in {@link Ext.data.SortTypes}. A custom sort example:
-         *
-         *     // current sort     after sort we want
-         *     // +-+------+          +-+------+
-         *     // |1|First |          |1|First |
-         *     // |2|Last  |          |3|Second|
-         *     // |3|Second|          |2|Last  |
-         *     // +-+------+          +-+------+
-         *
-         *     sortType: function(value) {
-         *        switch (value.toLowerCase()) // native toLowerCase():
-         *        {
-         *           case 'first': return 1;
-         *           case 'second': return 2;
-         *           default: return 3;
-         *        }
-         *     }
-         */
-        sortType : undefined,
-
-        /**
-         * @cfg {String} sortDir
-         *
-         * Initial direction to sort (`"ASC"` or `"DESC"`). Defaults to `"ASC"`.
-         */
-        sortDir : "ASC",
-
-        /**
-         * @cfg {Boolean} allowBlank
-         * @private
-         *
-         * Used for validating a {@link Ext.data.Model model}. Defaults to true. An empty value here will cause
-         * {@link Ext.data.Model}.{@link Ext.data.Model#isValid isValid} to evaluate to false.
-         */
-        allowBlank : true,
-
-        /**
-         * @cfg {Boolean} persist
-         *
-         * False to exclude this field from being synchronized with the server or localstorage.
-         * This option is useful when model fields are used to keep state on the client but do
-         * not need to be persisted to the server. Defaults to true.
-         */
-        persist: true,
-
-        // Used in LocalStorage stuff
-        encode: null,
-        decode: null
-    },
-
-    constructor : function(config) {
-        // This adds support for just passing a string used as the field name
-        if (Ext.isString(config)) {
-            config = {name: config};
-        }
-
-        this.initConfig(config);
-    },
-
-    applyType: function(type) {
-        var types = Ext.data.Types,
-            autoType = types.AUTO;
-
-        if (type) {
-            if (Ext.isString(type)) {
-                return types[type.toUpperCase()] || autoType;
-            } else {
-                // At this point we expect an actual type
-                return type;
-            }
-        }
-
-        return autoType;
-    },
-
-    updateType: function(newType, oldType) {
-        var convert = this.getConvert();
-        if (oldType && convert === oldType.convert) {
-            this.setConvert(newType.convert);
-        }
-    },
-
-    applySortType: function(sortType) {
-        var sortTypes = Ext.data.SortTypes,
-            type = this.getType(),
-            defaultSortType = type.sortType;
-
-        if (sortType) {
-            if (Ext.isString(sortType)) {
-                return sortTypes[sortType] || defaultSortType;
-            } else {
-                // At this point we expect a function
-                return sortType;
-            }
-        }
-
-        return defaultSortType;
-    },
-
-    applyConvert: function(convert) {
-        var defaultConvert = this.getType().convert;
-        if (convert && convert !== defaultConvert) {
-            this._hasCustomConvert = true;
-            return convert;
-        } else {
-            this._hasCustomConvert = false;
-            return defaultConvert;
-        }
-    },
-
-    hasCustomConvert: function() {
-        return this._hasCustomConvert;
-    }
-
-}, function() {
-    /**
-     * @member Ext.data.Field
-     * @cfg {Boolean} useNull
-     * @inheritdoc Ext.data.Field#allowNull
-     * @deprecated 2.0.0 Please use {@link #allowNull} instead.
-     */
-    Ext.deprecateProperty(this, 'useNull', 'allowNull');
-});
-
-/**
  * @private
  */
 Ext.define('Ext.AbstractManager', {
@@ -41437,381 +41442,6 @@ Ext.define('Ext.data.association.HasMany', {
 });
 
 /**
- * @author Ed Spencer
- * @aside guide models
- *
- * Represents a many to one association with another model. The owner model is expected to have
- * a foreign key which references the primary key of the associated model:
- *
- *     Ext.define('Category', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 { name: 'id',   type: 'int' },
- *                 { name: 'name', type: 'string' }
- *             ]
- *         }
- *     });
- *
- *     Ext.define('Product', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 { name: 'id',          type: 'int' },
- *                 { name: 'category_id', type: 'int' },
- *                 { name: 'name',        type: 'string' }
- *             ],
- *             // we can use the belongsTo shortcut on the model to create a belongsTo association
- *             associations: { type: 'belongsTo', model: 'Category' }
- *         }
- *     });
- *
- * In the example above we have created models for Products and Categories, and linked them together
- * by saying that each Product belongs to a Category. This automatically links each Product to a Category
- * based on the Product's category_id, and provides new functions on the Product model:
- *
- * ## Generated getter function
- *
- * The first function that is added to the owner model is a getter function:
- *
- *     var product = new Product({
- *         id: 100,
- *         category_id: 20,
- *         name: 'Sneakers'
- *     });
- *
- *     product.getCategory(function(category, operation) {
- *         // do something with the category object
- *         alert(category.get('id')); // alerts 20
- *     }, this);
- *
- * The getCategory function was created on the Product model when we defined the association. This uses the
- * Category's configured {@link Ext.data.proxy.Proxy proxy} to load the Category asynchronously, calling the provided
- * callback when it has loaded.
- *
- * The new getCategory function will also accept an object containing success, failure and callback properties
- * - callback will always be called, success will only be called if the associated model was loaded successfully
- * and failure will only be called if the associatied model could not be loaded:
- *
- *     product.getCategory({
- *         reload: true, // force a reload if the owner model is already cached
- *         callback: function(category, operation) {}, // a function that will always be called
- *         success : function(category, operation) {}, // a function that will only be called if the load succeeded
- *         failure : function(category, operation) {}, // a function that will only be called if the load did not succeed
- *         scope   : this // optionally pass in a scope object to execute the callbacks in
- *     });
- *
- * In each case above the callbacks are called with two arguments - the associated model instance and the
- * {@link Ext.data.Operation operation} object that was executed to load that instance. The Operation object is
- * useful when the instance could not be loaded.
- *
- * Once the getter has been called on the model, it will be cached if the getter is called a second time. To
- * force the model to reload, specify reload: true in the options object.
- *
- * ## Generated setter function
- *
- * The second generated function sets the associated model instance - if only a single argument is passed to
- * the setter then the following two calls are identical:
- *
- *     // this call...
- *     product.setCategory(10);
- *
- *     // is equivalent to this call:
- *     product.set('category_id', 10);
- *
- * An instance of the owner model can also be passed as a parameter.
- *
- * If we pass in a second argument, the model will be automatically saved and the second argument passed to
- * the owner model's {@link Ext.data.Model#save save} method:
- *
- *     product.setCategory(10, function(product, operation) {
- *         // the product has been saved
- *         alert(product.get('category_id')); //now alerts 10
- *     });
- *
- *     //alternative syntax:
- *     product.setCategory(10, {
- *         callback: function(product, operation), // a function that will always be called
- *         success : function(product, operation), // a function that will only be called if the load succeeded
- *         failure : function(product, operation), // a function that will only be called if the load did not succeed
- *         scope   : this //optionally pass in a scope object to execute the callbacks in
- *     })
- *
- * ## Customisation
- *
- * Associations reflect on the models they are linking to automatically set up properties such as the
- * {@link #primaryKey} and {@link #foreignKey}. These can alternatively be specified:
- *
- *     Ext.define('Product', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [ // ...
- *             ],
- *
- *             associations: [
- *                 { type: 'belongsTo', model: 'Category', primaryKey: 'unique_id', foreignKey: 'cat_id' }
- *             ]
- *         }
- *     });
- *
- * Here we replaced the default primary key (defaults to 'id') and foreign key (calculated as 'category_id')
- * with our own settings. Usually this will not be needed.
- */
-Ext.define('Ext.data.association.BelongsTo', {
-    extend: 'Ext.data.association.Association',
-    alternateClassName: 'Ext.data.BelongsToAssociation',
-    alias: 'association.belongsto',
-
-    config: {
-        /**
-         * @cfg {String} foreignKey The name of the foreign key on the owner model that links it to the associated
-         * model. Defaults to the lowercased name of the associated model plus "_id", e.g. an association with a
-         * model called Product would set up a product_id foreign key.
-         *
-         *     Ext.define('Order', {
-         *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'date'],
-         *         hasMany: 'Product'
-         *     });
-         *
-         *     Ext.define('Product', {
-         *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'name', 'order_id'], // refers to the id of the order that this product belongs to
-         *         belongsTo: 'Group'
-         *     });
-         *     var product = new Product({
-         *         id: 1,
-         *         name: 'Product 1',
-         *         order_id: 22
-         *     }, 1);
-         *     product.getOrder(); // Will make a call to the server asking for order_id 22
-         *
-         */
-        foreignKey: undefined,
-
-        /**
-         * @cfg {String} getterName The name of the getter function that will be added to the local model's prototype.
-         * Defaults to 'get' + the name of the foreign model, e.g. getCategory
-         */
-        getterName: undefined,
-
-        /**
-         * @cfg {String} setterName The name of the setter function that will be added to the local model's prototype.
-         * Defaults to 'set' + the name of the foreign model, e.g. setCategory
-         */
-        setterName: undefined,
-
-        instanceName: undefined
-    },
-
-    applyForeignKey: function(foreignKey) {
-        if (!foreignKey) {
-            foreignKey = this.getAssociatedName().toLowerCase() + '_id';
-        }
-        return foreignKey;
-    },
-
-    updateForeignKey: function(foreignKey, oldForeignKey) {
-        var fields = this.getOwnerModel().getFields(),
-            field = fields.get(foreignKey);
-
-        if (!field) {
-            field = new Ext.data.Field({
-                name: foreignKey
-            });
-            fields.add(field);
-            fields.isDirty = true;
-        }
-
-        if (oldForeignKey) {
-            field = fields.get(oldForeignKey);
-            if (field) {
-                fields.isDirty = true;
-                fields.remove(field);
-            }
-        }
-    },
-
-    applyInstanceName: function(instanceName) {
-        if (!instanceName) {
-            instanceName = this.getAssociatedName() + 'BelongsToInstance';
-        }
-        return instanceName;
-    },
-
-    applyAssociationKey: function(associationKey) {
-        if (!associationKey) {
-            var associatedName = this.getAssociatedName();
-            associationKey = associatedName[0].toLowerCase() + associatedName.slice(1);
-        }
-        return associationKey;
-    },
-
-    applyGetterName: function(getterName) {
-        if (!getterName) {
-            var associatedName = this.getAssociatedName();
-            getterName = 'get' + associatedName[0].toUpperCase() + associatedName.slice(1);
-        }
-        return getterName;
-    },
-
-    applySetterName: function(setterName) {
-        if (!setterName) {
-            var associatedName = this.getAssociatedName();
-            setterName = 'set' + associatedName[0].toUpperCase() + associatedName.slice(1);
-        }
-        return setterName;
-    },
-
-    updateGetterName: function(getterName, oldGetterName) {
-        var ownerProto = this.getOwnerModel().prototype;
-        if (oldGetterName) {
-            delete ownerProto[oldGetterName];
-        }
-        if (getterName) {
-            ownerProto[getterName] = this.createGetter();
-        }
-    },
-
-    updateSetterName: function(setterName, oldSetterName) {
-        var ownerProto = this.getOwnerModel().prototype;
-        if (oldSetterName) {
-            delete ownerProto[oldSetterName];
-        }
-        if (setterName) {
-            ownerProto[setterName] = this.createSetter();
-        }
-    },
-
-    /**
-     * @private
-     * Returns a setter function to be placed on the owner model's prototype
-     * @return {Function} The setter function
-     */
-    createSetter: function() {
-        var me = this,
-            foreignKey = me.getForeignKey();
-
-        //'this' refers to the Model instance inside this function
-        return function(value, options, scope) {
-            var inverse = me.getInverseAssociation();
-
-            // If we pass in an instance, pull the id out
-            if (value && value.isModel) {
-                value = value.getId();
-            }
-            this.set(foreignKey, value);
-
-            if (Ext.isFunction(options)) {
-                options = {
-                    callback: options,
-                    scope: scope || this
-                };
-            }
-
-            if (inverse) {
-                value = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(inverse.getOwnerModel().modelName, value));
-                if (value) {
-                    if (inverse.getType().toLowerCase() === 'hasmany') {
-                        var store = value[inverse.getName()]();
-                        store.add(this);
-                    } else {
-                        value[inverse.getInstanceName()] = this;
-                    }
-                }
-            }
-
-            if (Ext.isObject(options)) {
-                return this.save(options);
-            }
-        };
-    },
-
-    /**
-     * @private
-     * Returns a getter function to be placed on the owner model's prototype. We cache the loaded instance
-     * the first time it is loaded so that subsequent calls to the getter always receive the same reference.
-     * @return {Function} The getter function
-     */
-    createGetter: function() {
-        var me              = this,
-            associatedModel = me.getAssociatedModel(),
-            foreignKey      = me.getForeignKey(),
-            instanceName    = me.getInstanceName();
-
-        //'this' refers to the Model instance inside this function
-        return function(options, scope) {
-            options = options || {};
-
-            var model = this,
-                foreignKeyId = model.get(foreignKey),
-                success,
-                instance,
-                args;
-
-            instance = model[instanceName];
-            if (!instance) {
-                instance = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(associatedModel.modelName, foreignKeyId));
-                if (instance) {
-                    model[instanceName] = instance;
-                }
-            }
-
-            if (options.reload === true || instance === undefined) {
-                if (typeof options == 'function') {
-                    options = {
-                        callback: options,
-                        scope: scope || model
-                    };
-                }
-
-                // Overwrite the success handler so we can assign the current instance
-                success = options.success;
-                options.success = function(rec) {
-                    model[instanceName] = rec;
-                    if (success) {
-                        success.call(this, arguments);
-                    }
-                };
-
-                associatedModel.load(foreignKeyId, options);
-            } else {
-                args = [instance];
-                scope = scope || model;
-
-                Ext.callback(options, scope, args);
-                Ext.callback(options.success, scope, args);
-                Ext.callback(options.failure, scope, args);
-                Ext.callback(options.callback, scope, args);
-
-                return instance;
-            }
-        };
-    },
-
-    /**
-     * Read associated data
-     * @private
-     * @param {Ext.data.Model} record The record we're writing to
-     * @param {Ext.data.reader.Reader} reader The reader for the associated model
-     * @param {Object} associationData The raw associated data
-     */
-    read: function(record, reader, associationData){
-        record[this.getInstanceName()] = reader.read([associationData]).getRecords()[0];
-    },
-
-    getInverseAssociation: function() {
-        var ownerName = this.getOwnerModel().modelName,
-            foreignKey = this.getForeignKey();
-
-        return this.getAssociatedModel().associations.findBy(function(assoc) {
-            var type = assoc.getType().toLowerCase();
-            return (type === 'hasmany' || type === 'hasone') && assoc.getAssociatedModel().modelName === ownerName && assoc.getForeignKey() === foreignKey;
-        });
-    }
-});
-
-/**
  * @aside guide models
  *
  * Represents a one to one association with another model. The owner model is expected to have
@@ -42185,6 +41815,381 @@ Ext.define('Ext.data.association.HasOne', {
 
         return this.getAssociatedModel().associations.findBy(function(assoc) {
             return assoc.getType().toLowerCase() === 'belongsto' && assoc.getAssociatedModel().modelName === ownerName;
+        });
+    }
+});
+
+/**
+ * @author Ed Spencer
+ * @aside guide models
+ *
+ * Represents a many to one association with another model. The owner model is expected to have
+ * a foreign key which references the primary key of the associated model:
+ *
+ *     Ext.define('Category', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 { name: 'id',   type: 'int' },
+ *                 { name: 'name', type: 'string' }
+ *             ]
+ *         }
+ *     });
+ *
+ *     Ext.define('Product', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 { name: 'id',          type: 'int' },
+ *                 { name: 'category_id', type: 'int' },
+ *                 { name: 'name',        type: 'string' }
+ *             ],
+ *             // we can use the belongsTo shortcut on the model to create a belongsTo association
+ *             associations: { type: 'belongsTo', model: 'Category' }
+ *         }
+ *     });
+ *
+ * In the example above we have created models for Products and Categories, and linked them together
+ * by saying that each Product belongs to a Category. This automatically links each Product to a Category
+ * based on the Product's category_id, and provides new functions on the Product model:
+ *
+ * ## Generated getter function
+ *
+ * The first function that is added to the owner model is a getter function:
+ *
+ *     var product = new Product({
+ *         id: 100,
+ *         category_id: 20,
+ *         name: 'Sneakers'
+ *     });
+ *
+ *     product.getCategory(function(category, operation) {
+ *         // do something with the category object
+ *         alert(category.get('id')); // alerts 20
+ *     }, this);
+ *
+ * The getCategory function was created on the Product model when we defined the association. This uses the
+ * Category's configured {@link Ext.data.proxy.Proxy proxy} to load the Category asynchronously, calling the provided
+ * callback when it has loaded.
+ *
+ * The new getCategory function will also accept an object containing success, failure and callback properties
+ * - callback will always be called, success will only be called if the associated model was loaded successfully
+ * and failure will only be called if the associatied model could not be loaded:
+ *
+ *     product.getCategory({
+ *         reload: true, // force a reload if the owner model is already cached
+ *         callback: function(category, operation) {}, // a function that will always be called
+ *         success : function(category, operation) {}, // a function that will only be called if the load succeeded
+ *         failure : function(category, operation) {}, // a function that will only be called if the load did not succeed
+ *         scope   : this // optionally pass in a scope object to execute the callbacks in
+ *     });
+ *
+ * In each case above the callbacks are called with two arguments - the associated model instance and the
+ * {@link Ext.data.Operation operation} object that was executed to load that instance. The Operation object is
+ * useful when the instance could not be loaded.
+ *
+ * Once the getter has been called on the model, it will be cached if the getter is called a second time. To
+ * force the model to reload, specify reload: true in the options object.
+ *
+ * ## Generated setter function
+ *
+ * The second generated function sets the associated model instance - if only a single argument is passed to
+ * the setter then the following two calls are identical:
+ *
+ *     // this call...
+ *     product.setCategory(10);
+ *
+ *     // is equivalent to this call:
+ *     product.set('category_id', 10);
+ *
+ * An instance of the owner model can also be passed as a parameter.
+ *
+ * If we pass in a second argument, the model will be automatically saved and the second argument passed to
+ * the owner model's {@link Ext.data.Model#save save} method:
+ *
+ *     product.setCategory(10, function(product, operation) {
+ *         // the product has been saved
+ *         alert(product.get('category_id')); //now alerts 10
+ *     });
+ *
+ *     //alternative syntax:
+ *     product.setCategory(10, {
+ *         callback: function(product, operation), // a function that will always be called
+ *         success : function(product, operation), // a function that will only be called if the load succeeded
+ *         failure : function(product, operation), // a function that will only be called if the load did not succeed
+ *         scope   : this //optionally pass in a scope object to execute the callbacks in
+ *     })
+ *
+ * ## Customisation
+ *
+ * Associations reflect on the models they are linking to automatically set up properties such as the
+ * {@link #primaryKey} and {@link #foreignKey}. These can alternatively be specified:
+ *
+ *     Ext.define('Product', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [ // ...
+ *             ],
+ *
+ *             associations: [
+ *                 { type: 'belongsTo', model: 'Category', primaryKey: 'unique_id', foreignKey: 'cat_id' }
+ *             ]
+ *         }
+ *     });
+ *
+ * Here we replaced the default primary key (defaults to 'id') and foreign key (calculated as 'category_id')
+ * with our own settings. Usually this will not be needed.
+ */
+Ext.define('Ext.data.association.BelongsTo', {
+    extend: 'Ext.data.association.Association',
+    alternateClassName: 'Ext.data.BelongsToAssociation',
+    alias: 'association.belongsto',
+
+    config: {
+        /**
+         * @cfg {String} foreignKey The name of the foreign key on the owner model that links it to the associated
+         * model. Defaults to the lowercased name of the associated model plus "_id", e.g. an association with a
+         * model called Product would set up a product_id foreign key.
+         *
+         *     Ext.define('Order', {
+         *         extend: 'Ext.data.Model',
+         *         fields: ['id', 'date'],
+         *         hasMany: 'Product'
+         *     });
+         *
+         *     Ext.define('Product', {
+         *         extend: 'Ext.data.Model',
+         *         fields: ['id', 'name', 'order_id'], // refers to the id of the order that this product belongs to
+         *         belongsTo: 'Group'
+         *     });
+         *     var product = new Product({
+         *         id: 1,
+         *         name: 'Product 1',
+         *         order_id: 22
+         *     }, 1);
+         *     product.getOrder(); // Will make a call to the server asking for order_id 22
+         *
+         */
+        foreignKey: undefined,
+
+        /**
+         * @cfg {String} getterName The name of the getter function that will be added to the local model's prototype.
+         * Defaults to 'get' + the name of the foreign model, e.g. getCategory
+         */
+        getterName: undefined,
+
+        /**
+         * @cfg {String} setterName The name of the setter function that will be added to the local model's prototype.
+         * Defaults to 'set' + the name of the foreign model, e.g. setCategory
+         */
+        setterName: undefined,
+
+        instanceName: undefined
+    },
+
+    applyForeignKey: function(foreignKey) {
+        if (!foreignKey) {
+            foreignKey = this.getAssociatedName().toLowerCase() + '_id';
+        }
+        return foreignKey;
+    },
+
+    updateForeignKey: function(foreignKey, oldForeignKey) {
+        var fields = this.getOwnerModel().getFields(),
+            field = fields.get(foreignKey);
+
+        if (!field) {
+            field = new Ext.data.Field({
+                name: foreignKey
+            });
+            fields.add(field);
+            fields.isDirty = true;
+        }
+
+        if (oldForeignKey) {
+            field = fields.get(oldForeignKey);
+            if (field) {
+                fields.isDirty = true;
+                fields.remove(field);
+            }
+        }
+    },
+
+    applyInstanceName: function(instanceName) {
+        if (!instanceName) {
+            instanceName = this.getAssociatedName() + 'BelongsToInstance';
+        }
+        return instanceName;
+    },
+
+    applyAssociationKey: function(associationKey) {
+        if (!associationKey) {
+            var associatedName = this.getAssociatedName();
+            associationKey = associatedName[0].toLowerCase() + associatedName.slice(1);
+        }
+        return associationKey;
+    },
+
+    applyGetterName: function(getterName) {
+        if (!getterName) {
+            var associatedName = this.getAssociatedName();
+            getterName = 'get' + associatedName[0].toUpperCase() + associatedName.slice(1);
+        }
+        return getterName;
+    },
+
+    applySetterName: function(setterName) {
+        if (!setterName) {
+            var associatedName = this.getAssociatedName();
+            setterName = 'set' + associatedName[0].toUpperCase() + associatedName.slice(1);
+        }
+        return setterName;
+    },
+
+    updateGetterName: function(getterName, oldGetterName) {
+        var ownerProto = this.getOwnerModel().prototype;
+        if (oldGetterName) {
+            delete ownerProto[oldGetterName];
+        }
+        if (getterName) {
+            ownerProto[getterName] = this.createGetter();
+        }
+    },
+
+    updateSetterName: function(setterName, oldSetterName) {
+        var ownerProto = this.getOwnerModel().prototype;
+        if (oldSetterName) {
+            delete ownerProto[oldSetterName];
+        }
+        if (setterName) {
+            ownerProto[setterName] = this.createSetter();
+        }
+    },
+
+    /**
+     * @private
+     * Returns a setter function to be placed on the owner model's prototype
+     * @return {Function} The setter function
+     */
+    createSetter: function() {
+        var me = this,
+            foreignKey = me.getForeignKey();
+
+        //'this' refers to the Model instance inside this function
+        return function(value, options, scope) {
+            var inverse = me.getInverseAssociation();
+
+            // If we pass in an instance, pull the id out
+            if (value && value.isModel) {
+                value = value.getId();
+            }
+            this.set(foreignKey, value);
+
+            if (Ext.isFunction(options)) {
+                options = {
+                    callback: options,
+                    scope: scope || this
+                };
+            }
+
+            if (inverse) {
+                value = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(inverse.getOwnerModel().modelName, value));
+                if (value) {
+                    if (inverse.getType().toLowerCase() === 'hasmany') {
+                        var store = value[inverse.getName()]();
+                        store.add(this);
+                    } else {
+                        value[inverse.getInstanceName()] = this;
+                    }
+                }
+            }
+
+            if (Ext.isObject(options)) {
+                return this.save(options);
+            }
+        };
+    },
+
+    /**
+     * @private
+     * Returns a getter function to be placed on the owner model's prototype. We cache the loaded instance
+     * the first time it is loaded so that subsequent calls to the getter always receive the same reference.
+     * @return {Function} The getter function
+     */
+    createGetter: function() {
+        var me              = this,
+            associatedModel = me.getAssociatedModel(),
+            foreignKey      = me.getForeignKey(),
+            instanceName    = me.getInstanceName();
+
+        //'this' refers to the Model instance inside this function
+        return function(options, scope) {
+            options = options || {};
+
+            var model = this,
+                foreignKeyId = model.get(foreignKey),
+                success,
+                instance,
+                args;
+
+            instance = model[instanceName];
+            if (!instance) {
+                instance = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(associatedModel.modelName, foreignKeyId));
+                if (instance) {
+                    model[instanceName] = instance;
+                }
+            }
+
+            if (options.reload === true || instance === undefined) {
+                if (typeof options == 'function') {
+                    options = {
+                        callback: options,
+                        scope: scope || model
+                    };
+                }
+
+                // Overwrite the success handler so we can assign the current instance
+                success = options.success;
+                options.success = function(rec) {
+                    model[instanceName] = rec;
+                    if (success) {
+                        success.call(this, arguments);
+                    }
+                };
+
+                associatedModel.load(foreignKeyId, options);
+            } else {
+                args = [instance];
+                scope = scope || model;
+
+                Ext.callback(options, scope, args);
+                Ext.callback(options.success, scope, args);
+                Ext.callback(options.failure, scope, args);
+                Ext.callback(options.callback, scope, args);
+
+                return instance;
+            }
+        };
+    },
+
+    /**
+     * Read associated data
+     * @private
+     * @param {Ext.data.Model} record The record we're writing to
+     * @param {Ext.data.reader.Reader} reader The reader for the associated model
+     * @param {Object} associationData The raw associated data
+     */
+    read: function(record, reader, associationData){
+        record[this.getInstanceName()] = reader.read([associationData]).getRecords()[0];
+    },
+
+    getInverseAssociation: function() {
+        var ownerName = this.getOwnerModel().modelName,
+            foreignKey = this.getForeignKey();
+
+        return this.getAssociatedModel().associations.findBy(function(assoc) {
+            var type = assoc.getType().toLowerCase();
+            return (type === 'hasmany' || type === 'hasone') && assoc.getAssociatedModel().modelName === ownerName && assoc.getForeignKey() === foreignKey;
         });
     }
 });
@@ -49403,7 +49408,18 @@ Ext.define('App.model.Sections', {
     extend: 'Ext.data.Model',
     
     config: {
-        fields: ['id', 'dateCreated', 'start', 'startTime', 'name', 'place', 'ingress', 'description', 'items']
+        fields: [
+            'id', 
+            'dateCreated', 
+            'start',
+            'timestamp',
+            'startTime', 
+            'name', 
+            'place', 
+            'ingress', 
+            'description', 
+            'items'
+        ]
     }
 });
 /**
@@ -52306,7 +52322,25 @@ Ext.define('App.store.Sections', {
                 type: 'json',
                 rootProperty: 'items'
             }
+        },
+        sorters: [
+            { property: 'timestamp', direction: 'ASC'}
+        ],
+
+        grouper: {
+            sortProperty: "timestamp",
+            direction: "ASC",
+
+            groupFn: function (record) {
+                if (record && record.data.start && record.data.start!=null) {
+                    var theDate = new Date(record.data.timestamp*1);
+                    return theDate.getDate() + "." + theDate.getMonth() + "." + theDate.getFullYear();
+                } else {
+                    return '';
+                }
+            }
         }
+        
     }
 });
 /**
@@ -53129,18 +53163,18 @@ Ext.define('Ext.dataview.NestedList', {
 
 
 Ext.define('App.view.Sections', {
-    extend: 'Ext.dataview.NestedList',
+    extend: 'Ext.dataview.NestedList',    
     xtype: 'sectionslist',
     id: 'mainlist',
-    
     requires: [
         'App.store.Sections',
-        'App.view.Detail'
+        'App.view.Detail',
+        'Ext.TitleBar'
     ],
     
     config: {
-        title: 'Konferanse',
-        useTitleAsBackText: true,
+        title: 'Agenda',
+        useTitleAsBackText: false,
         onItemDisclosure: true,
         store: 'Sections',
         detailCard: {
@@ -53149,12 +53183,12 @@ Ext.define('App.view.Sections', {
         zIndex: 0
     },
     
-    getTitleTextTpl: function() {
-        return '<div>{name}</div>';
-    },
+//    getTitleTextTpl: function() {
+//        return '<div>hmm {name}</div>';
+//    },
     getItemTextTpl: function(node) {
-        return  '<div class="list-item-title">{startTime} {name}' +
-                '<div class="list-item-description"> {ingress}</div>';
+        return  '<div class="list-item-title">{start} {name}</div>' +
+                '<div class="list-item-description">{ingress}</div>';
     }
 });
 /**
@@ -53669,16 +53703,20 @@ Ext.define("App.store.Events", {
             type: 'localstorage',
             id: 'events-app-store'
         },
-        sorters: [{ property: 'start', direction: 'ASC'}],
+        sorters: [
+            {property: 'timestamp', direction: 'ASC'}//,
+    ],
 
         grouper: {
-            sortProperty: "start",
+            sortProperty: [
+                "timestamp"
+            ],
+                
             direction: "ASC",
 
             groupFn: function (record) {
                 if (record && record.data.start && record.data.start!=null) {
-                    var date = new Date(record.data.start*1);
-                    return date.toDateString();
+                    return record.data.start;
                 } else {
                     return '';
                 }
@@ -53860,6 +53898,7 @@ Ext.define('Ext.data.Validations', {
 
 Ext.define("App.model.Event", {
     extend: "Ext.data.Model",
+    
     config: {
         idProperty: 'id',
         fields: [
@@ -53867,6 +53906,7 @@ Ext.define("App.model.Event", {
             { name: 'externalId', type: 'string' },
             { name: 'start', type: 'string' },
             { name: 'startTime', type: 'string' },
+            { name: 'timestamp', type: 'string' },
             { name: 'dateCreated', type: 'string' },
             { name: 'name', type: 'string' },
             { name: 'place', type: 'string' },
@@ -53881,41 +53921,13 @@ Ext.define("App.model.Event", {
         ]
     }
 });
-Ext.define("App.view.EventList", {
-    extend: "Ext.dataview.List",
-    alias: 'widget.eventlist',
-
-    requires: [
-        'App.store.Events',
-        'App.model.Event'
-    ],
-
-    config: {
-        loadingText: "Finner events...",
-        scrollable: 'vertical',
-        emptyText:
-                '</pre>'+
-                '<div class="event-list-empty-text">Huskelisten er tom.</div>'+
-                '<pre>',
-        onItemDisclosure: true,
-        grouped: true,
-        itemTpl:
-                '</pre>'+
-                '<div class="list-item-title">{startTime} - {name}</div>'+
-                '<div class="list-item-title"></div>'+
-                '<div class="list-item-description">{ingress}</div>'+
-                '<pre>'
-    }
-});
-
 Ext.define("App.view.EventListContainer", {
     extend: 'Ext.Container',
     alias: "widget.eventlistcontainer",
     id:'eventlistcontainer',
 
-    //styleHtmlContent: true,
     requires: [
-        'Ext.Toolbar',
+        'Ext.TitleBar',
         'App.store.Events',
         'App.model.Event'
     ],
@@ -53923,24 +53935,15 @@ Ext.define("App.view.EventListContainer", {
     initialize: function () {
         this.callParent(arguments);
 
-/* Button for creating new local events
-        var newButton = {
-            xtype: 'button',
-            text: 'Ny',
-            ui: 'action',
-            handler: this.onNewButtonTap,
-            scope: this
-        };
- */
-
         var topToolbar = {
             xtype: 'toolbar',
-            title: 'Huskeliste',
+            title: 'Min huskeliste',
+            ui: 'dark',
             docked: 'top',
             items: [
                 {
                     xtype: 'spacer'
-                }//, newButton    // For testing purposes - for now. Perhaps add later
+                }
             ]
         };
 
@@ -53948,25 +53951,21 @@ Ext.define("App.view.EventListContainer", {
             xtype: "eventlist",
             store: Ext.getStore("Events"),
             listeners: {
-                disclose: { fn: this.onEventListDisclose, scope: this },
-                itemtaphold: { fn: this.onEventRemove, scope: this }
+                disclose: { fn: this.onEventListDisclose, scope: this }
+                //itemtaphold: { fn: this.onEventRemove, scope: this }
             }
         };
 
         this.add([topToolbar, eventList]);
     },
 
-/*
-    onNewButtonTap: function() {
-        this.fireEvent("newEventCommand", this);
-    },
-*/
-
     onEventListDisclose: function (list, record, target, index, evt, options) {
+        console.log("onEventListDisclose");
         this.fireEvent('editEventCommand', this, record);
     },
 
     onEventRemove: function (view, index, item, e) {
+        console.log("onEventRemove");
         var record = view.getStore().getAt(index);
         this.fireEvent('deleteEventCommand', this, record);
     },
@@ -53981,6 +53980,36 @@ Ext.define("App.view.EventListContainer", {
 
     }
 
+});
+
+Ext.define("App.view.EventList", {
+    extend: "Ext.dataview.List",
+    alias: 'widget.eventlist',
+
+    requires: [
+        'App.store.Events',
+        'App.model.Event'
+    ],
+
+    config: {
+        loadingText: "Henter huskelisten...",
+        scrollable: 'vertical',
+        emptyText:
+                '</pre>'+
+                '<div class="event-list-empty-text">Huskelisten er tom.</div>'+
+                '<pre>',
+        onItemDisclosure: true,
+        grouped: true,
+        iconCls: "button",
+        itemTpl:
+                '</pre>'+
+                '<div class="list-item-title">'+
+                '<input type="button" onClick="removeItem({id});" value="Fjern" /> '+
+                '{start} {name} ({startTime})</div>'+
+                '<div class="list-item-title"></div>'+
+                '<div class="list-item-description">{ingress}</div>'+
+                '<pre>'
+    }
 });
 
 /**

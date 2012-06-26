@@ -1,5 +1,5 @@
 {
-    "projectName": "Rica Nidelven Hotel",
+    "projectName": "XP 2010",
     "licenseText": "Copyright(c) 2012 Itema as",
     "builds": [
         {
@@ -150,13 +150,13 @@
                     "path": "sdk/src/fx/animation/"
                 },
                 {
-                    "clsName": "Ext.fx.animation.FadeOut",
-                    "name": "FadeOut.js",
+                    "clsName": "Ext.fx.animation.Flip",
+                    "name": "Flip.js",
                     "path": "sdk/src/fx/animation/"
                 },
                 {
-                    "clsName": "Ext.fx.animation.Flip",
-                    "name": "Flip.js",
+                    "clsName": "Ext.fx.animation.FadeOut",
+                    "name": "FadeOut.js",
                     "path": "sdk/src/fx/animation/"
                 },
                 {
@@ -760,14 +760,14 @@
                     "path": "sdk/src/tab/"
                 },
                 {
-                    "clsName": "Ext.mixin.Selectable",
-                    "name": "Selectable.js",
-                    "path": "sdk/src/mixin/"
-                },
-                {
                     "clsName": "Ext.dataview.element.Container",
                     "name": "Container.js",
                     "path": "sdk/src/dataview/element/"
+                },
+                {
+                    "clsName": "Ext.mixin.Selectable",
+                    "name": "Selectable.js",
+                    "path": "sdk/src/mixin/"
                 },
                 {
                     "clsName": "Ext.data.Connection",
@@ -895,13 +895,13 @@
                     "path": "sdk/src/data/association/"
                 },
                 {
-                    "clsName": "Ext.data.association.BelongsTo",
-                    "name": "BelongsTo.js",
+                    "clsName": "Ext.data.association.HasOne",
+                    "name": "HasOne.js",
                     "path": "sdk/src/data/association/"
                 },
                 {
-                    "clsName": "Ext.data.association.HasOne",
-                    "name": "HasOne.js",
+                    "clsName": "Ext.data.association.BelongsTo",
+                    "name": "BelongsTo.js",
                     "path": "sdk/src/data/association/"
                 },
                 {
@@ -1030,13 +1030,13 @@
                     "path": "app/model/"
                 },
                 {
-                    "clsName": "App.view.EventList",
-                    "name": "EventList.js",
+                    "clsName": "App.view.EventListContainer",
+                    "name": "EventListContainer.js",
                     "path": "app/view/"
                 },
                 {
-                    "clsName": "App.view.EventListContainer",
-                    "name": "EventListContainer.js",
+                    "clsName": "App.view.EventList",
+                    "name": "EventList.js",
                     "path": "app/view/"
                 },
                 {

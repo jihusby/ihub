@@ -10,8 +10,8 @@ Ext.define("App.view.Homepage", {
 
         items: [
             {
-                styleHtmlContent: true,
-                title: 'Rica',
+                // styleHtmlContent: true,
+                title: 'Rica Nidelven',
                 maxWidth: 750,
                 xtype: 'dataview',
                 itemTpl: [
