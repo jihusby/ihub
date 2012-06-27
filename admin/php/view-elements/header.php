@@ -7,7 +7,7 @@
             .stdSmallField{width: 80px;} 
             .stdSmallArea{min-height: 50px; max-height: 50px; min-width: 400px;} 
             .stdBigArea{min-height: 100px; max-height: 100px; min-width: 400px;}
-            .sectionItem{background-color: #FF9955;border: 1px solid #ADADAD; width:500px; padding: 5px;}
+            .sectionItem{background-color: #DCDCDD; border: 1px solid #ADADAD; width:450px; padding: 5px;}
 
         * { margin: 0; padding: 0; }
         #page-wrap { width: 960px; margin: 100px auto; }
@@ -29,41 +29,44 @@
         .tabbed-area div div, .tabs li a { border: 1px solid #ccc; }
         #box-one:target, #box-two:target, #box-three:target { z-index: 1; }
         
-        .w3c { min-height: 250px; position: relative; width: 100%; }
-        .w3c > div { display: inline; }
+        /*.w3c { background-color: #ff99ff; min-height: 250px; position: relative; width: 100%; }*/
+        .w3c > div { margin-top: 300px; display: inline; }
         .w3c > div > a { margin-left: -1px; position: relative; left: 1px; text-decoration: none; color: black; background: white; display: block; float: left; padding: 5px 10px; border: 1px solid #ccc; border-bottom: 1px solid white; }
         .w3c > div:not(:target) > a { border-bottom: 0; background: #dddddd; }
-        .w3c > div:target > a { background: white; }	
-        .w3c > div > div        { z-index: -2; left: 0; top: 30px; bottom: 0; right: 0; padding: 20px; border: 1px solid #ccc; }
-        .w3c > div > div  { z-index: -2; left: 0; top: 30px; bottom: 0; right: 0; padding: 20px; border: 1px solid #ccc; }
+        .w3c > div:target > a {background: white; }	
+        .w3c > div > div {z-index: -2; left: 0; top: 30px; height: 3px; padding: 10px;} /* Hidden box */
+        .w3c > div > div > div {z-index: -2; left: 0; top: 30px; bottom: 0; right: 0; padding: 20px; border: 1px solid #ccc; } /* Child boxes */
         .w3c > div:not(:target) > div { visibility: hidden }
         .w3c > div:not(:target) > div { position: absolute }
-        .w3c > div:target > div { position: absolute; z-index: -1; }
+        .w3c > div:target > div {position: absolute; z-index: -1; }
         
         .parentItem {
-            background-color: #efefef;
-            /*overflow-y: auto;
-            height: auto;*/
+            background-color: #fffff;
+            border: 0px #ffffff;
         }
         
         .submitBtn {
-            position: inherit;
-            width: 400px;
+            position: absolute;
+            margin-left: 520px;
+            margin-top: 0px;
+            width: 240px;
+            height: 100%;
+            padding: 10px;
+            border: 1px solid #cdcdcd;
+            background-color: #efefef;
+            line-height: 18px;
         }
-        
-        .submitBlock {
-            top: inherit;
-            background-color: #ff0000;
-            width: 400px;
-            
+
+        .btn {
+            width: 200px;
+            margin: 10px;
         }
         
          </style>
          <script src="utils/calendar/scripts.js" type="text/javascript"></script>
      </head>
 
-<body style='font-family:verdana; font-size: 12px; color:#333388;'>
-    <h1>Timeplan for konferanse</h1>
+<body style='font-family:verdana; font-size: 12px; color:#333388; background-color: #FAFAFA; '>
     <form action='admin.php' method='POST'>
 
 

@@ -89,9 +89,9 @@ class dataManager {
                     $parentCounter ++;
                     $result = $result . $this->getHiddenField('parentId'.$parentCounter, $value2);
                 }else if($key2 === "name") {
-                    $result = $result . $start . $this->getTextField('parent'.$key2.$parentCounter, "stdField", $value2) . $end;    
+                    $result = $result . $start . $this->getTextField('parent'.$key2.$parentCounter, "stdField", $value2) . "<br><br>" . $end;    
                 }else if($key2 === "ingress") {
-                    $result = $result . $start . $this->getTextArea('parent'.$key2.$parentCounter, "stdSmallArea", $value2) . $end;    
+                    $result = $result . $start . $this->getTextArea('parent'.$key2.$parentCounter, "stdSmallArea", $value2) . "<br><br>" . $end;    
                 }else {
                     $result = $result . $this->getHiddenField('parent'.$key2.$parentCounter, $value2);
                 }
@@ -124,21 +124,21 @@ class dataManager {
                 $start = ("<div style='width:100px; left:50px;'>$key</div><div style='width:400px; left:120px;'>");
                 $end = ("</div>");
                 if($key === "name"){
-                    $result = $result . $start . $this->getTextField($key.$counter, "stdField", $value) . $end;
+                    $result = $result . $start . $this->getTextField($key.$counter, "stdField", $value) . "<br>" . $end;
                 }
                 else if($key === "start"){
                     //$value = date("d.m.Y", ($value/1000));
                     $result = $result . $start . $this->getTextField($key.$counter, "stdSmallField", $value) . "<a href='javascript:viewcalendar(\"$key$counter\")'><img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'></a>&nbsp;";
                 }
                 else if($key === "startTime"){
-                    $result = $result . $this->getTextField($key.$counter, "stdSmallField", $value) . $end;
+                    $result = $result . $this->getTextField($key.$counter, "stdSmallField", $value) . "<br>" . $end;
                 }
 
                 else if($key === "ingress"){
                     $result = $result . $start . $this->getTextArea($key.$counter, "stdSmallArea", $value) . $end;
                 }
                 else if($key === "description"){
-                    $result = $result . $start . $this->getTextArea($key.$counter, "stdBigArea", $this->htmlToText($value)) . $end;
+                    $result = $result . $start . $this->getTextArea($key.$counter, "stdBigArea", $this->htmlToText($value)) . "<br>" . $end;
                     $result = $result . "</div><br>";
                 }
                 else {
@@ -151,7 +151,7 @@ class dataManager {
     }
     
     private function getTextField($name, $class, $value){
-        return "<input class='$class' type=text name='$name' id='$name' value='$value'></input><p>";
+        return "<input class='$class' type=text name='$name' id='$name' value='$value'></input>";
     }
 
     private function getTextArea($name, $class, $value){
@@ -213,7 +213,7 @@ class dataManager {
     }
 
     private function textToHtml($value) {
-        return preg_replace('/\r\n/', '<br>', trim($value));
+        return preg_replace('/\r\n/', '<p><p>', trim($value));
     }
     
 }
