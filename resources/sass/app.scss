@@ -26,10 +26,11 @@ $tabs-bottom-active-gradient: 'recessed';
 @include sencha-form;
 @include sencha-sheet;
 @include sencha-msgbox;
-
+/*
 .x-tab img.some_icon, .x-button img.x-icon-mask.delete {
   -webkit-mask-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAIgUlEQVRoBc2aWaxdUxjHezpqaVQprQ5JuakOqal');
 }
+*/
 
 .x-toolbar .x-toolbar-title {
   /*color: saturate(darken($active-color, 10%), 35%);
