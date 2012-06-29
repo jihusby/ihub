@@ -8,13 +8,11 @@ Ext.define("App.store.Events", {
             id: 'events-app-store'
         },
         sorters: [
-            {property: 'timestamp', direction: 'ASC'}//,
+            {property: 'timestamp', direction: 'ASC'}
     ],
 
         grouper: {
-            sortProperty: [
-                "timestamp"
-            ],
+            sortProperty: "timestamp",
                 
             direction: "ASC",
 

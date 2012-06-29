@@ -1,87 +1,42 @@
 
- <!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
- <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
-     <head>
-         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-         <style type='text/css'> 
-            .stdField{width: 400px;} 
-            .stdSmallField{width: 80px;} 
-            .stdSmallArea{min-height: 50px; max-height: 50px; min-width: 400px;} 
-            .stdBigArea{min-height: 100px; max-height: 100px; min-width: 400px;}
-            .sectionItem{background-color: #FF9955;border: 1px solid #ADADAD; width:500px; padding: 5px;}
+ 
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+ 
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+     
+<head>
+         
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+         
+<link rel="stylesheet" href="../resources/css/admin.css">
+         
+<script src="utils/calendar/scripts.js" type="text/javascript">
+</script>
+     
+</head>
 
-        * { margin: 0; padding: 0; }
-        #page-wrap { width: 960px; margin: 100px auto; }
-        h1 { font: 36px Georgia, Serif; margin: 20px 0; }
-        .group:after { visibility: hidden; display: block; font-size: 0; content: " "; clear: both; height: 0; }
-        p { margin: 0 0 10px 0; }
-        
-        .tabs { list-style: none; }
-        .tabs li { display: inline; }
-        .tabs li a { color: black; float: left; display: block; padding: 4px 10px; margin-left: -1px; position: relative; left: 1px; background: white; text-decoration: none; }
-        .tabs li a:hover { background: #ccc; }
-        
-        
-        /* Generic styles & example one */
-        
-        .tabbed-area { margin: 0 0 120px 0; }
-        .box-wrap { position: relative; min-height: 250px; }
-        .tabbed-area div div { background: white; padding: 20px; min-height: 250px; position: absolute; top: -1px; left: 0; width: 100%; }
-        .tabbed-area div div, .tabs li a { border: 1px solid #ccc; }
-        #box-one:target, #box-two:target, #box-three:target { z-index: 1; }
-        
-        .w3c { min-height: 250px; position: relative; width: 100%; }
-        .w3c > div { display: inline; }
-        .w3c > div > a { margin-left: -1px; position: relative; left: 1px; text-decoration: none; color: black; background: white; display: block; float: left; padding: 5px 10px; border: 1px solid #ccc; border-bottom: 1px solid white; }
-        .w3c > div:not(:target) > a { border-bottom: 0; background: #dddddd; }
-        .w3c > div:target > a { background: white; }	
-        .w3c > div > div        { z-index: -2; left: 0; top: 30px; bottom: 0; right: 0; padding: 20px; border: 1px solid #ccc; }
-        .w3c > div > div  { z-index: -2; left: 0; top: 30px; bottom: 0; right: 0; padding: 20px; border: 1px solid #ccc; }
-        .w3c > div:not(:target) > div { visibility: hidden }
-        .w3c > div:not(:target) > div { position: absolute }
-        .w3c > div:target > div { position: absolute; z-index: -1; }
-        
-        .parentItem {
-            background-color: #efefef;
-            /*overflow-y: auto;
-            height: auto;*/
-        }
-        
-        .submitBtn {
-            position: inherit;
-            width: 400px;
-        }
-        
-        .submitBlock {
-            top: inherit;
-            background-color: #ff0000;
-            width: 400px;
-            
-        }
-        
-         </style>
-         <script src="utils/calendar/scripts.js" type="text/javascript"></script>
-     </head>
 
-<body style='font-family:verdana; font-size: 12px; color:#333388;'>
-    <h1>Timeplan for konferanse</h1>
-    <form action='admin.php' method='POST'>
+<body>
+    
+<form action='admin.php' method='POST'>
 
 
 
 <div class='w3c'>
 <div id='parent1' style='left:10px;'>
-
 <a href='#parent1'>9. september
 </a>
-<div class='parentItem' style='left:10px;'>
+<div class='parentItem'>
 <input type=hidden name='parentId1' id='parentId1' value='1'>
 </input>
 <input class='stdField' type=text name='parentname1' id='parentname1' value='9. september'>
 </input>
-<p>
+<br>
+<br>
 <textarea class='stdSmallArea' name='parentingress1' id='parentingress1'>Focusing on programming techniques and technical info. Among the topics are sessions about Java SE 8, continous delivery and HTML5.
 </textarea>
+<br>
+<br>
 <input type=hidden name='parentdescription1' id='parentdescription1' value=''>
 </input>
 <input type=hidden name='parentitems1' id='parentitems1' value='Array'>
@@ -89,19 +44,24 @@
 <div class='sectionItem'>
 <input type=hidden name='childId1' id='childId1' value='2'>
 </input>
-<div style='width:100px; left:50px;'>name
-</div>
-<div style='width:400px; left:120px;'>
+<table>
+<tr>
+<td class='keyCell'>name
+</td>
+<td class='valueCell'
 <input class='stdField' type=text name='name1' id='name1' value='Presentation Patterns & Anti-Patterns'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>start
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>start
+</td>
+<td class='valueCell'
 <input class='stdSmallField' type=text name='start1' id='start1' value='09.09.2012'>
 </input>
-<p>
 <a href='javascript:viewcalendar("start1")'>
 <img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'>
 </a>&nbsp;
@@ -109,20 +69,31 @@
 </input>
 <input class='stdSmallField' type=text name='startTime1' id='startTime1' value='09:00'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>ingress
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>ingress
+</td>
+<td class='valueCell'
 <textarea class='stdSmallArea' name='ingress1' id='ingress1'>A different approach to how to build presentations
 </textarea>
-</div>
-<div style='width:100px; left:50px;'>description
-</div>
-<div style='width:400px; left:120px;'>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>description
+</td>
+<td class='valueCell'
 <textarea class='stdBigArea' name='description1' id='description1'>This session takes a different approach to how to build presentations, by providing patterns and anti-patterns you can use to make sure you’re getting the most leverage from your presentations. Don’t take a knife to a gunfight! The ability to create compelling presentations that explain your point is one of the things that keeps your job from disappearing.
 </textarea>
-</div>
+<br>
+</td>
+</tr>
+</table>
 </div>
 <br>
 <input type=hidden name='place1' id='place1' value='Sal 1'>
@@ -134,19 +105,24 @@
 <div class='sectionItem'>
 <input type=hidden name='childId2' id='childId2' value='3'>
 </input>
-<div style='width:100px; left:50px;'>name
-</div>
-<div style='width:400px; left:120px;'>
+<table>
+<tr>
+<td class='keyCell'>name
+</td>
+<td class='valueCell'
 <input class='stdField' type=text name='name2' id='name2' value='Java SE 7 has been released, what about Java SE 8?'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>start
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>start
+</td>
+<td class='valueCell'
 <input class='stdSmallField' type=text name='start2' id='start2' value='09.09.2012'>
 </input>
-<p>
 <a href='javascript:viewcalendar("start2")'>
 <img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'>
 </a>&nbsp;
@@ -154,20 +130,31 @@
 </input>
 <input class='stdSmallField' type=text name='startTime2' id='startTime2' value='10:00'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>ingress
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>ingress
+</td>
+<td class='valueCell'
 <textarea class='stdSmallArea' name='ingress2' id='ingress2'>Discussing changes in Java SE 8
 </textarea>
-</div>
-<div style='width:100px; left:50px;'>description
-</div>
-<div style='width:400px; left:120px;'>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>description
+</td>
+<td class='valueCell'
 <textarea class='stdBigArea' name='description2' id='description2'>Java SE 7 was launched officially on 28th of July this year; the first new version of the Java platform in nearly five years. Now that various issues have been resolved, Oracle are keen to maintain the momentum of Java as a platform. In this session we'll talk briefly about Java SE 7 before discussing some of the changes being made to the JCP to provide a more transparent development of new Java specifications.
 </textarea>
-</div>
+<br>
+</td>
+</tr>
+</table>
 </div>
 <br>
 <input type=hidden name='place2' id='place2' value=''>
@@ -179,19 +166,24 @@
 <div class='sectionItem'>
 <input type=hidden name='childId3' id='childId3' value='4'>
 </input>
-<div style='width:100px; left:50px;'>name
-</div>
-<div style='width:400px; left:120px;'>
+<table>
+<tr>
+<td class='keyCell'>name
+</td>
+<td class='valueCell'
 <input class='stdField' type=text name='name3' id='name3' value='Continous delivery'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>start
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>start
+</td>
+<td class='valueCell'
 <input class='stdSmallField' type=text name='start3' id='start3' value='09.09.2012'>
 </input>
-<p>
 <a href='javascript:viewcalendar("start3")'>
 <img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'>
 </a>&nbsp;
@@ -199,20 +191,31 @@
 </input>
 <input class='stdSmallField' type=text name='startTime3' id='startTime3' value='11:00'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>ingress
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>ingress
+</td>
+<td class='valueCell'
 <textarea class='stdSmallArea' name='ingress3' id='ingress3'>Introducion to continous delivery by Ken Sipe
 </textarea>
-</div>
-<div style='width:100px; left:50px;'>description
-</div>
-<div style='width:400px; left:120px;'>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>description
+</td>
+<td class='valueCell'
 <textarea class='stdBigArea' name='description3' id='description3'>Ken Sipe is a Technology Director with Perficient, Inc. (PRFT), an application architect, frequent technical speaker, author of several articles and courses, and software and methodology mentor. He is founder of CodeMentor, Inc., focusing on training and mentor in distributed computing technologies. Ken has delivered hundreds of private and public presentations including JavaOne, BorCon and NFJS.
 </textarea>
-</div>
+<br>
+</td>
+</tr>
+</table>
 </div>
 <br>
 <input type=hidden name='place3' id='place3' value=''>
@@ -224,19 +227,24 @@
 <div class='sectionItem'>
 <input type=hidden name='childId4' id='childId4' value='5'>
 </input>
-<div style='width:100px; left:50px;'>name
-</div>
-<div style='width:400px; left:120px;'>
+<table>
+<tr>
+<td class='keyCell'>name
+</td>
+<td class='valueCell'
 <input class='stdField' type=text name='name4' id='name4' value='HTML 5 Fact and Fiction'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>start
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>start
+</td>
+<td class='valueCell'
 <input class='stdSmallField' type=text name='start4' id='start4' value='09.09.2012'>
 </input>
-<p>
 <a href='javascript:viewcalendar("start4")'>
 <img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'>
 </a>&nbsp;
@@ -244,20 +252,31 @@
 </input>
 <input class='stdSmallField' type=text name='startTime4' id='startTime4' value='12:00'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>ingress
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>ingress
+</td>
+<td class='valueCell'
 <textarea class='stdSmallArea' name='ingress4' id='ingress4'>Web 2.0 development with the help of jQuery and Prototype
 </textarea>
-</div>
-<div style='width:100px; left:50px;'>description
-</div>
-<div style='width:400px; left:120px;'>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>description
+</td>
+<td class='valueCell'
 <textarea class='stdBigArea' name='description4' id='description4'>For the last few years, the web has been all a-twitter about web 2.0 (and even the occasional reference to web 3.0.) Yes, the days of static web applications are officially over and while libraries like jQuery and Prototype make it easier to build modern applications, ultimately they are papering over issues in the web standards (and the browsers that implement them.)
 </textarea>
-</div>
+<br>
+</td>
+</tr>
+</table>
 </div>
 <br>
 <input type=hidden name='place4' id='place4' value=''>
@@ -269,19 +288,24 @@
 <div class='sectionItem'>
 <input type=hidden name='childId5' id='childId5' value='6'>
 </input>
-<div style='width:100px; left:50px;'>name
-</div>
-<div style='width:400px; left:120px;'>
+<table>
+<tr>
+<td class='keyCell'>name
+</td>
+<td class='valueCell'
 <input class='stdField' type=text name='name5' id='name5' value='Do I still hate SOA?'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>start
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>start
+</td>
+<td class='valueCell'
 <input class='stdSmallField' type=text name='start5' id='start5' value='09.09.2012'>
 </input>
-<p>
 <a href='javascript:viewcalendar("start5")'>
 <img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'>
 </a>&nbsp;
@@ -289,20 +313,31 @@
 </input>
 <input class='stdSmallField' type=text name='startTime5' id='startTime5' value='13:00'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>ingress
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>ingress
+</td>
+<td class='valueCell'
 <textarea class='stdSmallArea' name='ingress5' id='ingress5'>Strengths and weaknesses in Service Oriented Architecture
 </textarea>
-</div>
-<div style='width:100px; left:50px;'>description
-</div>
-<div style='width:400px; left:120px;'>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>description
+</td>
+<td class='valueCell'
 <textarea class='stdBigArea' name='description5' id='description5'>At JavaZone 2005, I gave a talk with the title 'Why I hate SOA'. In the talk, I outlined several weaknesses with the then much-hyped term Service Oriented Architecture. Six years have passed, and I have learned much. The question is: Has SOA learned the same things?
 </textarea>
-</div>
+<br>
+</td>
+</tr>
+</table>
 </div>
 <br>
 <input type=hidden name='place5' id='place5' value=''>
@@ -314,19 +349,24 @@
 <div class='sectionItem'>
 <input type=hidden name='childId6' id='childId6' value='7'>
 </input>
-<div style='width:100px; left:50px;'>name
-</div>
-<div style='width:400px; left:120px;'>
+<table>
+<tr>
+<td class='keyCell'>name
+</td>
+<td class='valueCell'
 <input class='stdField' type=text name='name6' id='name6' value='Comparing Asynchronous Web Techniques'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>start
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>start
+</td>
+<td class='valueCell'
 <input class='stdSmallField' type=text name='start6' id='start6' value='09.09.2012'>
 </input>
-<p>
 <a href='javascript:viewcalendar("start6")'>
 <img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'>
 </a>&nbsp;
@@ -334,20 +374,31 @@
 </input>
 <input class='stdSmallField' type=text name='startTime6' id='startTime6' value='14:00'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>ingress
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>ingress
+</td>
+<td class='valueCell'
 <textarea class='stdSmallArea' name='ingress6' id='ingress6'>Pros and cons of comet, servlet 3, and websockets
 </textarea>
-</div>
-<div style='width:100px; left:50px;'>description
-</div>
-<div style='width:400px; left:120px;'>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>description
+</td>
+<td class='valueCell'
 <textarea class='stdBigArea' name='description6' id='description6'>The world is all about the asynchronous web these days. There are an increasing number of options for Java developers. In this presentation we'll cover 3 such options: comet, servlet 3, and websockets. We'll look at code and discuss pros and cons of each approach.
 </textarea>
-</div>
+<br>
+</td>
+</tr>
+</table>
 </div>
 <br>
 <input type=hidden name='place6' id='place6' value=''>
@@ -364,14 +415,17 @@
 <div id='parent8' style='left:10px;'>
 <a href='#parent8'>10. september
 </a>
-<div class='parentItem' style='left:10px;'>
+<div class='parentItem'>
 <input type=hidden name='parentId2' id='parentId2' value='8'>
 </input>
 <input class='stdField' type=text name='parentname2' id='parentname2' value='10. september'>
 </input>
-<p>
+<br>
+<br>
 <textarea class='stdSmallArea' name='parentingress2' id='parentingress2'>Workshops
 </textarea>
+<br>
+<br>
 <input type=hidden name='parentdescription2' id='parentdescription2' value=''>
 </input>
 <input type=hidden name='parentitems2' id='parentitems2' value='Array'>
@@ -379,19 +433,24 @@
 <div class='sectionItem'>
 <input type=hidden name='childId7' id='childId7' value='9'>
 </input>
-<div style='width:100px; left:50px;'>name
-</div>
-<div style='width:400px; left:120px;'>
+<table>
+<tr>
+<td class='keyCell'>name
+</td>
+<td class='valueCell'
 <input class='stdField' type=text name='name7' id='name7' value='Workshop med Uncle Bob'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>start
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>start
+</td>
+<td class='valueCell'
 <input class='stdSmallField' type=text name='start7' id='start7' value='10.09.2012'>
 </input>
-<p>
 <a href='javascript:viewcalendar("start7")'>
 <img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'>
 </a>&nbsp;
@@ -399,20 +458,31 @@
 </input>
 <input class='stdSmallField' type=text name='startTime7' id='startTime7' value='09:00'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>ingress
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>ingress
+</td>
+<td class='valueCell'
 <textarea class='stdSmallArea' name='ingress7' id='ingress7'>TDD and Extreme programming with Robert C. Martin
 </textarea>
-</div>
-<div style='width:100px; left:50px;'>description
-</div>
-<div style='width:400px; left:120px;'>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>description
+</td>
+<td class='valueCell'
 <textarea class='stdBigArea' name='description7' id='description7'>Robert C. Martin - Uncle Bob - has been a software professional since 1970. In the last 35 years, he has worked in various capacities on literally hundreds of software projects. He has authored 'landmark' books on Agile Programming, Extreme Programming, UML, Object-Oriented Programming, and C++ Programming.
 </textarea>
-</div>
+<br>
+</td>
+</tr>
+</table>
 </div>
 <br>
 <input type=hidden name='place7' id='place7' value=''>
@@ -424,19 +494,24 @@
 <div class='sectionItem'>
 <input type=hidden name='childId8' id='childId8' value='10'>
 </input>
-<div style='width:100px; left:50px;'>name
-</div>
-<div style='width:400px; left:120px;'>
+<table>
+<tr>
+<td class='keyCell'>name
+</td>
+<td class='valueCell'
 <input class='stdField' type=text name='name8' id='name8' value='Workshop med Kent Beck'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>start
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>start
+</td>
+<td class='valueCell'
 <input class='stdSmallField' type=text name='start8' id='start8' value='10.09.2012'>
 </input>
-<p>
 <a href='javascript:viewcalendar("start8")'>
 <img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'>
 </a>&nbsp;
@@ -444,20 +519,31 @@
 </input>
 <input class='stdSmallField' type=text name='startTime8' id='startTime8' value='12:00'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>ingress
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>ingress
+</td>
+<td class='valueCell'
 <textarea class='stdSmallArea' name='ingress8' id='ingress8'>Kent Beck was one of the 17 original signatories of the Agile Manifesto in 2001
 </textarea>
-</div>
-<div style='width:100px; left:50px;'>description
-</div>
-<div style='width:400px; left:120px;'>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>description
+</td>
+<td class='valueCell'
 <textarea class='stdBigArea' name='description8' id='description8'>Kent Beck is an American software engineer and the creator of the Extreme Programming[1] and Test Driven Development software development methodologies, also named agile software development. Beck was one of the 17 original signatories of the Agile Manifesto in 2001.
 </textarea>
-</div>
+<br>
+</td>
+</tr>
+</table>
 </div>
 <br>
 <input type=hidden name='place8' id='place8' value=''>
@@ -474,14 +560,17 @@
 <div id='parent11' style='left:10px;'>
 <a href='#parent11'>11. september
 </a>
-<div class='parentItem' style='left:10px;'>
+<div class='parentItem'>
 <input type=hidden name='parentId3' id='parentId3' value='11'>
 </input>
 <input class='stdField' type=text name='parentname3' id='parentname3' value='11. september'>
 </input>
-<p>
+<br>
+<br>
 <textarea class='stdSmallArea' name='parentingress3' id='parentingress3'>Lyntaler fra kjente utviklere
 </textarea>
+<br>
+<br>
 <input type=hidden name='parentdescription3' id='parentdescription3' value=''>
 </input>
 <input type=hidden name='parentitems3' id='parentitems3' value='Array'>
@@ -489,19 +578,24 @@
 <div class='sectionItem'>
 <input type=hidden name='childId9' id='childId9' value='12'>
 </input>
-<div style='width:100px; left:50px;'>name
-</div>
-<div style='width:400px; left:120px;'>
+<table>
+<tr>
+<td class='keyCell'>name
+</td>
+<td class='valueCell'
 <input class='stdField' type=text name='name9' id='name9' value='Avslutning'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>start
-</div>
-<div style='width:400px; left:120px;'>
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>start
+</td>
+<td class='valueCell'
 <input class='stdSmallField' type=text name='start9' id='start9' value='11.09.2012'>
 </input>
-<p>
 <a href='javascript:viewcalendar("start9")'>
 <img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'>
 </a>&nbsp;
@@ -509,20 +603,31 @@
 </input>
 <input class='stdSmallField' type=text name='startTime9' id='startTime9' value='09:00'>
 </input>
-<p>
-</div>
-<div style='width:100px; left:50px;'>ingress
-</div>
-<div style='width:400px; left:120px;'>
-<textarea class='stdSmallArea' name='ingress9' id='ingress9'>Siste dag!
+<br>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>ingress
+</td>
+<td class='valueCell'
+<textarea class='stdSmallArea' name='ingress9' id='ingress9'>Siste dag på seminaret!
 </textarea>
-</div>
-<div style='width:100px; left:50px;'>description
-</div>
-<div style='width:400px; left:120px;'>
-<textarea class='stdBigArea' name='description9' id='description9'>Vi sitter i en ring og spiser sjokoladepudding!
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td class='keyCell'>description
+</td>
+<td class='valueCell'
+<textarea class='stdBigArea' name='description9' id='description9'>Vi oppsummerer
 </textarea>
-</div>
+<br>
+</td>
+</tr>
+</table>
 </div>
 <br>
 <input type=hidden name='place9' id='place9' value=''>
@@ -536,10 +641,30 @@
 </div>
 </div>
 <p>
-</div>
-<p>        
+</div>        
 <p>
-        <span class='submitBlock'><input class='submitBtn' type=submit value='Oppdater eventliste'></span>
-    </form>
+        
+<div class='submitBtn'>
+                
+<b>Brukerveiledning
+</b>
+<p>
+                Lagre alle endringer i timeplanen. Endringer er synlige i mobil-appen ved oppdatering / restart.
+<p>
+                [Her i høyre kolonne er det plass til beskrivelse av prosedyren]
+<p>
+                
+<input class="btn" type=submit value='Oppdater timeplan' />
+<p>
+                
+                
+            
+</ul>
+        
+</div>
+    
+</form>
+
 </body>
+
 </html>

@@ -4,6 +4,7 @@
 "name": "9. september",
 "ingress": "Focusing on programming techniques and technical info. Among the topics are sessions about Java SE 8, continous delivery and HTML5.",
 "description": "",
+"timestamp": "1347141632400",
 "items": [
 {
 "id": "2",
@@ -17,6 +18,18 @@
 "dateCreated": "1325032800000",
 "leaf": "true"
 },{
+"id": "21",
+"name": "Presentation Patterns & Anti-Patterns II",
+"start": "09.09.2012",
+"timestamp": "1347141632400",
+"startTime": "09:00",
+"ingress": "A different approach to how to build presentations",
+"description": "This session takes a different approach to how to build presentations, by providing patterns and anti-patterns you can use to make sure you’re getting the most leverage from your presentations. Don’t take a knife to a gunfight! The ability to create compelling presentations that explain your point is one of the things that keeps your job from disappearing.",
+"place": "Sal 1",
+"dateCreated": "1325032800000",
+"leaf": "true"
+},{
+
 "id": "3",
 "name": "Java SE 7 has been released, what about Java SE 8?",
 "start": "09.09.2012",
@@ -76,6 +89,7 @@
 "name": "10. september",
 "ingress": "Workshops",
 "description": "",
+"timestamp": "1347141632400",
 "items": [
 {
 "id": "9",

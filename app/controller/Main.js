@@ -151,7 +151,6 @@ Ext.define('App.controller.Main', {
     
     showViewById: function(id) {
         var mainView = this.getMainView();
-        
         Ext.each(mainView.getInnerItems(), function(item) {
             if (item.getId() == id) {
                 mainView.setActiveItem(item);

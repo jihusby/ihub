@@ -3,7 +3,7 @@
 class dataManager {
     
     var $fullTime;
-    
+
     function __construct() {
         $this->fullTime = "";
     }
@@ -80,7 +80,7 @@ class dataManager {
             
             $result = $result . ("<div id='parent" . $value["id"] . "' style='left:10px;'>");
             $result = $result . ("<a href='#parent".$value["id"]."'>".$value["name"]."</a>");
-            $result = $result . ("<div class='parentItem' style='left:10px;'>");
+            $result = $result . ("<div class='parentItem'>");
             
             foreach ($value as $key2 => $value2){
 
@@ -107,39 +107,38 @@ class dataManager {
             $i ++;
             $day ++;
         }
-        $result = $result . "</div><p>";
+        $result = $result . "</div>";
         return $result;
     }
     
     private function getFormattedChild($child, $counter){
         $result = "";
         // Looping through each child
-        $result = $result . "<div class='sectionItem'>";
+        $result = $result . "<div class='sectionItem'><table>";
         foreach ($child as $key => $value){
             
             if($key === "id"){
                 $counter ++;
                 $result = $result . $this->getHiddenField('childId'.$counter, $value);
             }else {
-                $start = ("<div style='width:100px; left:50px;'>$key</div><div style='width:400px; left:120px;'>");
-                $end = ("</div>");
+                $start = ("<tr><td class='keyCell'>$key</td><td class='valueCell'>");
+                $end = ("</td></tr>");
                 if($key === "name"){
-                    $result = $result . $start . $this->getTextField($key.$counter, "stdField", $value) . "<br>" . $end;
+                    $result = $result . $start . $this->getTextField($key.$counter, "stdField", $value) . $end;
                 }
                 else if($key === "start"){
-                    //$value = date("d.m.Y", ($value/1000));
                     $result = $result . $start . $this->getTextField($key.$counter, "stdSmallField", $value) . "<a href='javascript:viewcalendar(\"$key$counter\")'><img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'></a>&nbsp;";
                 }
                 else if($key === "startTime"){
-                    $result = $result . $this->getTextField($key.$counter, "stdSmallField", $value) . "<br>" . $end;
+                    $result = $result . $this->getTextField($key.$counter, "stdSmallField", $value) . $end;
                 }
 
                 else if($key === "ingress"){
                     $result = $result . $start . $this->getTextArea($key.$counter, "stdSmallArea", $value) . $end;
                 }
                 else if($key === "description"){
-                    $result = $result . $start . $this->getTextArea($key.$counter, "stdBigArea", $this->htmlToText($value)) . "<br>" . $end;
-                    $result = $result . "</div><br>";
+                    $result = $result . $start . $this->getTextArea($key.$counter, "stdBigArea", $this->htmlToText($value)) . $end;
+                    $result = $result . "</table></div><br>";
                 }
                 else {
                     $result = $result . $this->getHiddenField($key.$counter, $value);

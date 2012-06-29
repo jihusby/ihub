@@ -20,7 +20,7 @@ Ext.define('App.view.Detail', {
                 xtype: 'button',
                 ui: 'confirm',
                 margin: 0,
-                text: 'Legg til som favoritt',
+                text: 'Legg til i huskeliste',
                 handler: this.onAddEventButtonTap
             },
             
