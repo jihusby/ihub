@@ -1,6 +1,7 @@
 Ext.define("App.view.Homepage", {
     extend: 'Ext.navigation.View',
     xtype: 'homepage',
+    //alias: "widget.Home",
     requires: [
         'Ext.TitleBar'
     ],

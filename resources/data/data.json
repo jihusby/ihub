@@ -1,11 +1,5 @@
 {
 "items": [
-{"id": "1",
-"name": "9. september",
-"ingress": "Focusing on programming techniques and technical info. Among the topics are sessions about Java SE 8, continous delivery and HTML5.",
-"description": "",
-"timestamp": "1347141632400",
-"items": [
 {
 "id": "2",
 "name": "Presentation Patterns & Anti-Patterns",
@@ -84,14 +78,7 @@
 "place": "",
 "dateCreated": "1325032800000",
 "leaf": "true"
-}]},
-{"id": "8",
-"name": "10. september",
-"ingress": "Workshops",
-"description": "",
-"timestamp": "1347141632400",
-"items": [
-{
+},{
 "id": "9",
 "name": "Workshop med Uncle Bob",
 "start": "10.09.2012",
@@ -113,13 +100,7 @@
 "place": "",
 "dateCreated": "1325032800000",
 "leaf": "true"
-}]},
-{"id": "11",
-"name": "11. september",
-"ingress": "Lyntaler fra kjente utviklere",
-"description": "",
-"items": [
-{
+},{
 "id": "12",
 "name": "Avslutning",
 "start": "11.09.2012",
@@ -131,6 +112,4 @@
 "dateCreated": "1325032800000",
 "leaf": "true"
 }]
-}
-]
 }

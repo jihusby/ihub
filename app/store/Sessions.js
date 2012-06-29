@@ -1,15 +1,8 @@
-Ext.define('App.store.Sections', {
-    extend: 'Ext.data.TreeStore',
-    
-    requires: [
-        'App.model.Sections'
-    ],
-    
+Ext.define("App.store.Sessions", {
+    extend: "Ext.data.Store",
+    requires: "Ext.data.proxy.LocalStorage",
     config: {
-        autoLoad: true,
-        
-        model: 'App.model.Sections',
-        
+        model: "App.model.Session",
         proxy: {
             type: 'ajax',
             url: 'resources/data/data.json',
@@ -19,22 +12,22 @@ Ext.define('App.store.Sections', {
             }
         },
         sorters: [
-            { property: 'timestamp', direction: 'ASC'}
-        ],
+            {property: 'timestamp', direction: 'ASC'}
+    ],
 
         grouper: {
             sortProperty: "timestamp",
+                
             direction: "ASC",
 
             groupFn: function (record) {
                 if (record && record.data.start && record.data.start!=null) {
-                    var theDate = new Date(record.data.timestamp*1);
-                    return theDate.getDate() + "." + theDate.getMonth() + "." + theDate.getFullYear();
+                    return record.data.start;
                 } else {
                     return '';
                 }
             }
         }
-        
     }
+
 });

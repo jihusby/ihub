@@ -1,11 +1,11 @@
-Ext.define('App.view.Detail', {
+Ext.define('App.view.SessionDetail', {
     extend: 'Ext.Panel',
-    xtype: 'detailcard',
+    xtype: 'sessionDetail',
     requires: [
         'Ext.Button'
     ],
 
-    id: 'detailcard',
+    id: 'sessiondetail',
     
     config: {
         scrollable: true,
@@ -32,7 +32,7 @@ Ext.define('App.view.Detail', {
     },
 
     onAddEventButtonTap: function () {
-        this.fireEvent("addEventCommand", this);
+        this.fireEvent("newEventCommand", this);
     }
 
 });

@@ -10,6 +10,9 @@ Ext.define("App.view.EventListContainer", {
     ],
 
     initialize: function () {
+        console.log("EventListContainer.initialize()");
+        
+        
         this.callParent(arguments);
 
         var topToolbar = {
@@ -29,7 +32,6 @@ Ext.define("App.view.EventListContainer", {
             store: Ext.getStore("Events"),
             listeners: {
                 disclose: { fn: this.onEventListDisclose, scope: this }
-                //itemtaphold: { fn: this.onEventRemove, scope: this }
             }
         };
 
@@ -55,6 +57,7 @@ Ext.define("App.view.EventListContainer", {
             xtype: 'detailcard'
         }
 
-    }
+    },
+    
 
 });

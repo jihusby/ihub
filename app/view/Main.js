@@ -5,7 +5,7 @@ Ext.define("App.view.Main", {
     config: {
         tabBarPosition: 'bottom',
         defaults: {
-            layout: 'fit'
+            layout: 'card'
             /*layout: {
                 type: 'auto',
                 align: 'stretch'
@@ -36,12 +36,12 @@ Ext.define("App.view.Main", {
             },
 
             {
-                id: 'sections',
+                id: 'sessions',
                 title: 'Agenda',
                 iconCls: 'bookmarks',
                 items: [
                     {
-                        xtype: 'sectionslist'
+                        xtype: 'sessionlistcontainer'
                     }
                 ]
             },

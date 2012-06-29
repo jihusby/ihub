@@ -11,77 +11,34 @@ function getTimeFromTimestamp(d) {
     return (d.getHours()>9? d.getHours(): "0"+ d.getHours()) + ":" + (d.getMinutes()>9? d.getMinutes(): "0"+ d.getMinutes());
 }
 
-function getEmptyEvent() {
+function getEventFromSession(session) {
     var event = Ext.create("App.model.Event", {
-        externalId: "",
-        dateCreated: new Date().getTime(),
-        place: "",
-        //start: new Date().getTime(),
-        start: new Date(),
-        //timestamp: 
-        name: "",
-        ingress: "",
-        description: "",
-        leaf: true
+        id: session.data.id,
+        dateCreated: session.data.dateCreated,
+        place: session.data.place,
+        start: session.data.start,
+        timestamp: session.data.timestamp,
+        startTime: session.data.startTime,
+        name: session.data.name,
+        ingress: session.data.ingress,
+        description: session.data.description,
+        leaf: session.data.leaf
     });
     return event;
 }
 
-function getEventFromSection(section) {
-    var d = new Date();
-    d.setTime(section.data.start);
-
-    var event = Ext.create("App.model.Event", {
-        externalId: section.data.id,
-        dateCreated: section.data.dateCreated,
-        place: section.data.place,
-        start: section.data.start,
-        timestamp: section.data.timestamp,
-        startTime: section.data.startTime,
-        name: section.data.name,
-        ingress: section.data.ingress,
-        description: section.data.description,
-        leaf: section.data.leaf
-    });
-    return event;
-}
-
-function saveEvent(currentEvent) {
-    var errors = currentEvent.validate();
-    currentEvent.data.id = getUniqueEventId();
-
-    if (!errors.isValid()) {
-        console.log("Error saving event: " + errors);
-        alert('Wait!', errors.getByField("name")[0].getMessage(), Ext.emptyFn);
-        currentEvent.reject();
-        return;
-    }
-
+function addItem(currentSessionId) {
+    var sessionStore = Ext.getStore("Sessions");
     var eventStore = Ext.getStore("Events");
-    if (null == eventStore.findRecord('externalId', currentEvent.data.externalId)) {
-        eventStore.add(currentEvent);
+    if (null != sessionStore.findRecord('id', currentSessionId)) {
+        if (null == eventStore.findRecord('id', currentSessionId)) {
+            eventStore.add(getEventFromSession(sessionStore.findRecord('id', currentSessionId)));
+            eventStore.sync();
+            eventStore.sort([
+                {property: 'timestamp', direction: 'ASC'}
+            ]);
+        }
     }
-    eventStore.sync();
-    eventStore.sort([
-        {property: 'timestamp', direction: 'ASC'}
-    ]);
-}
-
-function deleteEvent(currentEvent) {
-    var eventStore = Ext.getStore("Events");
-
-    eventStore.remove(currentEvent);
-    eventStore.sync();
-    eventStore.sort([
-        {property: 'timestamp', direction: 'ASC'}
-    ]);
-}
-
-function getFormattedDetailCard(record) {
-    return '<div class="textBlock"><div class="header">'+
-            record.get('name') + '</div><div class="contentText">' + 
-            '<b>' + record.get('start') + '&nbsp;' + record.get('startTime') + '</b><br>' + 
-            record.get('description') + '</div>';
 }
 
 function isUpcomingEvent(node){
@@ -92,5 +49,10 @@ function isUpcomingEvent(node){
 
 function removeItem(id){
     var record = Ext.getStore("Events").findRecord('id', id)
-    this.deleteEvent(record);
+    var eventStore = Ext.getStore("Events");
+    eventStore.remove(record);
+    eventStore.sync();
+    eventStore.sort([
+        {property: 'timestamp', direction: 'ASC'}
+    ]);
 }
