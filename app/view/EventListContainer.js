@@ -57,7 +57,7 @@ Ext.define("App.view.EventListContainer", {
             xtype: 'detailcard'
         }
 
-    },
+    }
     
 
 });

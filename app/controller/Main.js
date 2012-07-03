@@ -9,15 +9,16 @@ Ext.define('App.controller.Main', {
     
     config: {
         refs: {
+            main: 'sessionlistcontainer',
             mainView: '#mainview',
             eventListContainer: 'eventlistcontainer',
-            sessionListContainer: 'sessionlistcontainer',
-            eventEditor: 'eventeditor',
-            sessionList: 'sessionlist',
-            sessionDetail: 'sessiondetail'
+            eventEditor: 'eventeditor'
         },
 
         control: {
+            'sessionlist': {
+                disclose: 'onSessionDetailCommand'
+            },
 /*
             mainView: {
                 activeitemchange: 'onMainViewActiveItemChange'
@@ -31,27 +32,13 @@ Ext.define('App.controller.Main', {
                 eventDetailCommand: "onEventDetailCommand",
                 removeEventCommand: "onRemoveEventCommand"
             },
-
-            sessionListContainer: {
-                sessionDetailCommand: "onSessionDetailCommand"
-            },
-
             eventEditor: {
                 deleteEventCommand: "onRemoveEventCommand",
                 eventListCommand: "onEventListCommand"
             },
 
-            sessionDetail: {
-                sessionListCommand: "onSessionListCommand",
-                addEventCommand: "onAddEventCommand"
-            },
-
             'eventspanel list': {
                 itemtap: 'showEvent'
-            },
-            
-            'sessionspanel list': {
-                itemtap: 'showSession'
             }
         },
         
@@ -83,19 +70,13 @@ Ext.define('App.controller.Main', {
     },
     
     onSessionDetailCommand: function(list, record) {
-        console.log('onSessionDetailCommand');
-        var sessionDetail = this.getSessionDetail();
-        sessionDetail.setRecord(record); // load() is deprecated.
-        Ext.Viewport.animateActiveItem(sessionDetail, this.slideLeftTransition);
+        console.log('onSessionDetailCommand: ');
+        this.getMain().push({
+            xtype: 'sessiondetail',
+            data: record.data
+        });
+        console.log('done!');
     },
-
-    onAddEventCommand :function () {
-        console.log('onAddEventCommand');
-        var currentSession = this.getSessionDetail().getRecord();        
-        addItem(currentSession.data.id);
-        Ext.Viewport.animateActiveItem(this.getMainView(), this.slideRightTransition);
-    },
-
 
     onEventListCommand: function() {
         Ext.Viewport.animateActiveItem(this.getEventListContainer(), this.slideRightTransition);

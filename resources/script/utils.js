@@ -28,11 +28,11 @@ function getEventFromSession(session) {
 }
 
 function addItem(currentSessionId) {
-    var sessionStore = Ext.getStore("Sessions");
-    var eventStore = Ext.getStore("Events");
-    if (null != sessionStore.findRecord('id', currentSessionId)) {
-        if (null == eventStore.findRecord('id', currentSessionId)) {
-            eventStore.add(getEventFromSession(sessionStore.findRecord('id', currentSessionId)));
+    if (null == getStoreItem(currentSessionId, "Events")) {
+        if (null != getStoreItem(currentSessionId, "Sessions")) {
+            console.log("yup!");
+            var eventStore = Ext.getStore("Events");
+            eventStore.add(getEventFromSession(getStoreItem(currentSessionId, "Sessions")));
             eventStore.sync();
             eventStore.sort([
                 {property: 'timestamp', direction: 'ASC'}
@@ -40,6 +40,10 @@ function addItem(currentSessionId) {
         }
     }
 }
+
+function getStoreItem(id, storeName) {
+    return (Ext.getStore(storeName).findRecord('id', id));
+} 
 
 function isUpcomingEvent(node){
     console.log("node is " + node);

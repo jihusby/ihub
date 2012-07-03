@@ -44,19 +44,7 @@ Ext.application({
     launch: function() {
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
-
-        var event = {
-            xtype: "eventeditor"
-        };
-        
-        var session = {
-            xtype: "sessiondetail"
-        };
-
-        // Initialize the main view
-        Ext.Viewport.add(Ext.create('App.view.Main'), event, session);
-
-        
+        Ext.Viewport.add(Ext.create('App.view.Main'));
     },
 
     onUpdated: function() {

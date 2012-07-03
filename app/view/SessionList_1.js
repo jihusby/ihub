@@ -1,6 +1,6 @@
 Ext.define("App.view.SessionList", {
-    extend: "Ext.List",
-    xtype: 'sessionlist',
+    extend: "Ext.dataview.List",
+    alias: 'widget.sessionlist',
 
     requires: [
         'App.store.Sessions',
@@ -8,11 +8,8 @@ Ext.define("App.view.SessionList", {
     ],
 
     config: {
-        store: 'Sessions',
-        title: 'Agenda',
         loadingText: "Henter agenda...",
         scrollable: 'vertical',
-        indexBar: false,
         emptyText:
                 '</pre>'+
                 '<div class="session-list-empty-text">Agendaen er tom.</div>'+
