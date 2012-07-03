@@ -28,6 +28,7 @@ Ext.define("App.view.SessionListContainer", {
             xtype: "sessionlist",
             store: Ext.getStore("Sessions"),
             listeners: {
+                //itemtap: { fn: this.onSessionListDisclose, scope: this }
                 disclose: { fn: this.onSessionListDisclose, scope: this }
             }
         };
@@ -37,12 +38,12 @@ Ext.define("App.view.SessionListContainer", {
 
     onSessionListDisclose: function (list, record, target, index, evt, options) {
         console.log("onSessionListDisclose");
-        this.fireEvent('editSessionCommand', list, record);
+        this.fireEvent('sessionDetailCommand', list, record);
     },
 
     config: {
         layout: {
-            type: 'fit'
+            type: 'card'
         },
         detailCard: {
             xtype: 'detailcard'

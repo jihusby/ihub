@@ -40,13 +40,13 @@ Ext.define("App.view.EventListContainer", {
 
     onEventListDisclose: function (list, record, target, index, evt, options) {
         console.log("onEventListDisclose");
-        this.fireEvent('editEventCommand', this, record);
+        this.fireEvent('eventDetailCommand', this, record);
     },
 
     onEventRemove: function (view, index, item, e) {
         console.log("onEventRemove");
         var record = view.getStore().getAt(index);
-        this.fireEvent('deleteEventCommand', this, record);
+        this.fireEvent('removeEventCommand', this, record);
     },
 
     config: {

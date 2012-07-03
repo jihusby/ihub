@@ -1,89 +1,3 @@
-/*
-app = new Ext.Application({ 
-    name: "Application", 
-
-    launch: function() { 
-
-    this.detailView = new Ext.Panel({ 
-        id: 'detailView', 
-        layout: { 
-                flex: 1, 
-                type: 'fit'
-        }, 
-        tpl: '{field1} {field2}' 
-    }); 
-
-    this.listView = new Ext.List({ 
-        id: 'listView', 
-        store: dataStore, 
-        itemTpl: '{field1}', 
-        grouped: true, 
-        onItemDisclosure: function(record) {     
-            app.detailView.update(record.data); 
-            app.listCard.setActiveItem('detailView');  //fails here!!! 
-        } 
-    }); 
-
-        this.backButton = new Ext.Button({ 
-            text: this.backText, 
-            ui: 'back', 
-            handler: this.onUiBack, 
-            hidden: true, 
-            scope: this 
-        }); 
-
-        var btns = []; 
-        if (Ext.is.Phone) { 
-            btns.unshift(this.backButton); 
-        } 
-
-        this.navigationBar = new Ext.Toolbar({ 
-            ui: 'dark', 
-            dock: 'top', 
-            title: this.title, 
-            items: btns.concat(this.buttons || []) 
-        }); 
-         
-    this.listCard = new Ext.Panel({ 
-            title: 'list', 
-            cls: 'card_list', 
-            id: 'card_list', 
-            iconCls: 'calendar', 
-            layout: 'card', 
-            items: [this.listView, this.detailView] 
-    }); 
-         
-    this.mainView = new Ext.TabPanel({ 
-        tabBar: { 
-                dock: 'bottom', 
-                ui: 'dark', 
-                layout: { pack: 'center' } 
-            }, 
-        cardSwitchAnimation: { 
-                type: 'fade', 
-                cover: true 
-            }, 
-        dockedItems: [this.navigationBar], 
-        items: [this.listCard], 
-        tabBarDock: 'bottom', 
-        defaults: { 
-                scroll: 'vertical',
-                layout: 'fit' 
-        },
-        fullscreen: true, 
-        layout: 'fit' 
-    }); 
-         
-    this.Viewport = this.mainView; 
-    this.dataStore.load();     
-    } 
-});  
-
-
-
-*/
-
-
 Ext.application({
     name: 'App',
 
@@ -95,14 +9,12 @@ Ext.application({
         'Main',
         'Homepage',
         'Info',
+        'SessionListContainer',
         'SessionList',
-        'SessionListContainer',
-        'SessionEditor',
-        'EventList',
+        'SessionDetail',
         'EventListContainer',
-        'SessionListContainer',
-        'EventEditor',
-        'SessionEditor'
+        'EventList',
+        'EventEditor'
     ],
     
     models: [
@@ -138,7 +50,7 @@ Ext.application({
         };
         
         var session = {
-            xtype: "sessioneditor"
+            xtype: "sessiondetail"
         };
 
         // Initialize the main view

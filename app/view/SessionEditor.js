@@ -19,7 +19,7 @@ Ext.define("App.view.SessionEditor", {
         var backButton = {
             xtype: "button",
             ui: "back",
-            text: "Hjem",
+            text: "Tilbake",
             handler: this.onBackButtonTap,
             scope: this
         };
@@ -82,15 +82,15 @@ Ext.define("App.view.SessionEditor", {
     },
 
     onSaveButtonTap: function () {
-        this.fireSession("saveSessionCommand", this);
+        this.fireEvent("saveSessionCommand", this);
     },
 
     onDeleteButtonTap: function () {
-        this.fireSession("deleteSessionCommand", this);
+        this.fireEvent("deleteSessionCommand", this);
     },
 
     onBackButtonTap: function () {
-        this.fireSession("sessionListCommand", this);
+        this.fireEvent("sessionListCommand", this);
     }
 
 });

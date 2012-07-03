@@ -36,7 +36,7 @@ Ext.define("App.view.Main", {
             },
 
             {
-                id: 'sessions',
+                id: 'agenda',
                 title: 'Agenda',
                 iconCls: 'bookmarks',
                 items: [

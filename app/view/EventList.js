@@ -21,9 +21,10 @@ Ext.define("App.view.EventList", {
                 '</pre>'+
                 '<div class="list-item-title">'+
                 '<input type="button" onClick="removeItem({id});" value="Fjern" /> '+
-                '{start} {name} ({startTime})</div>'+
+                '{name}</div>'+
                 '<div class="list-item-title"></div>'+
                 '<div class="list-item-description">{ingress}</div>'+
+                '<div class="list-item-title"><a href="">{place}</a></div>'+
                 '<pre>'
     }
 });

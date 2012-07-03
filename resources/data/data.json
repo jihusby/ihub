@@ -8,7 +8,7 @@
 "startTime": "09:00",
 "ingress": "A different approach to how to build presentations",
 "description": "This session takes a different approach to how to build presentations, by providing patterns and anti-patterns you can use to make sure you’re getting the most leverage from your presentations. Don’t take a knife to a gunfight! The ability to create compelling presentations that explain your point is one of the things that keeps your job from disappearing.",
-"place": "Sal 1",
+"place": "Gråkallen",
 "dateCreated": "1325032800000",
 "leaf": "true"
 },{
@@ -19,7 +19,7 @@
 "startTime": "09:00",
 "ingress": "A different approach to how to build presentations",
 "description": "This session takes a different approach to how to build presentations, by providing patterns and anti-patterns you can use to make sure you’re getting the most leverage from your presentations. Don’t take a knife to a gunfight! The ability to create compelling presentations that explain your point is one of the things that keeps your job from disappearing.",
-"place": "Sal 1",
+"place": "Torget",
 "dateCreated": "1325032800000",
 "leaf": "true"
 },{
@@ -27,22 +27,22 @@
 "id": "3",
 "name": "Java SE 7 has been released, what about Java SE 8?",
 "start": "09.09.2012",
-"timestamp": "1347141636000",
-"startTime": "10:00",
+"timestamp": "1347141632400",
+"startTime": "09:00",
 "ingress": "Discussing changes in Java SE 8",
 "description": "Java SE 7 was launched officially on 28th of July this year; the first new version of the Java platform in nearly five years. Now that various issues have been resolved, Oracle are keen to maintain the momentum of Java as a platform. In this session we'll talk briefly about Java SE 7 before discussing some of the changes being made to the JCP to provide a more transparent development of new Java specifications.",
-"place": "",
-"dateCreated": "1325032800000",
+"place": "Ringve",
+"dateCreated": "1347141632400",
 "leaf": "true"
 },{
 "id": "4",
 "name": "Continous delivery",
 "start": "09.09.2012",
 "timestamp": "1347141639600",
-"startTime": "11:00",
+"startTime": "09:00",
 "ingress": "Introducion to continous delivery by Ken Sipe",
 "description": "Ken Sipe is a Technology Director with Perficient, Inc. (PRFT), an application architect, frequent technical speaker, author of several articles and courses, and software and methodology mentor. He is founder of CodeMentor, Inc., focusing on training and mentor in distributed computing technologies. Ken has delivered hundreds of private and public presentations including JavaOne, BorCon and NFJS.",
-"place": "",
+"place": "Møllenberg",
 "dateCreated": "1325032800000",
 "leaf": "true"
 },{

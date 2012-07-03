@@ -17,8 +17,8 @@ Ext.define("App.store.Events", {
             direction: "ASC",
 
             groupFn: function (record) {
-                if (record && record.data.start && record.data.start!=null) {
-                    return record.data.start;
+                if (record && record.data.startTime && record.data.startTime!=null) {
+                    return record.data.startTime;
                 } else {
                     return '';
                 }
