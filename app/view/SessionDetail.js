@@ -51,8 +51,15 @@ Ext.define('App.view.SessionDetail', {
             ]
         };
 
-        var sessionNameLabel = {
+        var sessionStartTimeLabel = {
             xtype: 'textfield',
+            name: 'startTime',
+            label: 'Start',
+            readOnly: true
+        };
+
+        var sessionNameLabel = {
+            xtype: 'textareafield',
             name: 'name',
             label: 'Tittel',
             readOnly: true
@@ -61,7 +68,15 @@ Ext.define('App.view.SessionDetail', {
         var sessionDescriptionLabel = {
             xtype: 'textareafield',
             name: 'description',
+            cls: 'descLabel',
             label: 'Beskrivelse',
+            readOnly: true
+        };
+
+        var sessionPlaceLabel = {
+            xtype: 'textfield',
+            name: 'place',
+            label: 'Sted',
             readOnly: true
         };
 
@@ -69,7 +84,7 @@ Ext.define('App.view.SessionDetail', {
             topToolbar,
             addButton,
             { xtype: "fieldset",
-                items: [sessionNameLabel, sessionDescriptionLabel]
+                items: [sessionStartTimeLabel, sessionNameLabel, sessionDescriptionLabel, sessionPlaceLabel]
             },
         ]);
     },
