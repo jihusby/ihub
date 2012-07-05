@@ -90,13 +90,24 @@ body {
   padding: 10px;
   font-size: 11pt;
   line-height: 25px;
-  -webkit-border-radius: 5px;
+  -webkit-border-radius: 6px;
 
   background-color:
     rgba(255,255,255,0.8);
 }
 
-
+.contentInfo {
+  font-weight: bold;
+  padding: 1px;
+}
+.contentTitle {
+  font-weight: bold;
+  padding: 1px;
+}
+.contentIngress {
+  font-style: italic;
+  padding: 1px;
+}
 .contentText {
   padding: 1px;
 }
@@ -161,3 +172,7 @@ body {
   padding:10px;
 }
  
+
+.button {
+  float: right;
+}

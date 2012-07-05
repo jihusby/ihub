@@ -23,8 +23,7 @@ Ext.define("App.view.SessionList", {
         itemTpl:
                 '</pre>'+
                 '<div class="list-item-title">'+
-                '<input type="button" onClick="addItem({id});" value="Legg til" /> '+
-                /*'<input type="image" src="resources/icons/star_active.png" onClick="addItem({id});" value="Legg til" /> '+*/
+                /*'<input type="image" id="list_{id}" src="resources/icons/star_gray_small.png" onClick="saveSessionList({id});" value="Legg til" /> '+*/
                 '{name}</div>'+
                 '<div class="list-item-title"></div>'+
                 '<div class="list-item-description">{ingress}</div>'+
@@ -32,3 +31,14 @@ Ext.define("App.view.SessionList", {
                 '<pre>'
     }
 });
+
+function saveSessionList(id, icon) {
+    console.log("saveSession in list");
+    if(toggleSession(id)){
+        document.getElementById("list_"+id).src="resources/icons/star_color_small.png";
+    }else {
+        document.getElementById("list_"+id).src="resources/icons/star_gray_small.png";
+    }
+}
+
+

@@ -10,7 +10,7 @@ Ext.define('App.controller.Main', {
     config: {
         refs: {
             main: 'sessionlistcontainer',
-            mainView: '#mainview',
+            mainView: 'mainview',
             eventListContainer: 'eventlistcontainer',
             eventEditor: 'eventeditor'
         },
@@ -19,15 +19,6 @@ Ext.define('App.controller.Main', {
             'sessionlist': {
                 disclose: 'onSessionDetailCommand'
             },
-/*
-            mainView: {
-                activeitemchange: 'onMainViewActiveItemChange'
-            },
-            
-            mainList: {
-                activeitemchange: 'onListActiveItemChange'
-            },
-*/
             eventListContainer: {
                 eventDetailCommand: "onEventDetailCommand",
                 removeEventCommand: "onRemoveEventCommand"
@@ -60,22 +51,19 @@ Ext.define('App.controller.Main', {
         this.callParent(arguments);
     },
 
-/*
-    onMainViewActiveItemChange: function(comp, activeItem, oldItem) {
-        console.log("onMainViewActiveItemChange");
-    },
-*/    
     onSessionListCommand: function() {
         Ext.Viewport.animateActiveItem(this.getMainView(), this.slideRightTransition);
     },
     
     onSessionDetailCommand: function(list, record) {
         console.log('onSessionDetailCommand: ');
+        console.log("event store is " + Ext.getStore("Events").id);
+        console.log("session store is " + Ext.getStore("Sessions").id);
         this.getMain().push({
             xtype: 'sessiondetail',
-            data: record.data
+            data: record.data,
+            id: record.data.id
         });
-        console.log('done!');
     },
 
     onEventListCommand: function() {

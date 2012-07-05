@@ -4,7 +4,6 @@ Ext.define('App.view.SessionDetail', {
     requires: [
         'Ext.Button'
     ],
-
     config: {
         scrollable: 'vertical',
         styleHtmlContent: true, 
@@ -12,35 +11,28 @@ Ext.define('App.view.SessionDetail', {
         maxWidth: 750,
         xtype: 'dataview',
         ui: 'light',
-        
-        tpl: '<div class="textBlock">' + 
-            '<div class="contentText"><b>{name}</b></div>' + 
-            '<div class="contentText">{ingress}</div>' + 
-            '<div class="contentText"><b>{place} kl. {startTime} </b></div>' + 
+        tpl:'<div class="textBlock">' + 
+            '<div class="contentInfo">{place} kl. {startTime} &nbsp; <input class="button" type="button" id="detail_{id}" src="resources/icons/star_gray.png" onClick="saveSessionDetail({id});" value="Husk" /></div>' + 
+            '<div class="contentTitle">{name}</div>' + 
+            '<div class="contentIngress">{ingress}</div>' + 
             '<div class="contentText">{description}</div>' + 
             
-            '<input type="image" id="star" src="resources/icons/star_passive.png" onClick="saveSession({id});" value="Legg til i huskeliste" /> '+
             '</div>'
     },
 
-    init: function(){
-        console.log("init: function");
+    initialize: function(){
+        console.log("initialize: this.id is " + this.id);
+        // TODO: Set initial value on the save button based on event list
     }
 
 });
 
-
-
-function saveSession(id) {
-    if (isEventSaved(id)) {
-        removeItem(id);
-        document.getElementById("star").src="resources/icons/star_active.png";
-    } else {
-        addItem(id);
-        document.getElementById("star").src="resources/icons/star_passive.png";
+function saveSessionDetail(id) {
+    console.log("saveSession in detail");
+    if(toggleSession(id)){
+        document.getElementById("detail_"+id).value = "Glem";
+    }else {
+        document.getElementById("detail_"+id).value = "Husk";
     }
 }
 
-function isEventSaved(id) {
-    return (getStoreItem(id, "Events") != null);
-}

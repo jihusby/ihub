@@ -27,10 +27,19 @@ function getEventFromSession(session) {
     return event;
 }
 
+function toggleSession(id) {
+    if (isEventSaved(id)) {
+        removeItem(id);
+        return false;
+    } else {
+        addItem(id);
+        return true;
+    }
+}
+
 function addItem(currentSessionId) {
     if (null == getStoreItem(currentSessionId, "Events")) {
         if (null != getStoreItem(currentSessionId, "Sessions")) {
-            console.log("yup!");
             var eventStore = Ext.getStore("Events");
             eventStore.add(getEventFromSession(getStoreItem(currentSessionId, "Sessions")));
             eventStore.sync();
@@ -39,6 +48,20 @@ function addItem(currentSessionId) {
             ]);
         }
     }
+}
+
+function removeItem(id){
+    var record = Ext.getStore("Events").findRecord('id', id)
+    var eventStore = Ext.getStore("Events");
+    eventStore.remove(record);
+    eventStore.sync();
+    eventStore.sort([
+        {property: 'timestamp', direction: 'ASC'}
+    ]);
+}
+
+function isEventSaved(id) {
+    return (getStoreItem(id, "Events") != null);
 }
 
 function getStoreItem(id, storeName) {
@@ -51,12 +74,3 @@ function isUpcomingEvent(node){
     return true;
 }
 
-function removeItem(id){
-    var record = Ext.getStore("Events").findRecord('id', id)
-    var eventStore = Ext.getStore("Events");
-    eventStore.remove(record);
-    eventStore.sync();
-    eventStore.sort([
-        {property: 'timestamp', direction: 'ASC'}
-    ]);
-}
