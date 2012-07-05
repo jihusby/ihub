@@ -14,6 +14,7 @@ function getTimeFromTimestamp(d) {
 function getEventFromSession(session) {
     var event = Ext.create("App.model.Event", {
         id: session.data.id,
+        externalId: session.data.id,
         dateCreated: session.data.dateCreated,
         place: session.data.place,
         start: session.data.start,
@@ -21,8 +22,7 @@ function getEventFromSession(session) {
         startTime: session.data.startTime,
         name: session.data.name,
         ingress: session.data.ingress,
-        description: session.data.description,
-        leaf: session.data.leaf
+        description: session.data.description
     });
     return event;
 }
@@ -38,16 +38,16 @@ function toggleSession(id) {
 }
 
 function addItem(currentSessionId) {
-    if (null == getStoreItem(currentSessionId, "Events")) {
-        if (null != getStoreItem(currentSessionId, "Sessions")) {
+    //if (null == getStoreItem(currentSessionId, "Events")) {
+        //if (null != getStoreItem(currentSessionId, "Sessions")) {
             var eventStore = Ext.getStore("Events");
             eventStore.add(getEventFromSession(getStoreItem(currentSessionId, "Sessions")));
             eventStore.sync();
             eventStore.sort([
                 {property: 'timestamp', direction: 'ASC'}
             ]);
-        }
-    }
+        //}
+    //}
 }
 
 function removeItem(id){

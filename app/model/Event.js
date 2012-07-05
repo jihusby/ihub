@@ -6,16 +6,14 @@ Ext.define("App.model.Event", {
         fields: [
             { name: 'id', type: 'int' },
             { name: 'externalId', type: 'string' },
-            { name: 'start', type: 'string' },
-            { name: 'startTime', type: 'string' },
-            { name: 'timestamp', type: 'string' },
             { name: 'dateCreated', type: 'string' },
-            { name: 'name', type: 'string' },
             { name: 'place', type: 'string' },
+            { name: 'start', type: 'string' },
+            { name: 'timestamp', type: 'string' },
+            { name: 'startTime', type: 'string' },
+            { name: 'name', type: 'string' },
             { name: 'ingress', type: 'string' },
-            { name: 'description', type: 'string' },
-            { name: 'items', type: 'string' },
-            { name: 'leaf', type: 'boolean' }
+            { name: 'description', type: 'string' }
         ],
         validations: [
             { type: 'presence', field: 'id' },

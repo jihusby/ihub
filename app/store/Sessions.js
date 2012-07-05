@@ -1,6 +1,8 @@
 Ext.define("App.store.Sessions", {
     extend: "Ext.data.Store",
-    requires: "Ext.data.proxy.LocalStorage",
+    requires: [
+        'App.model.Session'
+    ],
     config: {
         model: "App.model.Session",
         proxy: {

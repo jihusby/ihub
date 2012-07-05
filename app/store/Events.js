@@ -7,13 +7,14 @@ Ext.define("App.store.Events", {
             type: 'localstorage',
             id: 'events-app-store'
         },
-        autoLoad: true,
         sorters: [
-            {property: 'timestamp', direction: 'ASC'}
+            {property: 'timestamp', direction: 'ASC'}//,
     ],
 
         grouper: {
-            sortProperty: "timestamp",
+            sortProperty: [
+                "timestamp"
+            ],
                 
             direction: "ASC",
 

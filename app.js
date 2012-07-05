@@ -42,6 +42,7 @@ Ext.application({
     tabletStartupScreen: 'resources/loading/Default~ipad.png',
 
     launch: function() {
+        Ext.getStore("Events").load();
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
 

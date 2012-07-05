@@ -42,8 +42,13 @@ Ext.define('App.controller.Main', {
     launch: function() {
         console.log("launch");
         this.callParent(arguments);
-        Ext.getStore("Events").load();
+        //Ext.getStore("Events").load();
+        console.log("1storage is " + localStorage.getItem('app-store-sessions-1'));
+        console.log("1event store is " + Ext.getStore("Sessions").id);
         Ext.getStore("Sessions").load();
+        console.log("2event store is " + Ext.getStore("Sessions").id);
+        console.log("2storage is " + localStorage.getItem('app-store-sessions-1'));
+        
     },
 
     init: function() {
@@ -59,6 +64,8 @@ Ext.define('App.controller.Main', {
         console.log('onSessionDetailCommand: ');
         console.log("event store is " + Ext.getStore("Events").id);
         console.log("session store is " + Ext.getStore("Sessions").id);
+        
+        
         this.getMain().push({
             xtype: 'sessiondetail',
             data: record.data,
