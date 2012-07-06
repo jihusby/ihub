@@ -1,6 +1,6 @@
 Ext.define("App.view.EventList", {
-    extend: "Ext.List",
-    xtype: 'eventlist',
+    extend: "Ext.dataview.List",
+    alias: 'widget.eventlist',
 
     requires: [
         'App.store.Events',
@@ -8,11 +8,8 @@ Ext.define("App.view.EventList", {
     ],
 
     config: {
-        store: 'Events',
-        title: 'Min huskeliste',
-        loadingText: "Henter huskeliste...",
+        loadingText: "Henter huskelisten...",
         scrollable: 'vertical',
-        indexBar: false,
         emptyText:
                 '</pre>'+
                 '<div class="event-list-empty-text">Huskelisten er tom.</div>'+
@@ -23,22 +20,11 @@ Ext.define("App.view.EventList", {
         itemTpl:
                 '</pre>'+
                 '<div class="list-item-title">'+
-                '<input class="button" type="button" id="detail_{id}" onClick="removeEventDetail({id});" value="Fjern" />' + 
-                '{name} ({id})</div>'+
+                '<input type="button" onClick="removeItem({id});" value="Glem" /> '+
+                '{name}</div>'+
                 '<div class="list-item-title"></div>'+
                 '<div class="list-item-description">{ingress}</div>'+
                 '<div class="list-item-title"><a href="">{place}</a></div>'+
                 '<pre>'
     }
 });
-
-function saveEventList(id, icon) {
-    console.log("saveEvent in list");
-    if(toggleEvent(id)){
-        document.getElementById("list_"+id).src="resources/icons/star_color_small.png";
-    }else {
-        document.getElementById("list_"+id).src="resources/icons/star_gray_small.png";
-    }
-}
-
-

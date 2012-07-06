@@ -3,14 +3,16 @@ Ext.define('App.controller.Main', {
     extend: 'Ext.app.Controller',
     
     requires: [
+        
         'App.view.SessionDetail',
+        'App.view.EventDetail',
         'Ext.MessageBox'
     ],
     
     config: {
         refs: {
-            main: 'sessionlistcontainer',
             mainView: 'mainview',
+            sessionListContainer: 'sessionlistcontainer',
             eventListContainer: 'eventlistcontainer',
             eventEditor: 'eventeditor'
         },
@@ -19,10 +21,15 @@ Ext.define('App.controller.Main', {
             'sessionlist': {
                 disclose: 'onSessionDetailCommand'
             },
+            'eventlist': {
+                disclose: 'onEventDetailCommand'
+            }
+/*            
             eventListContainer: {
                 eventDetailCommand: "onEventDetailCommand",
                 removeEventCommand: "onRemoveEventCommand"
             },
+
             eventEditor: {
                 deleteEventCommand: "onRemoveEventCommand",
                 eventListCommand: "onEventListCommand"
@@ -31,6 +38,7 @@ Ext.define('App.controller.Main', {
             'eventspanel list': {
                 itemtap: 'showEvent'
             }
+*/            
         },
         
         history: null
@@ -42,13 +50,8 @@ Ext.define('App.controller.Main', {
     launch: function() {
         console.log("launch");
         this.callParent(arguments);
-        //Ext.getStore("Events").load();
-        console.log("1storage is " + localStorage.getItem('app-store-sessions-1'));
-        console.log("1event store is " + Ext.getStore("Sessions").id);
+        Ext.getStore("Events").load();
         Ext.getStore("Sessions").load();
-        console.log("2event store is " + Ext.getStore("Sessions").id);
-        console.log("2storage is " + localStorage.getItem('app-store-sessions-1'));
-        
     },
 
     init: function() {
@@ -65,42 +68,24 @@ Ext.define('App.controller.Main', {
         console.log("event store is " + Ext.getStore("Events").id);
         console.log("session store is " + Ext.getStore("Sessions").id);
         
-        
-        this.getMain().push({
+        this.getSessionListContainer().push({
             xtype: 'sessiondetail',
-            data: record.data,
-            id: record.data.id
+            data: record.data
+            //sessionId: record.data.id
         });
     },
 
     onEventListCommand: function() {
-        Ext.Viewport.animateActiveItem(this.getEventListContainer(), this.slideRightTransition);
+        Ext.Viewport.animateActiveItem(this.getMainView(), this.slideRightTransition);
     },
 
     onEventDetailCommand: function(list, record) {
-        var body = "<b>"+ record.data.start +"</b><br>" + record.data.description;
-        Ext.Msg.alert(record.data.name, body);
-        // Doesn't work. Commented out, temporarily replaced with view dialog.
-        //var eventEditor = this.getEventEditor();
-        //eventEditor.setRecord(record); // load() is deprecated.
-        //Ext.Viewport.animateActiveItem(eventEditor, this.slideLeftTransition);
-    },
-
-    onRemoveEventCommand: function (list, record) {
-        console.log("onRemoveEventCommand");
-        deleteEvent(record);
-
-        /*
-         * For future use
-         *
-        
-        var eventEditor = this.getEventEditor();
-        removeItem(sessionEditor.getRecord().id);
-        this.activateSessionList();
-        */
+        this.getEventListContainer().push({
+            xtype: 'eventdetail',
+            data: record.data
+            //eventId: record.data.id
+        });
     }
-
-
 });
 
 

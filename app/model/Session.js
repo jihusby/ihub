@@ -5,7 +5,7 @@ Ext.define("App.model.Session", {
         idProperty: 'id',
         fields: [
             { name: 'id', type: 'int' },
-            { name: 'externalId', type: 'string' },
+            { name: 'externalId', type: 'int' },
             { name: 'dateCreated', type: 'string' },            
             { name: 'place', type: 'string' },
             { name: 'start', type: 'string' },

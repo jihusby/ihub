@@ -1,6 +1,6 @@
-Ext.define('App.view.SessionDetail', {
+Ext.define('App.view.EventDetail', {
     extend: 'Ext.Panel',
-    xtype: 'sessiondetail',
+    xtype: 'eventdetail',
     requires: [
         'Ext.Button'
     ],
@@ -12,7 +12,7 @@ Ext.define('App.view.SessionDetail', {
         xtype: 'dataview',
         ui: 'light',
         tpl:'<div class="textBlock">' + 
-            '<div class="contentInfo">{place} kl. {startTime} &nbsp; <input class="button" type="button" id="detail_{id}" onClick="saveSessionDetail({id});" value="Husk" /></div>' + 
+            '<div class="contentInfo">{place} kl. {startTime}</div>' + 
             '<div class="contentTitle">{name}</div>' + 
             '<div class="contentIngress">{ingress}</div>' + 
             '<div class="contentText">{description}</div>' + 
@@ -21,18 +21,14 @@ Ext.define('App.view.SessionDetail', {
     },
 
     initialize: function(){
-        //console.log("initialize: SessionDetail: this.id is " + this.sessionId);
+        //console.log("initialize EventDetail: this.id is " + this.eventId);
         // TODO: Set initial value on the save button based on event list
     }
 
 });
 
-function saveSessionDetail(id) {
-    console.log("saveSession in detail");
-    if(toggleSession(id)){
-        document.getElementById("detail_"+id).value = "Glem";
-    }else {
-        document.getElementById("detail_"+id).value = "Husk";
-    }
+function removeEventDetail(id) {
+    console.log("removeEvent in detail");
+    toggleSession(id);
 }
 
