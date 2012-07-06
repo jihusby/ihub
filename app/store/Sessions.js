@@ -14,17 +14,26 @@ Ext.define("App.store.Sessions", {
             }
         },
         sorters: [
-            {property: 'timestamp', direction: 'ASC'}
+            {property: 'start', direction: 'ASC'},
+            {property: 'startTime', direction: 'ASC'}
     ],
 
         grouper: {
-            sortProperty: "timestamp",
+            sortProperty: [
+                "start", "startTime"
+            ],
                 
             direction: "ASC",
 
             groupFn: function (record) {
-                if (record && record.data.startTime && record.data.startTime!=null) {
-                    return record.data.startTime;
+                if (record && record.data.start && record.data.start!=null) {
+                    var myDays=
+                    ["Søndag", "Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag"];
+                    var d = record.data.start.substring(0,2);
+                    var m = record.data.start.substring(3,5);
+                    var y = record.data.start.substring(6,10);
+                    var date = new Date(Date.parse(m+"/"+d+"/"+y,"MM/dd/yyyy"));
+                    return myDays[date.getDay()] + " " + record.data.start;
                 } else {
                     return '';
                 }

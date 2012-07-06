@@ -23,8 +23,7 @@ Ext.define("App.view.SessionList", {
         itemTpl:
                 '</pre>'+
                 '<div class="list-item-title">'+
-                /*'<input type="image" id="list_{id}" src="resources/icons/star_gray_small.png" onClick="saveSessionList({id});" value="Legg til" /> '+*/
-                '{name}</div>'+
+                '{startTime}: {name}</div>'+
                 '<div class="list-item-title"></div>'+
                 '<div class="list-item-description">{ingress}</div>'+
                 '<div class="list-item-title"><a href="">{place}</a></div>'+
