@@ -1,17 +1,14 @@
 Ext.define("App.store.Events", {
     extend: "Ext.data.Store",
     requires: [
-        "Ext.data.proxy.LocalStorage",
-        "App.model.Event"
+        "Ext.data.proxy.LocalStorage"
     ],
     config: {
         model: "App.model.Event",
-        /*
         proxy: {
             type: 'localstorage',
             id: 'events-app-store'
         },
-        */
         sorters: [
             {property: 'timestamp', direction: 'ASC'}
     ],

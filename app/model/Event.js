@@ -4,8 +4,8 @@ Ext.define("App.model.Event", {
     config: {
         idProperty: 'id',
         fields: [
-            { name: 'id', type: 'int' },
-            { name: 'externalId', type: 'int' },
+            { name: 'id', type: 'string' },
+            { name: 'externalId', type: 'string' },
             { name: 'dateCreated', type: 'string' },
             { name: 'place', type: 'string' },
             { name: 'start', type: 'string' },
@@ -18,10 +18,6 @@ Ext.define("App.model.Event", {
         validations: [
             { type: 'presence', field: 'id' },
             { type: 'presence', field: 'name', message: 'Vennligst fyll inn navn.' }
-        ],
-        proxy: {
-            type: 'localstorage',
-            id  : 'events-app-store'
-        }        
+        ]        
     }
 });

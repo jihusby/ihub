@@ -1,5 +1,5 @@
 Ext.define("App.view.EventList", {
-    extend: "Ext.List",
+    extend: "Ext.dataview.List",
     xtype: 'eventlist',
 
     requires: [
@@ -24,7 +24,7 @@ Ext.define("App.view.EventList", {
                 '</pre>'+
                 '<div class="list-item-title">'+
                 '<input class="button" type="button" id="detail_{id}" onClick="removeEventDetail({id});" value="Fjern" />' + 
-                '{name} ({id})</div>'+
+                '{name}</div>'+
                 '<div class="list-item-title"></div>'+
                 '<div class="list-item-description">{ingress}</div>'+
                 '<div class="list-item-title"><a href="">{place}</a></div>'+

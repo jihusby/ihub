@@ -13,7 +13,6 @@ function getTimeFromTimestamp(d) {
 
 function getEventFromSession(session) {
     var event = Ext.create("App.model.Event", {
-        id: session.data.id,
         externalId: session.data.id,
         dateCreated: session.data.dateCreated,
         place: session.data.place,
@@ -24,6 +23,7 @@ function getEventFromSession(session) {
         ingress: session.data.ingress,
         description: session.data.description
     });
+    logEvent(event, "");
     return event;
 }
 
@@ -38,17 +38,17 @@ function toggleSession(id) {
 }
 
 function addItem(currentSessionId) {
-    //if (null == getStoreItem(currentSessionId, "Events")) {
-        //if (null != getStoreItem(currentSessionId, "Sessions")) {
-            var eventStore = Ext.getStore("Events");
-            eventStore.add(getEventFromSession(getStoreItem(currentSessionId, "Sessions")));
-            eventStore.sync();
-            eventStore.sort([
-                {property: 'timestamp', direction: 'ASC'}
-            ]);
-        //}
-    //}
+    if ((null == Ext.getStore("Events").findRecord('externalId', currentSessionId)) &&
+            (null != Ext.getStore("Sessions").findRecord('id', currentSessionId))) {
+        var eventStore = Ext.getStore("Events");
+        eventStore.add(getEventFromSession(Ext.getStore("Sessions").findRecord('id', currentSessionId)));
+        eventStore.sync();
+        eventStore.sort([
+            {property: 'timestamp', direction: 'ASC'}
+        ]);
+    }
 }
+
 
 function removeItem(id){
     var record = Ext.getStore("Events").findRecord('id', id)
@@ -61,12 +61,8 @@ function removeItem(id){
 }
 
 function isEventSaved(id) {
-    return (getStoreItem(id, "Events") != null);
+    return (Ext.getStore("Events").findRecord('externalId', id) != null);
 }
-
-function getStoreItem(id, storeName) {
-    return (Ext.getStore(storeName).findRecord('id', id));
-} 
 
 function isUpcomingEvent(node){
     console.log("node is " + node);

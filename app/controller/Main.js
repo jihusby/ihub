@@ -3,7 +3,6 @@ Ext.define('App.controller.Main', {
     extend: 'Ext.app.Controller',
     
     requires: [
-        
         'App.view.SessionDetail',
         'App.view.EventDetail',
         'Ext.MessageBox'
@@ -39,17 +38,17 @@ Ext.define('App.controller.Main', {
                 itemtap: 'showEvent'
             }
 */            
-        },
+        }
         
-        history: null
+        //history: null
     },
 
     slideLeftTransition: {type: 'slide', direction: 'left'},
     slideRightTransition: {type: 'slide', direction: 'right'},
 
     launch: function() {
-        console.log("launch");
         this.callParent(arguments);
+        //Ext.getStore("Events").load();
         Ext.getStore("Events").load();
         Ext.getStore("Sessions").load();
     },

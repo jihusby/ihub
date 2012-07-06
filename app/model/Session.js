@@ -14,10 +14,6 @@ Ext.define("App.model.Session", {
             { name: 'name', type: 'string' },
             { name: 'ingress', type: 'string' },
             { name: 'description', type: 'string' }
-        ],
-        validations: [
-            { type: 'presence', field: 'id' },
-            { type: 'presence', field: 'name', message: 'Vennligst fyll inn navn.' }
         ]
     }
 });
