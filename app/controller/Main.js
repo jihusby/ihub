@@ -4,7 +4,6 @@ Ext.define('App.controller.Main', {
     
     requires: [
         'App.view.SessionDetail',
-        'App.view.EventDetail',
         'Ext.MessageBox'
     ],
     
@@ -12,8 +11,7 @@ Ext.define('App.controller.Main', {
         refs: {
             mainView: 'mainview',
             sessionListContainer: 'sessionlistcontainer',
-            eventListContainer: 'eventlistcontainer',
-            eventEditor: 'eventeditor'
+            eventListContainer: 'eventlistcontainer'
         },
 
         control: {
@@ -36,7 +34,6 @@ Ext.define('App.controller.Main', {
     },
 
     init: function() {
-        console.log("init");
         this.callParent(arguments);
     },
 
@@ -58,12 +55,15 @@ Ext.define('App.controller.Main', {
 });
 
 function getSessionDetail(record) {
-    var value = isEventSaved(record.id)?"Glem":"Husk";
+    var value = isEventSaved(record.id)?"Fjern fra huskeliste":"Legg til i huskeliste";
     return {
             xtype: 'sessiondetail',
+            title: record.startTime,
             data: record,
-            tpl:'<div class="textBlock">' + 
-                '<div class="contentInfo">{place} kl. {startTime} &nbsp; <input value="'+value+'" id="btn" class="buttonRight" type="button" onClick="saveSessionDetail({id});" /></div>' + 
+            tpl:
+                '<input value="'+value+'" id="btn" class="buttonWide" type="button" onClick="saveSessionDetail({id});" />' + 
+                '<div class="textBlock">' + 
+                '<div class="contentInfo">{place} kl. {startTime}</div>' + 
                 '<div class="contentTitle">{name}</div>' + 
                 '<div class="contentIngress">{ingress}</div>' + 
                 '<div class="contentText">{description}</div>' + 
@@ -74,9 +74,10 @@ function getSessionDetail(record) {
 function getEventDetail(record) {
     return {
             xtype: 'sessiondetail',
+            title: record.startTime,
             data: record,
             tpl:'<div class="textBlock">' + 
-                '<div class="contentInfo">{place} kl. {startTime} &nbsp; <input value="Fjern" id="btn" class="buttonRight" type="button" onClick="removeItem({externalId});" /></div>' + 
+                '<div class="contentInfo">{place} kl. {startTime}</div>' + 
                 '<div class="contentTitle">{name}</div>' + 
                 '<div class="contentIngress">{ingress}</div>' + 
                 '<div class="contentText">{description}</div>' + 

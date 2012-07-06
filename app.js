@@ -14,7 +14,6 @@ Ext.application({
         'SessionDetail',
         'EventListContainer',
         'EventList',
-        'EventDetail'
     ],
     
     models: [

@@ -4,7 +4,6 @@ Ext.define("App.view.EventListContainer", {
 
     requires: [
         'App.view.EventList',
-        'App.view.EventDetail',
         'Ext.TitleBar'
     ],
     

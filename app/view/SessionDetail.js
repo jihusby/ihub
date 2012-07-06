@@ -7,7 +7,6 @@ Ext.define('App.view.SessionDetail', {
     config: {
         scrollable: 'vertical',
         styleHtmlContent: true, 
-        title: 'Details',
         maxWidth: 750,
         xtype: 'dataview',
         ui: 'light'
@@ -16,9 +15,9 @@ Ext.define('App.view.SessionDetail', {
 
 function saveSessionDetail(id) {
     if(toggleSession(id)){
-        document.getElementById("btn").value = "Glem";
+        document.getElementById("btn").value = "Fjern fra huskeliste";
     }else {
-        document.getElementById("btn").value = "Husk";
+        document.getElementById("btn").value = "Legg til i huskeliste";
     }
 }
 
