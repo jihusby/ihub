@@ -23,7 +23,7 @@ Ext.define("App.view.EventList", {
         itemTpl:
                 '</pre>'+
                 '<div class="list-item-title">'+
-                '<input class="button" type="button" id="detail_{id}" onClick="removeEventDetail({id});" value="Fjern" />' + 
+                '<input class="buttonLeft" type="button" onClick="removeEvent({externalId});" value="Fjern" />' + 
                 '{name}</div>'+
                 '<div class="list-item-title"></div>'+
                 '<div class="list-item-description">{ingress}</div>'+
@@ -32,13 +32,8 @@ Ext.define("App.view.EventList", {
     }
 });
 
-function saveEventList(id, icon) {
-    console.log("saveEvent in list");
-    if(toggleEvent(id)){
-        document.getElementById("list_"+id).src="resources/icons/star_color_small.png";
-    }else {
-        document.getElementById("list_"+id).src="resources/icons/star_gray_small.png";
-    }
+function removeEvent(id) {
+    removeItem(id);
 }
 
 

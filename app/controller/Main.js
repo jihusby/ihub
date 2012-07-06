@@ -23,24 +23,7 @@ Ext.define('App.controller.Main', {
             'eventlist': {
                 disclose: 'onEventDetailCommand'
             }
-/*            
-            eventListContainer: {
-                eventDetailCommand: "onEventDetailCommand",
-                removeEventCommand: "onRemoveEventCommand"
-            },
-
-            eventEditor: {
-                deleteEventCommand: "onRemoveEventCommand",
-                eventListCommand: "onEventListCommand"
-            },
-
-            'eventspanel list': {
-                itemtap: 'showEvent'
-            }
-*/            
         }
-        
-        //history: null
     },
 
     slideLeftTransition: {type: 'slide', direction: 'left'},
@@ -48,7 +31,6 @@ Ext.define('App.controller.Main', {
 
     launch: function() {
         this.callParent(arguments);
-        //Ext.getStore("Events").load();
         Ext.getStore("Events").load();
         Ext.getStore("Sessions").load();
     },
@@ -63,15 +45,7 @@ Ext.define('App.controller.Main', {
     },
     
     onSessionDetailCommand: function(list, record) {
-        console.log('onSessionDetailCommand: ');
-        console.log("event store is " + Ext.getStore("Events").id);
-        console.log("session store is " + Ext.getStore("Sessions").id);
-        
-        this.getSessionListContainer().push({
-            xtype: 'sessiondetail',
-            data: record.data
-            //sessionId: record.data.id
-        });
+        this.getSessionListContainer().push(getSessionDetail(record.data));
     },
 
     onEventListCommand: function() {
@@ -79,13 +53,33 @@ Ext.define('App.controller.Main', {
     },
 
     onEventDetailCommand: function(list, record) {
-        this.getEventListContainer().push({
-            xtype: 'eventdetail',
-            data: record.data
-            //eventId: record.data.id
-        });
+        this.getEventListContainer().push(getEventDetail(record.data));
     }
 });
 
+function getSessionDetail(record) {
+    var value = isEventSaved(record.id)?"Glem":"Husk";
+    return {
+            xtype: 'sessiondetail',
+            data: record,
+            tpl:'<div class="textBlock">' + 
+                '<div class="contentInfo">{place} kl. {startTime} &nbsp; <input value="'+value+'" id="btn" class="buttonRight" type="button" onClick="saveSessionDetail({id});" /></div>' + 
+                '<div class="contentTitle">{name}</div>' + 
+                '<div class="contentIngress">{ingress}</div>' + 
+                '<div class="contentText">{description}</div>' + 
+                '</div>'
+    }
+}
 
-
+function getEventDetail(record) {
+    return {
+            xtype: 'sessiondetail',
+            data: record,
+            tpl:'<div class="textBlock">' + 
+                '<div class="contentInfo">{place} kl. {startTime} &nbsp; <input value="Fjern" id="btn" class="buttonRight" type="button" onClick="removeItem({externalId});" /></div>' + 
+                '<div class="contentTitle">{name}</div>' + 
+                '<div class="contentIngress">{ingress}</div>' + 
+                '<div class="contentText">{description}</div>' + 
+                '</div>'
+    }
+}

@@ -23,7 +23,6 @@ function getEventFromSession(session) {
         ingress: session.data.ingress,
         description: session.data.description
     });
-    logEvent(event, "");
     return event;
 }
 
@@ -51,7 +50,7 @@ function addItem(currentSessionId) {
 
 
 function removeItem(id){
-    var record = Ext.getStore("Events").findRecord('id', id)
+    var record = Ext.getStore("Events").findRecord('externalId', id)
     var eventStore = Ext.getStore("Events");
     eventStore.remove(record);
     eventStore.sync();
