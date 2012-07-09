@@ -26,18 +26,15 @@ Ext.define("App.view.SessionList", {
                 '{startTime}: {name}</div>'+
                 '<div class="list-item-title"></div>'+
                 '<div class="list-item-description">{ingress}</div>'+
-                '<div class="list-item-title"><a href="">{place}</a></div>'+
+                '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPlace(\'{place}\');" value="{place}" /></div>'+
                 '<pre>'
     }
 });
 
-function saveSessionList(id, icon) {
-    console.log("saveSession in list");
-    if(toggleSession(id)){
-        document.getElementById("list_"+id).src="resources/icons/star_color_small.png";
-    }else {
-        document.getElementById("list_"+id).src="resources/icons/star_gray_small.png";
-    }
+function showPlace(place) {
+    var body = "<img src='resources/images/map2.jpg' style='height:70%; width:90%'>";
+    Ext.Msg.alert(place, body);
 }
+
 
 

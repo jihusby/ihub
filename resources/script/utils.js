@@ -69,3 +69,12 @@ function isUpcomingEvent(node){
     return true;
 }
 
+function getDateWithWeekdayFromDateString(dateString) {
+    var myDays= ["Søndag", "Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag"];
+    var d = dateString.substring(0,2);
+    var m = dateString.substring(3,5);
+    var y = dateString.substring(6,10);
+    var date = new Date(Date.parse(m+"/"+d+"/"+y,"MM/dd/yyyy"));
+    return myDays[date.getDay()] + " " + dateString;
+}
+

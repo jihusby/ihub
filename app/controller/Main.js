@@ -83,4 +83,4 @@ function getEventDetail(record) {
                 '<div class="contentText">{description}</div>' + 
                 '</div>'
     }
-}
+  }

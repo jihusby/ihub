@@ -21,8 +21,8 @@ Ext.define("App.store.Events", {
             direction: "ASC",
 
             groupFn: function (record) {
-                if (record && record.data.startTime && record.data.startTime!=null) {
-                    return record.data.startTime;
+                if (record && record.data.start && record.data.start!=null) {
+                    return getDateWithWeekdayFromDateString(record.data.start);
                 } else {
                     return '';
                 }
