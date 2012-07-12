@@ -1,13 +1,12 @@
-        <p>
-        <div class='submitBtn'>
-                <b>Brukerveiledning</b><p>
-                Lagre alle endringer i timeplanen. Endringer er synlige i mobil-appen ved oppdatering / restart.<p>
-                [Her i høyre kolonne er det plass til beskrivelse av prosedyren]<p>
-                <input class="btn" type=submit value='Oppdater timeplan' /><p>
-                
-                
-            </ul>
-        </div>
     </form>
+    
+    <div class="rightCol">
+    <IFRAME SRC="../../index-debug.html" WIDTH=320 HEIGHT=480 style="border-radius: 5px;">
+        If you can see this, your browser doesn't 
+        understand IFRAME.  However, we'll still 
+        <A HREF="../../index-debug.html">link</A> 
+        you to the file.
+    </IFRAME>    
+    </div>
 </body>
 </html>

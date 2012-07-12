@@ -10,7 +10,7 @@ Ext.define("App.store.Sessions", {
             url: 'resources/data/data.json',
             reader: {
                 type: 'json',
-                rootProperty: 'day1'
+                rootProperty: 'items'
             }
         },
         sorters: [

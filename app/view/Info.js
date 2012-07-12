@@ -16,18 +16,16 @@ Ext.define("App.view.Info", {
                 ui: 'light',
                 itemTpl: [
                     '<div class="textBlock">',
-                    '<div class="contentText">{content.content1}</div>',
-                    '<div class="contentText">{content.content2}</div>',
-                    '<div class="contentText">{content.content3}</div>',
-                    '<div class="contentText">{content.content4}</div>',
-                    '<div class="contentText">{content.content5}</div>',
-                    '<div class="contentText">{content.content6}</div>',
+                    '<div class="contentText">{header}</div>',
+                    '<div class="contentText">{ingress}</div>',
+                    '<div class="contentText">{content1}</div>',
+                    '<div class="contentText">{content2}</div>',
                     '<div class="footer">{footer}</div></div>'
                 ],
 
                 store: {
                     autoLoad: true,
-                    fields: ['header', 'ingress', 'content', 'footer'],
+                    fields: ['header', 'ingress', 'content1', 'content2', 'footer'],
                     proxy: {
                         type: 'ajax',
                         url: 'resources/data/info.json',

@@ -4,8 +4,8 @@ class storage {
     
     private $conferenceDataFile;
 
-    function __construct() {
-        $this->conferenceDataFile = "../../resources/data/data.json";
+    function __construct($data) {
+        $this->conferenceDataFile = $data;
     }
     
     function getContent(){
@@ -20,7 +20,7 @@ class storage {
         return true;
     }
     
-    private function getConferenceDataFile(){
+    function getConferenceDataFile(){
         return $this->conferenceDataFile;
     }
 
