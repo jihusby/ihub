@@ -6,7 +6,7 @@
         Purpose of the stylesheet follows.
 */
 
-.stdField, .stdSmallField, .stdSmallArea, .stdBigArea, .stdHugeArea {
+.stdField, .stdMediumField, .stdSmallField, .stdSmallArea, .stdBigArea, .stdHugeArea {
     border-radius: 5px; 
     padding: 3px;
 }
@@ -17,8 +17,23 @@ div {
 
 h1 {
     font-family: Tahoma;
-    font-size: 160%;
+    font-size: 200%;
+    font-weight: bold;
+}
+
+h2 {
+    font-family: Tahoma;
+    font-size: 170%;
+    font-weight: bold;
     line-height: 27px;
+}
+h3 {
+    font-family: Tahoma;
+    font-size: 170%;
+    font-weight: bold;
+    line-height: 40px;
+    vertical-align: middle;
+    color: #9A9A9A;
 }
 
 td {
@@ -28,22 +43,25 @@ td {
 }
 .stdField{
     width: 400px;
+}
+.stdMediumField{
+    width: 200px;
 } 
 .stdSmallField{
     width: 80px;
 } 
 .stdSmallArea{
-    min-height: 50px; max-height: 50px; min-width: 400px;
+    min-height: 25px; max-height: 75px; min-width: 400px; max-width: 400px;
 } 
 .stdBigArea{
-    min-height: 100px; max-height: 100px; min-width: 400px;
+    min-height: 50px; max-height: 150px; min-width: 400px; max-width: 400px;
 }
 .stdHugeArea{
-    min-height: 200px; max-height: 200px; min-width: 450px;
+    min-height: 100px; max-height: 250px; min-width: 400px; max-width: 400px;
 }
 
 .keyCell {
-    width:100px; 
+    width:50px; 
     text-align: right;
 }
 
@@ -51,10 +69,28 @@ td {
     width:400px; 
 }
 
-.menuCol {
+.errorInput {
+    border: 1px solid #009900;
+    background-color: #009900;
+}
+
+.headerCol {
     position: absolute;
     margin-left: 10px;
     margin-top: 10px;
+    width: 1230px;
+    height: 40px;
+    padding: 10px;
+    border: 1px solid #cdcdcd;
+    background-color: #782069;
+    color: #FFFFFF;
+    line-height: 18px;
+}
+
+.menuCol {
+    position: absolute;
+    margin-left: 10px;
+    margin-top: 80px;
     width: 240px;
     height: 180px;
     padding: 10px;
@@ -72,7 +108,7 @@ td {
 .menuColSelected {
     position: absolute;
     margin-left: 10px;
-    margin-top: 10px;
+    margin-top: 80px;
     width: 240px;
     height: 180px;
     padding: 10px;
@@ -84,38 +120,53 @@ td {
 
 .mainCol {
     position: absolute;
-    margin-left: 275px;
-    margin-top: 10px;
-    width: 700px;
+    margin-left: 280px;
+    margin-top: 80px;
+    width: 600px;
     padding: 10px;
     border: 1px solid #cdcdcd;
     background-color: #efefef;
     line-height: 18px;
 }
 
+.mainColFixed {
+    position: absolute;
+    margin-left: 280px;
+    margin-top: 80px;
+    width: 600px;
+    height: 600px;
+    padding: 10px;
+    border: 1px solid #cdcdcd;
+    background-color: #efefef;
+    line-height: 18px;
+}
 .mainSubCol {
   /*clear: both;*/
   background: #ddd;
   padding: 25px;
-  margin: 1px -3px 1px 1px;
-  height: 600px;
+  margin: 1px 1px 3px 1px;
+  height: 547px;
   border: 1px solid #bbb;
 }
 
 .rightCol {
     position: absolute;
-    margin-left: 1005px;
-    margin-top: 10px;
-    padding: 5px;
-    width: 330;
-    height: 490;
+    margin-left: 910px;
+    margin-top: 80px;
+    border-radius: 30px;
+    padding: 3px;
+    width: 340px;
+    height: 610px;
     border: 1px solid #cdcdcd;
-    background-color: #efefef;
-    line-height: 18px;
+    color: #FFFFFF;
+    background-color: #5a5a5a;
 }
 
 
 .btn {
-    width: 200px;
-    margin: 10px;
+    width: 210px;
+    height: 80px;
+    vertical-align: bottom;
+    float: bottom;
+    margin-top: 10px;
 }

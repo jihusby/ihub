@@ -1,9 +1,8 @@
-    [
-        {
-        "header": "XP 2010",
-        "ingress": "",
-        "content1": "The 11th International Conference on Agile Software Development, XP2010, a leading international conference on agile methods in software and information systems development, was organized in Trondheim 1-4 June 2010.",
-        "content2": "<b>Conference room map</b><div id='map'><img src='resources/images/map2.jpg' style='width:100%; height:100%'></div>",
-        "footer": ""
-        }
-    ]
+[
+{"id": "undefined",
+"header": "XP 2010",
+"ingress": "The 11th International Conference on Agile Software Development, XP2010.",
+"content1": "XP2010, a leading international conference on agile methods in software and information systems development, was organized in Trondheim 1-4 June 2011.",
+"mapHeader": "Conference room map",
+"map": "map2.jpg"}
+]

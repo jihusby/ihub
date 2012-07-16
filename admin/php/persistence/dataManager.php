@@ -9,15 +9,17 @@ class dataManager {
     
     var $conferenceDay;
     var $conference;
+    var $totalSessionCount;
        
     function __construct() {
         $this->conferenceDay = new conferenceDay();
         $this->conference = new conference();
+        $this->totalSessionCount = 0;
     }
     
     function getHotelInfo($json){
         $result = "";
-        $result = $result . '<div class="mainCol" id="hotel" style="display: block">';
+        $result = $result . '<div class="mainColFixed" id="hotel" style="display: block">';
         $result = $result . '<div class="mainSubCol">This is the hotel info</div>';
         foreach ($json as $key => $value){
             
@@ -27,22 +29,29 @@ class dataManager {
     }
     function getConferenceInfo($json){
         $result = "";
-        $result = $result . '<div class="mainCol" id="conference" style="display: none">';
+        $result = $result . '<div class="mainColFixed" id="conference" style="display: none">';
         $result = $result . '<div class="mainSubCol">';
+        $result = $result . '<div id="info_form">';
+        $result = $result . '<form name="info" id="info" action="">';
+        $result = $result . '<input type="hidden" id="info" name="info" value="true">';
         foreach ($json as $key => $value){
             $info = $this->getInfoFromJsonArray($value);
             $result = $result . $this->getFormattedInfo($info);
         }
-        $result = $result . '</div></div>';
+        $result = $result . '<input type="submit" name="submit" class="button" id="submit_btn" value="Send" style="display:none;" />';
+        $result = $result . '</form></div></div></div>';
         return $result;
     }
 
     private function getFormattedInfo($info){
+        $result = $result . $this->getHiddenField('id', $info->get_id());
         $result = $result . "<table>";
         $result = $result . $this->getTextFieldSection("Overskrift", "header", "stdField", $this->htmlToText($info->get_header())) . "</td></tr>";
         $result = $result . $this->getTextAreaSection("Ingress", "ingress", "stdBigArea", $this->htmlToText($info->get_ingress())) . "</td></tr>";        
         $result = $result . $this->getTextAreaSection("Tekst 1", "content1", "stdHugeArea", $this->htmlToText($info->get_content1())) . "</td></tr>";
         $result = $result . $this->getTextAreaSection("Tekst 2", "content2", "stdHugeArea", $this->htmlToText($info->get_content2())) . "</td></tr>";
+        $result = $result . $this->getTextFieldSection("Områdekart", "mapHeader", "stdMediumField", $this->htmlToText($info->get_mapHeader()));
+        $result = $result . $this->getTextField("map", "stdSmallField", $this->htmlToText($info->get_map())) . "&nbsp;<a name='maplink' id='maplink' target='_new' href='../../resources/images/".$info->get_map()."'>Vis bilde</a></td></tr>";
         $result = $result . "</table>";
         return $result;
     }
@@ -60,6 +69,10 @@ class dataManager {
                 $info->set_content1($value);
             }else if($key === "content2"){
                 $info->set_content2($value);
+            }else if($key === "mapHeader"){
+                $info->set_mapHeader($value);
+            }else if($key === "map"){
+                $info->set_map($value);
             }else if($key === "footer"){
                 $info->set_footer($value);
             }
@@ -71,7 +84,9 @@ class dataManager {
     function getConferenceForm($json){
         $result = "";
         $result = $result . '<div class="mainCol" id="agenda" style="display: none">';
-        $result = $result . '<input type="hidden" name="post" value="true">';
+        $result = $result . '<div id="agenda_form">';
+        $result = $result . '<form name="agenda" id="agenda" action="">';
+        $result = $result . '<input type="hidden" id="agenda" name="agenda" value="true">';
         foreach ($json as $key => $value){
             $conference = $this->getConferenceObject($value);
             
@@ -88,7 +103,9 @@ class dataManager {
             
             $result = $result . '</section>';
         }
-        $result = $result . '</div>';
+        $result = $result . '<input type="hidden" name="totalSessionCount" id="totalSessionCount" value="'.$this->totalSessionCount.'" />';
+        $result = $result . '<input type="submit" name="submit" class="button" id="submit_btn" value="Send" style="display:none;" />';
+        $result = $result . '</form></div></div>';
 
         return $result;
     }
@@ -107,8 +124,10 @@ class dataManager {
                 $counter++;
             }
             
+            
             $result = $result . '</article>';
         }
+        $this->totalSessionCount += $counter;
         return $result;
     }
 
@@ -160,7 +179,7 @@ class dataManager {
     private function getFormattedSession($session, $sessionCounter){
         $result = $result . $this->getHiddenField('id'.$sessionCounter, $session->get_id());
         $result = $result . "<table>";
-        $result = $result . $this->getLabel("Tidspunkt") . $this->getTextField("start".$sessionCounter, "stdSmallField", $session->get_start()) . "<a href='javascript:viewcalendar(\"start".$sessionCounter."\")'><img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'></a>&nbsp;";
+        $result = $result . $this->getLabel("start".$sessionCounter, "Tidspunkt") . $this->getTextField("start".$sessionCounter, "stdSmallField", $session->get_start()) . "<a href='javascript:viewcalendar(\"start".$sessionCounter."\")'><img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'></a>&nbsp;";
         $result = $result . $this->getTextField("startTime".$sessionCounter, "stdSmallField", $session->get_startTime()) . "</td></tr>";
         $result = $result . $this->getTextFieldSection("Navn", "name".$sessionCounter, "stdField", $this->htmlToText($session->get_name())) . "</td></tr>";
         $result = $result . $this->getTextAreaSection("Ingress", "ingress".$sessionCounter, "stdSmallArea", $this->htmlToText($session->get_ingress())) . "</td></tr>";
@@ -173,36 +192,53 @@ class dataManager {
     
     private function getTextFieldSection($label, $name, $class, $value){
         if($label!==null){
-            return $this->getLabel($label)."<input class='$class' type='text' name='$name' id='$name' value='$value' />";
+            return $this->getLabel($name, $label)."<input class='$class' type='text' name='$name' id='$name' value='$value' onBlur='javascript:saveForm();' /><label class='error' for='$name' id='".$name."_error'>(*)</label>";
         }
-        return "<input class='$class' type='text' name='$name' id='$name' value='$value' />";
+        return "<label for='$name' id='".$name."_label'>".$label."</label><input class='$class' type='text' name='$name' id='$name' value='$value' onBlur='javascript:saveForm();' /><label class='error' for='$name' id='".$name."_error'>(*)</label>";
     }
 
     private function getTextField($name, $class, $value){
-        return "<input class='$class' type='text' name='$name' id='$name' value='$value' />";
+        return "<label for='$name' id='".$name."_label'>".$label."</label><input class='$class' type='text' name='$name' id='$name' value='$value' onBlur='javascript:saveForm();' /><label class='error' for='$name' id='".$name."_error'>(*)</label>";
     }
 
     
     private function getTextAreaSection($label, $name, $class, $value){
-        return $this->getLabel($label)."<textarea class='$class' name='$name' id='$name'>$value</textarea>";
+        return $this->getLabel($name, $label)."<textarea class='$class' name='$name' id='$name' onBlur='javascript:saveForm();'>$value</textarea><label class='error' for='$name' id='".$name."_error'>(*)</label>";
     }
 
     private function getHiddenField($name, $value){
-        return "<input type=hidden name='$name' id='$name' value='$value'></input>";
+        return "<input type=hidden name='$name' id='$name' value='$value' onBlur='javascript:saveForm();'></input><label class='error' for='$name' id='".$name."_error'>(*)</label>";
     }
     
-    private function getLabel($label){
-        return "<tr><td class='keyCell'>".$label."</td><td class='valueCell'>";
+    private function getLabel($name, $label){
+        return "<tr><td class='keyCell'><label for='$name' id='".$name."_label'>".$label."</label></td><td class='valueCell'>";
     }
     
+    function getInfoJSONFromFormData($formData) {
+        $json = "[\n{";
+        $firstChild = true;
+        foreach ($formData as $key => $value){
+            if($key!=="agenda" && $key!=="info" && $key!=="hotel" && $key!=="tab" && strpos($key, "btn") === false){
+                if(!$firstChild){
+                    $json = $json . ",\n";
+                }
+                $json = $json . "\"" . $key . "\": \"" . $this->textToHtml($value) . "\"";
+                $firstChild = false;
+            }
+        }
+            
+        $json = $json . "}\n]";
+        
+        return $json;
+    }
 
-    function getJSONFromFormData($formData) {
+    function getAgendaJSONFromFormData($formData) {
         $json = "{\n\"items\": [\n";
         $num = -1;
         $firstChild = true;
         $fullTime = "";
         foreach ($formData as $key => $value){
-            if($key!=="post" && $key!=="tab"){
+            if($key!=="agenda" && $key!=="info" && $key!=="hotel" && $key!=="tab" && strpos($key, "btn") === false){
                 if(strpos($key, "id") !== false ){ // New session
                     $num++;
                     if(!$firstChild){

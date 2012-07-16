@@ -19,13 +19,14 @@ Ext.define("App.view.Info", {
                     '<div class="contentText">{header}</div>',
                     '<div class="contentText">{ingress}</div>',
                     '<div class="contentText">{content1}</div>',
-                    '<div class="contentText">{content2}</div>',
+                    '<div class="contentText"><b>{mapHeader}</b><div id="map"><img src="resources/images/{map}" style="width:100%; height:100%"></div></div>',
+                    
                     '<div class="footer">{footer}</div></div>'
                 ],
 
                 store: {
                     autoLoad: true,
-                    fields: ['header', 'ingress', 'content1', 'content2', 'footer'],
+                    fields: ['header', 'ingress', 'content1', 'mapHeader', 'map', 'footer'],
                     proxy: {
                         type: 'ajax',
                         url: 'resources/data/info.json',

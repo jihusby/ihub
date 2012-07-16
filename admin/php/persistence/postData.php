@@ -2,9 +2,9 @@
 
     require ("storage.php");
 
-    $conferenceData = new storage("../../../resources/data/data.json");
+    //$conferenceData = new storage("../../../resources/data/data.json");
 
-    print_r ($_POST);
+    print_r ("javascript:alert(In postData, this is the form result: '.$_POST.');");
     //$fileContent = getJSONFromFormData($_POST);
     
 /*
@@ -12,7 +12,7 @@
         print_r (" Skjemaet er lagret! ");
     }
 */
-    //function getJSONFromFormData($_POST) {
+    function getJSONFromFormData($_POST) {
         $json = "{\n\"items\": [\n";
         $num = -1;
         $firstChild = true;
@@ -51,8 +51,8 @@
             
         $json = $json . "}\n]\n}";
         
-        //return $json;
-    //}
+        return $json;
+    }
     
     
     function hourMinuteToSeconds($value) {

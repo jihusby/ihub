@@ -7,6 +7,8 @@ class info {
     var $ingress;
     var $content1;
     var $content2;
+    var $mapHeader;
+    var $map;
     var $footer;
     
     function set_id($new_id){
@@ -39,7 +41,18 @@ class info {
     function get_content2(){
         return $this->content2;
     }
-    
+    function set_mapHeader($new_mapHeader){
+        $this->mapHeader = $new_mapHeader;
+    }
+    function get_mapHeader(){
+        return $this->mapHeader;
+    }
+    function set_map($new_map){
+        $this->map = $new_map;
+    }
+    function get_map(){
+        return $this->map;
+    }
     function set_footer($new_footer){
         $this->footer = $new_footer;
     }

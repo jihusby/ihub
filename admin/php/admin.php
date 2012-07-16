@@ -58,13 +58,20 @@
     
 */    
     
+    
+    $manager = new dataManager();
     $agenda = new storage("../../resources/data/data.json");
     $info = new storage("../../resources/data/info.json");
-    $manager = new dataManager();
-    
-    if($_POST["post"] === "true") {
-        $fileContent = $manager->getJSONFromFormData($_POST);
+    if($_POST["agenda"] === "true") {
+        print_r("<script>alert('".$_POST."');</script>");
+        $fileContent = $manager->getAgendaJSONFromFormData($_POST);
         if($agenda->saveContent($fileContent)===true){
+            print_r (" Skjemaet er lagret!");
+        }
+    }else if($_POST["info"] === "true"){
+        print_r("<script>alert('".$_POST."');</script>");
+        $fileContent = $manager->getInfoJSONFromFormData($_POST);
+        if($info->saveContent($fileContent)===true){
             print_r (" Skjemaet er lagret!");
         }
     }
