@@ -1,8 +1,9 @@
 [
-{"id": "undefined",
-"header": "XP 2010",
-"ingress": "The 11th International Conference on Agile Software Development, XP2010.",
-"content1": "XP2010, a leading international conference on agile methods in software and information systems development, was organized in Trondheim 1-4 June 2011.",
+{"?info": "true",
+"id": "1",
+"header": "XP 2010 JIH",
+"ingress": "The 11th International Conference on Agile Software Development, XP2010.<br>Kjære gjest!<br>Velkommen til helgens konferanse her hos oss. Rica Nidelven Hotel er et av Trondheims mest moderne og velutstyrte forretningshoteller. Hotellet ligger midt i sentrum og strekker seg 17 meter ut i Nidelven.",
+"content1": "XP2010, a leading international conference on agile methods in software and information systems development, was organized in Trondheim 1-4 June 2010.",
 "mapHeader": "Conference room map",
 "map": "map2.jpg"}
 ]

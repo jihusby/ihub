@@ -54,19 +54,19 @@ td {
     min-height: 25px; max-height: 75px; min-width: 400px; max-width: 400px;
 } 
 .stdBigArea{
-    min-height: 50px; max-height: 150px; min-width: 400px; max-width: 400px;
+    min-height: 100px; max-height: 150px; min-width: 400px; max-width: 400px;
 }
 .stdHugeArea{
-    min-height: 100px; max-height: 250px; min-width: 400px; max-width: 400px;
+    min-height: 150px; max-height: 300px; min-width: 400px; max-width: 400px;
 }
 
 .keyCell {
-    width:50px; 
+    width:80px; 
     text-align: right;
 }
 
 .valueCell {
-    width:400px; 
+    width:370px; 
 }
 
 .errorInput {
@@ -78,7 +78,7 @@ td {
     position: absolute;
     margin-left: 10px;
     margin-top: 10px;
-    width: 1230px;
+    width: 960px;
     height: 40px;
     padding: 10px;
     border: 1px solid #cdcdcd;
@@ -87,40 +87,9 @@ td {
     line-height: 18px;
 }
 
-.menuCol {
-    position: absolute;
-    margin-left: 10px;
-    margin-top: 80px;
-    width: 240px;
-    height: 180px;
-    padding: 10px;
-    border: 1px solid #cdcdcd;
-    background-color: #efefef;
-    color: #888888;
-    line-height: 18px;
-}
-
-.menuCol:hover {
-    background-color: #f4f4f4;
-    color: #000000;
-}
-
-.menuColSelected {
-    position: absolute;
-    margin-left: 10px;
-    margin-top: 80px;
-    width: 240px;
-    height: 180px;
-    padding: 10px;
-    border: 1px solid #cdcdcd;
-    background-color: #fefea0;
-    color: #000000;
-    line-height: 18px;
-}
-
 .mainCol {
     position: absolute;
-    margin-left: 280px;
+    margin-left: 370px;
     margin-top: 80px;
     width: 600px;
     padding: 10px;
@@ -131,7 +100,7 @@ td {
 
 .mainColFixed {
     position: absolute;
-    margin-left: 280px;
+    margin-left: 370px;
     margin-top: 80px;
     width: 600px;
     height: 600px;
@@ -149,9 +118,9 @@ td {
   border: 1px solid #bbb;
 }
 
-.rightCol {
+.previewCol {
     position: absolute;
-    margin-left: 910px;
+    margin-left: 10px;
     margin-top: 80px;
     border-radius: 30px;
     padding: 3px;

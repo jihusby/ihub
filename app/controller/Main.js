@@ -6,7 +6,7 @@ Ext.define('App.controller.Main', {
         'App.view.SessionDetail',
         'Ext.MessageBox'
     ],
-    
+
     config: {
         refs: {
             mainView: 'mainview',
@@ -56,6 +56,7 @@ Ext.define('App.controller.Main', {
 
 function getSessionDetail(record) {
     var value = isEventSaved(record.id)?"Fjern fra huskeliste":"Legg til i huskeliste";
+    this.setMainWindow();
     return {
             xtype: 'sessiondetail',
             title: record.startTime,
@@ -83,4 +84,7 @@ function getEventDetail(record) {
                 '<div class="contentText">{description}</div>' + 
                 '</div>'
     }
-  }
+}
+
+  
+  

@@ -1,14 +1,14 @@
 
 function showElement(elementIndex){
-    var elements = new Array("hotel", "conference", "agenda");
+    var elements = new Array("hotel", "info", "agenda");
     for(var i=elements.length-1; i>=0; i--) {
 	var value = elements[i];
         document.getElementById(value).style.display = "none";
-        document.getElementById("menu"+i).className = "menuCol";
+        document.getElementById(value).enabled = "false";
+        document.forms[i].disabled=true;
     }    
-    
+    document.forms[elementIndex].disabled=false;
     document.getElementById(elements[elementIndex]).style.display = "block";
-    document.getElementById("menu"+elementIndex).className = "menuColSelected";
 }
 
 function updateFrame(source){
@@ -24,22 +24,31 @@ function saveForm() {
 $(function() { 
   $('.error').hide();  
   $(".button").click(function() {  
-    
-    var totalSessionCount = $("input#totalSessionCount").val();
     var dataString = "";
-    //alert($("input#info").val());
-    if($("input#info").val() === "true"){
-        var id = $("input#id"+i).val();  
-        var header = $("input#header").val();
-        var ingress = $("textarea#ingress").val();
-        var content1 = $("textarea#content1").val();
-        var mapHeader = $("input#mapHeader").val();
-        var map = $("input#map").val();
+    if(document.forms[0].disabled!==true){
+        var id = $("input#hotelid").val();  
+        var content1 = $("input#hotelcontent1").val();
+        var content2 = $("textarea#hotelcontent2").val();
+        var content3 = $("textarea#hotelcontent3").val();
+        var content4 = $("input#hotelcontent4").val();
+        dataString = '?hotel=true&id=' + id + '&content1=' + content1 + '&content2='+ content2 + '&content3='+ content3 + '&content4='+ content4;
+    }
+
+    else if(document.forms[1].disabled!==true){
+        id = $("input#infoid").val();  
+        var header = $("input#infoheader").val();
+        var ingress = $("textarea#infoingress").val();
+        content1 = $("textarea#infocontent1").val();
+        var mapHeader = $("input#infomapHeader").val();
+        var map = $("input#infomap").val();
         
-        dataString += 'info=true&id=' + id + '&header=' + header + '&ingress='+ ingress + '&content1='+ content1 + '&mapHeader='+ mapHeader + '&map=' + map;
+        dataString = '?info=true&id=' + id + '&header=' + header + '&ingress='+ ingress + '&content1='+ content1 + '&mapHeader='+ mapHeader + '&map=' + map;
         document.getElementById("maplink").href = "../../resources/images/"+map;
     }
-    else if($("input#agenda").val() === "true"){
+
+    else if(document.forms[2].disabled!==true){
+        var totalSessionCount = $("input#totalSessionCount").val();
+        dataString = '?agenda=true';
         for(var i=0; i<totalSessionCount; i++) {
 
             $('.error').hide();  
@@ -83,17 +92,16 @@ $(function() {
                 $("input#description"+i).focus();  
                 return false;  
             }  
-            dataString += 'agenda=true&id'+i+'=' + id + '&start'+i+'='+ start + '&startTime'+i+'='+ startTime + '&name'+i+'='+ name + '&ingress'+i+'=' + ingress + '&description'+i+'=' + description + '&place'+i+'=' + place;
+            dataString += '&id'+i+'=' + id + '&start'+i+'='+ start + '&startTime'+i+'='+ startTime + '&name'+i+'='+ name + '&ingress'+i+'=' + ingress + '&description'+i+'=' + description + '&place'+i+'=' + place;
         }
     }
   
-  //return false;
   $.ajax({
     type: "POST",
-    url: "admin.php",
+    url: "post.php",
     data: dataString,
     success: function() {
-        //alert(dataString);
+        //alert("sending ");
       //$('#agenda_form').html("<div id='message'></div>");
       //$('#message').html("<h2>Agenda Form Submitted!</h2>")
       //.append("<p>We will be in touch soon.</p>")

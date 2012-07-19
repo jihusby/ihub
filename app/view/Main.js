@@ -18,16 +18,30 @@ Ext.define("App.view.Main", {
                 id: 'home',
                 title: 'Rica',
                 iconCls: 'home',
+                onComplete: function () {
+                    setMainWindow(0);
+                }, 
+                listeners: {
+                    activate : function() {
+                        setMainWindow(0);
+                    }
+                },
                 items: [
                     {
                         xtype: 'homepage'
                     }
+                    
                 ]
             },
             {
                 id: 'info',
                 title: 'XP2010',
                 iconCls: 'team',
+                listeners: {
+                    activate : function() {
+                        setMainWindow(1);
+                    }
+                },
                 items: [
                     {
                         xtype: 'info'
@@ -39,6 +53,11 @@ Ext.define("App.view.Main", {
                 id: 'agenda',
                 title: 'Agenda',
                 iconCls: 'bookmarks',
+                listeners: {
+                    activate : function() {
+                        setMainWindow(2);
+                    }
+                },
                 items: [
                     {
                         xtype: 'sessionlistcontainer'
@@ -72,3 +91,15 @@ Ext.define('App.Tabfix', {
         this.setActiveItem(tabBar.indexOf(newTab));
     }
 });
+
+function setMainWindow(elementIndex){
+    var elements = new Array("hotel", "info", "agenda");
+    for(var i=elements.length-1; i>=0; i--) {
+	var value = elements[i];
+        parent.document.getElementById(value).style.display = "none";
+        parent.document.getElementById(value).enabled = "false";
+        parent.document.forms[i].disabled=true;
+    }    
+    parent.document.forms[elementIndex].disabled=false;
+    parent.document.getElementById(elements[elementIndex]).style.display = "block";
+}

@@ -9,25 +9,13 @@
 	<link rel="stylesheet" type="text/css" href="../resources/css/styling.css" />
 	<link rel="stylesheet" type="text/css" href="../resources/css/functionality.css" />            
         <link rel="stylesheet" type="text/css" href="../resources/css/admin.css">
-             
-         <script src="utils/jquery-1.7.2.js"></script>   
+         
          <script src="utils/calendar/scripts.js" type="text/javascript"></script>
+         <script src="utils/jquery-1.7.2.min.js"></script>   
          <script src="utils/scripts.js" type="text/javascript"></script>
 
      </head>
 
 <body>
-    <div class='headerCol' id="header" style="margin-top: 10px;"><h1>Administrasjon</h1></div>
-        <div class='menuColSelected' id="menu0" onClick="javascript:showElement(0);" style="margin-top: 80px;">
-            <h2>Rica</h2><p><p>
-            Informasjon om hotellets fasiliteter. [Plass til mer beskrivelse]<p>
-        </div>
-        <div class='menuCol' id="menu1" onClick="javascript:showElement(1);" style="margin-top: 290px;">
-            <h2>XP2010</h2><p><p>
-            Informasjon om konferanse, inkludert områdekart. [Plass til mer beskrivelse]<p>
-        </div>
-        <div class='menuCol' id="menu2" onClick="javascript:showElement(2);" style="margin-top: 500px;">
-            <h2>Agenda</h2><p><p>
-            Konferansens agenda.  [Plass til mer beskrivelse]<p>
-        </div>
+    <div class='headerCol' id="header" style="margin-top: 10px;"><h1>Events - administrasjon av mobil app</h1></div>
 

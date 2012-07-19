@@ -59,28 +59,16 @@
 */    
     
     
-    $manager = new dataManager();
     $agenda = new storage("../../resources/data/data.json");
+    $hotel = new storage("../../resources/data/homepage.json");
     $info = new storage("../../resources/data/info.json");
-    if($_POST["agenda"] === "true") {
-        print_r("<script>alert('".$_POST."');</script>");
-        $fileContent = $manager->getAgendaJSONFromFormData($_POST);
-        if($agenda->saveContent($fileContent)===true){
-            print_r (" Skjemaet er lagret!");
-        }
-    }else if($_POST["info"] === "true"){
-        print_r("<script>alert('".$_POST."');</script>");
-        $fileContent = $manager->getInfoJSONFromFormData($_POST);
-        if($info->saveContent($fileContent)===true){
-            print_r (" Skjemaet er lagret!");
-        }
-    }
-    
+
+    $hotelInfoResult = $hotel->getContent();
     $conferenceInfoResult = $info->getContent();
     $agendaResult = $agenda->getContent();
-    
+
     $manager = new dataManager();
-    $formattedHotelInfo = $manager->getHotelInfo($result);
+    $formattedHotelInfo = $manager->getHotelInfo($hotelInfoResult);
     $formattedConferenceInfo = $manager->getConferenceInfo($conferenceInfoResult);
     $formattedFormInfo = $manager->getConferenceForm($agendaResult);
     

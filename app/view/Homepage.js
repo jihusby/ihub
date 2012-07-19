@@ -8,7 +8,6 @@ Ext.define("App.view.Homepage", {
 
     config: {
         scrollable: true,
-
         items: [
             {
                 // styleHtmlContent: true,
@@ -17,21 +16,15 @@ Ext.define("App.view.Homepage", {
                 xtype: 'dataview',
                 itemTpl: [
                     '<div class="textBlock">',
-                    '<div class="header">{header}</div>',
-                    '<div class="contentText">{content.content1}</div>',
-                    '<div class="contentText">{content.content2}</div>',
-                    '<div class="contentText">{content.content3}</div>',
-                    '<div class="contentText">{content.content4}</div>',
-                    '<div class="contentText">{content.content5}</div>',
-                    '<div class="contentText">{content.content6}</div>',
-                    '<div class="contentText">{content.content7}</div>',
-                    '<div class="contentText">{content.content8}</div>',
-                    '<div class="footer">{footer}</div></div>'
+                    '<div class="header">{content1}</div>',
+                    '<div class="contentText">{content2}</div>',
+                    '<div class="contentText">{content3}</div>',
+                    '<div class="footer">{content4}</div></div>'
                 ],
 
                 store: {
                     autoLoad: true,
-                    fields: ['header', 'ingress', 'content', 'footer'],
+                    fields: ['content1', 'content2', 'content3', 'content4'],
                     proxy: {
                         type: 'ajax',
                         url: 'resources/data/homepage.json',

@@ -7,6 +7,7 @@ Ext.define("App.view.Info", {
 
     config: {
         scrollable: true,
+        
         items: [
             {
                 //styleHtmlContent: true,
@@ -16,11 +17,10 @@ Ext.define("App.view.Info", {
                 ui: 'light',
                 itemTpl: [
                     '<div class="textBlock">',
-                    '<div class="contentText">{header}</div>',
+                    '<div class="header">{header}</div>',
                     '<div class="contentText">{ingress}</div>',
                     '<div class="contentText">{content1}</div>',
                     '<div class="contentText"><b>{mapHeader}</b><div id="map"><img src="resources/images/{map}" style="width:100%; height:100%"></div></div>',
-                    
                     '<div class="footer">{footer}</div></div>'
                 ],
 
@@ -38,4 +38,5 @@ Ext.define("App.view.Info", {
             }
         }]
     }
+    
 });
