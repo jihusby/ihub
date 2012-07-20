@@ -11,7 +11,9 @@ Ext.define("App.model.Event", {
             { name: 'start', type: 'string' },
             { name: 'timestamp', type: 'string' },
             { name: 'startTime', type: 'string' },
+            { name: 'endTime', type: 'string' },
             { name: 'name', type: 'string' },
+            { name: 'speaker', type: 'string' },
             { name: 'ingress', type: 'string' },
             { name: 'description', type: 'string' }
         ],

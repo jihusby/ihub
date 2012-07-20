@@ -65,13 +65,20 @@ $(function() {
                 $("input#startTime"+i).focus();  
                 return false;  
             }  
-            var name = $("input#name"+i).val();  
+            var endTime = $("input#endTime"+i).val();  
+            if (endTime == "") {  
+                $("label#endTime"+i+"_error").show();  
+                $("input#endTime"+i).focus();  
+                return false;  
+            }  
+            var name = $("#agenda input#name"+i).val();  
+            
             if (name == "") {  
                 $("label#name"+i+"_error").show();  
                 $("input#name"+i).className = "errorInput";  
                 return false;  
             }  
-
+            var speaker = $("input#speaker"+i).val();  
             var place = $("input#place"+i).val();  
             if (place == "") {  
                 $("label#place"+i+"_error").show();  
@@ -92,7 +99,8 @@ $(function() {
                 $("input#description"+i).focus();  
                 return false;  
             }  
-            dataString += '&id'+i+'=' + id + '&start'+i+'='+ start + '&startTime'+i+'='+ startTime + '&name'+i+'='+ name + '&ingress'+i+'=' + ingress + '&description'+i+'=' + description + '&place'+i+'=' + place;
+            dataString += '&id'+i+'=' + id + '&start'+i+'='+ start + '&startTime'+i+'='+ startTime + '&endTime'+i+'='+ endTime + '&name'+i+'='+ name + '&speaker'+i+'='+ speaker + '&ingress'+i+'=' + ingress + '&description'+i+'=' + description + '&place'+i+'=' + place;
+            
         }
     }
   
@@ -101,7 +109,6 @@ $(function() {
     url: "post.php",
     data: dataString,
     success: function() {
-        //alert("sending ");
       //$('#agenda_form').html("<div id='message'></div>");
       //$('#message').html("<h2>Agenda Form Submitted!</h2>")
       //.append("<p>We will be in touch soon.</p>")
@@ -109,6 +116,9 @@ $(function() {
       //.fadeIn(1500, function() {
       //  $('#message').append("<img id='checkmark' src='images/check.png' />");
 //      });
+    },
+    error: function() {
+        
     }
   });
   return false;

@@ -22,9 +22,8 @@ Ext.define("App.view.SessionList", {
         iconCls: "button",
         itemTpl:
                 '</pre>'+
-                '<div class="list-item-title">'+
-                '{startTime}: {name}</div>'+
-                '<div class="list-item-title"></div>'+
+                '<div class="list-item-title">{startTime} - {endTime}: {name}</div>'+
+                '<div class="list-item-title">{speaker}</div>'+
                 '<div class="list-item-description">{ingress}</div>'+
                 '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPlace(\'{place}\');" value="{place}" /></div>'+
                 '<pre>'

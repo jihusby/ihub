@@ -34,12 +34,12 @@ class dataManager {
     }
     
     private function getFormattedHotel($hotel){
-        $result = $result . $this->getHiddenField('hotel', 'hotelid', $hotel->get_id());
+        $result = $result . $this->getHiddenField('hotelid', $hotel->get_id());
         $result = $result . "<table>";
-        $result = $result . $this->getTextFieldSection("hotel", "Overskrift", "hotelcontent1", "stdField", $hotel->get_header()) . "</td></tr>";
-        $result = $result . $this->getTextAreaSection("hotel", "Ingress", "hotelcontent2", "stdBigArea", $this->htmlToText($hotel->get_ingress())) . "</td></tr>";        
-        $result = $result . $this->getTextAreaSection("hotel", "Hovedtekst", "hotelcontent3", "stdHugeArea", $this->htmlToText($hotel->get_content())) . "</td></tr>";
-        $result = $result . $this->getTextFieldSection("hotel", "Undertekst", "hotelcontent4", "stdField", $hotel->get_footer()) . "</td></tr>";
+        $result = $result . $this->getTextFieldSection("Overskrift", "hotelcontent1", "stdField", $hotel->get_header()) . "</td></tr>";
+        $result = $result . $this->getTextAreaSection("Ingress", "hotelcontent2", "stdBigArea", $this->htmlToText($hotel->get_ingress())) . "</td></tr>";        
+        $result = $result . $this->getTextAreaSection("Hovedtekst", "hotelcontent3", "stdHugeArea", $this->htmlToText($hotel->get_content())) . "</td></tr>";
+        $result = $result . $this->getTextFieldSection("Undertekst", "hotelcontent4", "stdField", $hotel->get_footer()) . "</td></tr>";
         $result = $result . "</table>";
         return $result;
     }
@@ -81,12 +81,12 @@ class dataManager {
     private function getFormattedInfo($info){
         $result = $result . $this->getHiddenField('info', 'infoid', $info->get_id());
         $result = $result . "<table>";
-        $result = $result . $this->getTextFieldSection("info", "Overskrift", "infoheader", "stdField", $info->get_header()) . "</td></tr>";
-        $result = $result . $this->getTextAreaSection("info", "Ingress", "infoingress", "stdBigArea", $this->htmlToText($info->get_ingress())) . "</td></tr>";        
-        $result = $result . $this->getTextAreaSection("info", "Tekst 1", "infocontent1", "stdHugeArea", $this->htmlToText($info->get_content1())) . "</td></tr>";
-        $result = $result . $this->getTextAreaSection("info", "Tekst 2", "infocontent2", "stdHugeArea", $this->htmlToText($info->get_content2())) . "</td></tr>";
-        $result = $result . $this->getTextFieldSection("info", "Områdekart", "infomapHeader", "stdMediumField", $info->get_mapHeader());
-        $result = $result . $this->getTextField("info", "infomap", "stdSmallField", $info->get_map()) . "&nbsp;<a name='maplink' id='maplink' target='_new' href='../../resources/images/".$info->get_map()."'>Vis bilde</a></td></tr>";
+        $result = $result . $this->getTextFieldSection("Overskrift", "infoheader", "stdField", $info->get_header()) . "</td></tr>";
+        $result = $result . $this->getTextAreaSection("Ingress", "infoingress", "stdBigArea", $this->htmlToText($info->get_ingress())) . "</td></tr>";        
+        $result = $result . $this->getTextAreaSection("Tekst 1", "infocontent1", "stdHugeArea", $this->htmlToText($info->get_content1())) . "</td></tr>";
+        $result = $result . $this->getTextAreaSection("Tekst 2", "infocontent2", "stdHugeArea", $this->htmlToText($info->get_content2())) . "</td></tr>";
+        $result = $result . $this->getTextFieldSection("Områdekart", "infomapHeader", "stdMediumField", $info->get_mapHeader());
+        $result = $result . $this->getTextField("infomap", "stdSmallField", $info->get_map()) . "&nbsp;<a name='maplink' id='maplink' target='_new' href='../../resources/images/".$info->get_map()."'>Vis bilde</a></td></tr>";
         $result = $result . "</table>";
         return $result;
     }
@@ -193,10 +193,14 @@ class dataManager {
                     $session->set_start($value);
                 }else if($key === "startTime"){
                     $session->set_startTime($value);
+                }else if($key === "endTime"){
+                    $session->set_endTime($value);
                 }else if($key === "timestamp"){
                     $session->set_timestamp($value);
                 }else if($key === "name"){
                     $session->set_name($value);
+                }else if($key === "speaker"){
+                    $session->set_speaker($value);
                 }else if($key === "ingress"){
                     $session->set_ingress($value);
                 }else if($key === "description"){
@@ -211,36 +215,38 @@ class dataManager {
     }
     
     private function getFormattedSession($session, $sessionCounter){
-        $result = $result . $this->getHiddenField('agenda', 'id'.$sessionCounter, $session->get_id());
+        $result = $result . $this->getHiddenField('id'.$sessionCounter, $session->get_id());
         $result = $result . "<table>";
-        $result = $result . $this->getLabel("agenda", "start".$sessionCounter, "Tidspunkt") . $this->getTextField("agenda", "start".$sessionCounter, "stdSmallField", $session->get_start()) . "<a href='javascript:viewcalendar(\"start".$sessionCounter."\")'><img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'></a>&nbsp;";
-        $result = $result . $this->getTextField("agenda", "startTime".$sessionCounter, "stdSmallField", $session->get_startTime()) . "</td></tr>";
-        $result = $result . $this->getTextFieldSection("agenda", "Navn", "name".$sessionCounter, "stdField", $this->htmlToText($session->get_name())) . "</td></tr>";
-        $result = $result . $this->getTextAreaSection("agenda", "Ingress", "ingress".$sessionCounter, "stdSmallArea", $this->htmlToText($session->get_ingress())) . "</td></tr>";
-        $result = $result . $this->getTextAreaSection("agenda", "Beskrivelse", "description".$sessionCounter, "stdBigArea", $this->htmlToText($session->get_description())) . "</td></tr>";
-        $result = $result . $this->getTextFieldSection("agenda", "Sted", "place".$sessionCounter, "stdField", $session->get_place()) . "</td></tr>";
+        $result = $result . $this->getLabel("start".$sessionCounter, "Tidspunkt") . $this->getTextField("start".$sessionCounter, "stdSmallField", $session->get_start()) . "<a href='javascript:viewcalendar(\"start".$sessionCounter."\")'><img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'></a>&nbsp;";
+        $result = $result . $this->getTextField("startTime".$sessionCounter, "stdSmallField", $session->get_startTime()) . "";
+        $result = $result . $this->getTextField("endTime".$sessionCounter, "stdSmallField", $session->get_endTime()) . "</td></tr>";
+        $result = $result . $this->getTextFieldSection("Navn", "name".$sessionCounter, "stdField", $session->get_name()) . "</td></tr>";
+        $result = $result . $this->getTextFieldSection("Speaker", "speaker".$sessionCounter, "stdField", $session->get_speaker()) . "</td></tr>";
+        $result = $result . $this->getTextAreaSection("Ingress", "ingress".$sessionCounter, "stdSmallArea", $this->htmlToText($session->get_ingress())) . "</td></tr>";
+        $result = $result . $this->getTextAreaSection("Beskrivelse", "description".$sessionCounter, "stdBigArea", $this->htmlToText($session->get_description())) . "</td></tr>";
+        $result = $result . $this->getTextFieldSection("Sted", "place".$sessionCounter, "stdField", $session->get_place()) . "</td></tr>";
         $result = $result . "</table><br>";
         
         return $result;
     }
     
-    private function getTextFieldSection($type, $label, $name, $class, $value){
+    private function getTextFieldSection($label, $name, $class, $value){
         if($label!==null){
             return $this->getLabel($name, $label)."<input class='$class' type='text' name='$name' id='$name' value='$value' onBlur='javascript:saveForm();' /><label class='error' for='$name' id='".$name."_error'>(*)</label>";
         }
         return "<label for='$name' id='".$name."_label'>".$label."</label><input class='$class' type='text' name='$name' id='$name' value='$value' onBlur='javascript:saveForm();' /><label class='error' for='$name' id='".$name."_error'>(*)</label>";
     }
 
-    private function getTextField($type, $name, $class, $value){
+    private function getTextField($name, $class, $value){
         return "<label for='$name' id='".$name."_label'>".$label."</label><input class='$class' type='text' name='$name' id='$name' value='$value' onBlur='javascript:saveForm();' /><label class='error' for='$name' id='".$name."_error'>(*)</label>";
     }
 
     
-    private function getTextAreaSection($type, $label, $name, $class, $value){
+    private function getTextAreaSection($label, $name, $class, $value){
         return $this->getLabel($name, $label)."<textarea class='$class' name='$name' id='$name' onBlur='javascript:saveForm();'>$value</textarea><label class='error' for='$name' id='".$name."_error'>(*)</label>";
     }
 
-    private function getHiddenField($type, $name, $value){
+    private function getHiddenField($name, $value){
         return "<input type=hidden name='$name' id='$name' value='$value' onBlur='javascript:saveForm();'></input><label class='error' for='$name' id='".$name."_error'>(*)</label>";
     }
     
@@ -256,7 +262,6 @@ class dataManager {
                 if(!$firstChild){
                     $json = $json . ",\n";
                 }
-                //$json = $json . "\"" . $key . "\": \"" . $this->textToHtml($value) . "\"";
                 $json = $json . "\"" . $key . "\": \"" . $this->textToHtml($value) . "\"";
                 $firstChild = false;
             }
@@ -315,14 +320,14 @@ class dataManager {
     }
     
     private function htmlToText($value) {
-        return $value;
-        //return str_replace("<br>", "\n", trim($value));
+        //return $value;
+        return str_replace("<br>", "\n", trim($value));
     }
 
     private function textToHtml($value) {
-        return $value;
+        //return $value;
         //$value2 = $this->parse($value);
-        //return $this->preg_replace('\n', '<br>', trim($value));
+        return $this->preg_replace('\n', '<br>', trim($value));
     }
     
     private function parse($text) {

@@ -5,7 +5,9 @@ class session {
     var $id;
     var $start;
     var $startTime;
+    var $endTime;
     var $name;
+    var $speaker;
     var $timestamp;
     var $ingress;
     var $description;
@@ -30,11 +32,23 @@ class session {
     function get_startTime(){
         return $this->startTime;
     }
+    function set_endTime($new_endTime){
+        $this->endTime = $new_endTime;
+    }
+    function get_endTime(){
+        return $this->endTime;
+    }
     function set_name($new_name){
         $this->name = $new_name;
     }
     function get_name(){
         return $this->name;
+    }
+    function set_speaker($new_speaker){
+        $this->speaker = $new_speaker;
+    }
+    function get_speaker(){
+        return $this->speaker;
     }
     function set_timestamp($new_timestamp){
         $this->timestamp = $new_timestamp;
