@@ -3,6 +3,8 @@
 
     require ("persistence/storage.php");
     require ("persistence/dataManager.php");
+    require ("handlers/hotelHandler.php");
+    
     
 /*
     $realm = 'Restricted area';
@@ -60,20 +62,20 @@
     
     
     $agenda = new storage("../../resources/data/data.json");
-    $hotel = new storage("../../resources/data/homepage.json");
+    $hotelStorage = new storage("../../resources/data/homepage.json");
     $info = new storage("../../resources/data/info.json");
 
-    $hotelInfoResult = $hotel->getContent();
+    $hotelInfoResult = $hotelStorage->getContent();
     $conferenceInfoResult = $info->getContent();
     $agendaResult = $agenda->getContent();
 
     $manager = new dataManager();
-    $formattedHotelInfo = $manager->getHotelInfo($hotelInfoResult);
+    $hotelHandler = new hotelHandler();
     $formattedConferenceInfo = $manager->getConferenceInfo($conferenceInfoResult);
     $formattedFormInfo = $manager->getConferenceForm($agendaResult);
     
     require ("view-elements/header.php");
-    print_r ($formattedHotelInfo);  
+    print_r ($hotelHandler->getPageContentFromJSON($hotelInfoResult));  
     print_r ($formattedConferenceInfo);
     print_r ($formattedFormInfo);
     require ("view-elements/footer.php");

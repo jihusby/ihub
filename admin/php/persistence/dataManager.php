@@ -1,10 +1,10 @@
 <?php
 
-require ("persistence/session.php");
-require ("persistence/conferenceDay.php");
-require ("persistence/conference.php");
-require ("persistence/info.php");
-require ("persistence/hotel.php");
+require ("model/session.php");
+require ("model/conferenceDay.php");
+require ("model/conference.php");
+require ("model/info.php");
+require ("model/hotel.php");
 
 class dataManager {
     
@@ -17,7 +17,8 @@ class dataManager {
         $this->conference = new conference();
         $this->totalSessionCount = 0;
     }
-    
+
+/*
     function getHotelInfo($json){
         $result = "";
         $result = $result . '<div class="mainColFixed" id="hotel" style="display: block">';
@@ -61,7 +62,8 @@ class dataManager {
         }
         return $hotel;
     }
-    
+ * 
+ */
     
     function getConferenceInfo($json){
         $result = "";
@@ -79,7 +81,7 @@ class dataManager {
     }
 
     private function getFormattedInfo($info){
-        $result = $result . $this->getHiddenField('info', 'infoid', $info->get_id());
+        $result = $result . $this->getHiddenField('infoid', $info->get_id());
         $result = $result . "<table>";
         $result = $result . $this->getTextFieldSection("Overskrift", "infoheader", "stdField", $info->get_header()) . "</td></tr>";
         $result = $result . $this->getTextAreaSection("Ingress", "infoingress", "stdBigArea", $this->htmlToText($info->get_ingress())) . "</td></tr>";        
@@ -238,7 +240,7 @@ class dataManager {
     }
 
     private function getTextField($name, $class, $value){
-        return "<label for='$name' id='".$name."_label'>".$label."</label><input class='$class' type='text' name='$name' id='$name' value='$value' onBlur='javascript:saveForm();' /><label class='error' for='$name' id='".$name."_error'>(*)</label>";
+        return "<label for='$name' id='".$name."_label' /><input class='$class' type='text' name='$name' id='$name' value='$value' onBlur='javascript:saveForm();' /><label class='error' for='$name' id='".$name."_error'>(*)</label>";
     }
 
     
@@ -247,7 +249,7 @@ class dataManager {
     }
 
     private function getHiddenField($name, $value){
-        return "<input type=hidden name='$name' id='$name' value='$value' onBlur='javascript:saveForm();'></input><label class='error' for='$name' id='".$name."_error'>(*)</label>";
+        return "<input type=hidden name='$name' id='$name' value='$value' />";
     }
     
     private function getLabel($name, $label){
@@ -258,7 +260,7 @@ class dataManager {
         $json = "[\n{";
         $firstChild = true;
         foreach ($formData as $key => $value){
-            if($key!=="agenda" && $key!=="info" && $key!=="hotel" && $key!=="tab" && strpos($key, "btn") === false){
+            if($key!=="?info" && $key!=="?hotel" && $key!=="tab" && strpos($key, "btn") !== true){
                 if(!$firstChild){
                     $json = $json . ",\n";
                 }
@@ -278,7 +280,7 @@ class dataManager {
         $firstChild = true;
         $fullTime = "";
         foreach ($formData as $key => $value){
-            if($key!=="?agenda" && $key!=="?info" && $key!=="?hotel" && $key!=="tab" && strpos($key, "btn") === false){
+            if($key!=="?agenda" && $key!=="tab" && strpos($key, "btn") === false){
                 if(strpos($key, "id") !== false ){ // New session
                     $num++;
                     if(!$firstChild){
@@ -320,26 +322,15 @@ class dataManager {
     }
     
     private function htmlToText($value) {
-        //return $value;
-        return str_replace("<br>", "\n", trim($value));
+        return $value;
+        //return str_replace("<br>", "\n", $value);
     }
 
     private function textToHtml($value) {
-        //return $value;
+        return $value;
         //$value2 = $this->parse($value);
-        return $this->preg_replace('\n', '<br>', trim($value));
+        //return preg_replace('\r\n', '<br>', $value);
     }
-    
-    private function parse($text) {
-        // Damn pesky carriage returns...
-        $text = str_replace("\r\n", "\n", $text);
-        $text = str_replace("\r", "\n", $text);
-
-        // JSON requires new line characters be escaped
-        $text = str_replace("\n", "\\n", $text);
-        return $text;
-    }    
-    
 }
 
 ?>

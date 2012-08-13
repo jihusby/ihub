@@ -109,6 +109,7 @@ $(function() {
     url: "post.php",
     data: dataString,
     success: function() {
+        //document.write("success: " + dataString);
       //$('#agenda_form').html("<div id='message'></div>");
       //$('#message').html("<h2>Agenda Form Submitted!</h2>")
       //.append("<p>We will be in touch soon.</p>")
@@ -118,7 +119,7 @@ $(function() {
 //      });
     },
     error: function() {
-        
+        document.write("error");
     }
   });
   return false;

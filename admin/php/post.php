@@ -3,13 +3,16 @@
 
     require ("persistence/storage.php");
     require ("persistence/dataManager.php");
+    require ("handlers/hotelHandler.php");
+    
     
     $manager = new dataManager();
     $storage = "";
     $file = '';
     $fileContent = "";
     if($_POST["?hotel"] === "true"){
-        $fileContent = $manager->getJSONFromFormData($_POST);
+        $hotelHandler = new hotelHandler();
+        $fileContent = $hotelHandler->getJSONFromPostData($_POST);
         $file = "../../resources/data/homepage.json";
     }else if($_POST["?info"] === "true"){
         $fileContent = $manager->getJSONFromFormData($_POST);

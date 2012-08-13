@@ -93,13 +93,15 @@ Ext.define('App.Tabfix', {
 });
 
 function setMainWindow(elementIndex){
-    var elements = new Array("hotel", "info", "agenda");
-    for(var i=elements.length-1; i>=0; i--) {
-	var value = elements[i];
-        parent.document.getElementById(value).style.display = "none";
-        parent.document.getElementById(value).enabled = "false";
-        parent.document.forms[i].disabled=true;
-    }    
-    parent.document.forms[elementIndex].disabled=false;
-    parent.document.getElementById(elements[elementIndex]).style.display = "block";
+    if(parent.document.getElementById("hotel")) {
+        var elements = new Array("hotel", "info", "agenda");
+        for(var i=elements.length-1; i>=0; i--) {
+            var value = elements[i];
+            parent.document.getElementById(value).style.display = "none";
+            parent.document.getElementById(value).enabled = "false";
+            parent.document.forms[i].disabled=true;
+        }    
+        parent.document.forms[elementIndex].disabled=false;
+        parent.document.getElementById(elements[elementIndex]).style.display = "block";
+    }
 }

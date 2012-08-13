@@ -10,9 +10,9 @@
 	<link rel="stylesheet" type="text/css" href="../resources/css/functionality.css" />            
         <link rel="stylesheet" type="text/css" href="../resources/css/admin.css">
          
-         <script src="utils/calendar/scripts.js" type="text/javascript"></script>
-         <script src="utils/jquery-1.7.2.min.js"></script>   
-         <script src="utils/scripts.js" type="text/javascript"></script>
+         <script src="utils/javascript/calendar/scripts.js" type="text/javascript"></script>
+         <script src="utils/javascript/jquery/jquery-1.7.2.min.js"></script>   
+         <script src="utils/javascript/scripts.js" type="text/javascript"></script>
 
      </head>
 
