@@ -2,8 +2,10 @@
 <?php
 
     require ("persistence/storage.php");
-    require ("persistence/dataManager.php");
+    require ("handlers/genericContentHandler.php");
     require ("handlers/hotelHandler.php");
+    require ("handlers/infoHandler.php");
+    require ("handlers/agendaHandler.php");
     
     
 /*
@@ -60,24 +62,22 @@
     
 */    
     
-    
-    $agenda = new storage("../../resources/data/data.json");
     $hotelStorage = new storage("../../resources/data/homepage.json");
-    $info = new storage("../../resources/data/info.json");
+    $infoStorage = new storage("../../resources/data/info.json");
+    $agendaStorage = new storage("../../resources/data/data.json");
 
-    $hotelInfoResult = $hotelStorage->getContent();
-    $conferenceInfoResult = $info->getContent();
-    $agendaResult = $agenda->getContent();
+    $hotelContent = $hotelStorage->getContent();
+    $infoContent = $infoStorage->getContent();
+    $agendaContent = $agendaStorage->getContent();
 
-    $manager = new dataManager();
     $hotelHandler = new hotelHandler();
-    $formattedConferenceInfo = $manager->getConferenceInfo($conferenceInfoResult);
-    $formattedFormInfo = $manager->getConferenceForm($agendaResult);
+    $infoHandler = new infoHandler();
+    $agendaHandler = new agendaHandler();
     
     require ("view-elements/header.php");
-    print_r ($hotelHandler->getPageContentFromJSON($hotelInfoResult));  
-    print_r ($formattedConferenceInfo);
-    print_r ($formattedFormInfo);
+    print_r ($hotelHandler->getPageContentFromJSON($hotelContent));  
+    print_r ($infoHandler->getPageContentFromJSON($infoContent));  
+    print_r ($agendaHandler->getPageContentFromJSON($agendaContent));  
     require ("view-elements/footer.php");
     
 ?>

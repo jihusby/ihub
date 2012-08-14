@@ -1,9 +1,8 @@
 <?php
 
-require ("handlers/dataHandler.php");
-require ("utils/formElementUtils.php");
+require ("model/hotel.php");
 
-class hotelHandler implements dataHandler {
+class hotelHandler implements genericContentHandler {
     
     public function getPageContentFromJSON($json) {
         $result = "";

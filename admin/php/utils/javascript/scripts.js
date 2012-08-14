@@ -110,16 +110,9 @@ $(function() {
     data: dataString,
     success: function() {
         //document.write("success: " + dataString);
-      //$('#agenda_form').html("<div id='message'></div>");
-      //$('#message').html("<h2>Agenda Form Submitted!</h2>")
-      //.append("<p>We will be in touch soon.</p>")
-      //.hide()
-      //.fadeIn(1500, function() {
-      //  $('#message').append("<img id='checkmark' src='images/check.png' />");
-//      });
     },
     error: function() {
-        document.write("error");
+        document.write("Error");
     }
   });
   return false;
