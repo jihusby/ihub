@@ -2,28 +2,21 @@
 
 class storage {
     
-    private $conferenceDataFile;
-
-    function __construct($data) {
-        $this->conferenceDataFile = $data;
+    public function __construct() {
     }
     
-    function getContent(){
-        $string = file_get_contents($this->getConferenceDataFile());
+    public static function getContent($file){
+        $string = file_get_contents($file);
         return json_decode($string, true);
     }
 
-    function saveContent($content){
-        $fh = fopen($this->getConferenceDataFile(), 'w') or die;
+    public static function saveContent($file, $content){
+        $fh = fopen($file, 'w') or die;
         fwrite($fh, $content);
         fclose($fh);
         return true;
     }
     
-    function getConferenceDataFile(){
-        return $this->conferenceDataFile;
-    }
-
 }
 
 ?>

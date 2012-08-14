@@ -29,18 +29,6 @@ class formElementUtils {
     public static function getLabel($name, $label){
         return "<tr><td class='keyCell'><label for='$name' id='".$name."_label'>".$label."</label></td><td class='valueCell'>";
     }
-    
-    public static function htmlToText($value) {
-        return $value;
-        //return str_replace("<br>", "\n", $value);
-    }
-
-    public static function textToHtml($value) {
-        return $value;
-        //$value2 = $this->parse($value);
-        //return preg_replace('\r\n', '<br>', $value);
-    }
-
 }
 
 ?>

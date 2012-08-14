@@ -1,6 +1,7 @@
 <?php
 
 require ("utils/formElementUtils.php");
+require ("utils/stringUtils.php");
     
 interface genericContentHandler {
     

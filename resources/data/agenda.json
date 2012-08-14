@@ -1,6 +1,5 @@
 {
 "items": [
-
 {
 "id": "1",
 "start": "09.09.2012",
@@ -9,7 +8,7 @@
 "endTime": "09:45",
 "name": "Presentation Patterns and Anti-patterns",
 "speaker": "Robert C. Martin",
-"ingress": "A different approach to how to build good presentations",
+"ingress": "A different approach to how to build presentations",
 "description": "This session takes a different approach to how to build presentations, by providing patterns and anti-patterns you can use to make sure you’re getting the most leverage from your presentations. Don’t take a knife to a gunfight! The ability to create compelling presentations that explain your point is one of the things that keeps your job from disappearing.",
 "place": "Gråkallen"
 },
@@ -36,7 +35,7 @@
 "name": "Java SE 7 has been released, what about Java SE 8?",
 "speaker": "Robert C. Martin",
 "ingress": "Discussing changes in Java SE 8",
-"description": "Java SE 7 was launched officially on 28th of July this year; the first new version of the Java platform in nearly five years. Now that various issues have been resolved, Oracle are keen to maintain the momentum of Java as a platform. In this session we\'ll talk briefly about Java SE 7 before discussing some of the changes being made to the JCP to provide a more transparent development of new Java specifications.",
+"description": "What the HELL",
 "place": "Ringve"
 },
 
@@ -75,7 +74,7 @@
 "name": "Do I still hate SOA?",
 "speaker": "Robert C. Martin",
 "ingress": "Strengths and weaknesses in Service Oriented Architecture",
-"description": "At JavaZone 2005, I gave a talk with the title \'Why I hate SOA\'. In the talk, I outlined several weaknesses with the then much-hyped term Service Oriented Architecture. Six years have passed, and I have learned much. The question is: Has SOA learned the same things?",
+"description": "At JavaZone 2005, I gave a talk with the title Why I hate SOA. In the talk, I outlined several weaknesses with the then much-hyped term Service Oriented Architecture. Six years have passed, and I have learned much. The question is: Has SOA learned the same things?",
 "place": "Gråkallen"
 },
 
@@ -88,7 +87,7 @@
 "name": "Comparing Asynchronous Web Techniques",
 "speaker": "",
 "ingress": "Pros and cons of comet, servlet 3, and websockets",
-"description": "The world is all about the asynchronous web these days. There are an increasing number of options for Java developers. In this presentation we\'ll cover 3 such options: comet, servlet 3, and websockets. We\'ll look at code and discuss pros and cons of each approach.",
+"description": "The world is all about the asynchronous web these days. There are an increasing number of options for Java developers. In this presentation we'll cover 3 such options: comet, servlet 3, and websockets. We'll look at code and discuss pros and cons of each approach.",
 "place": "Gråkallen"
 },
 
@@ -101,7 +100,7 @@
 "name": "Workshop med Uncle Bob",
 "speaker": "",
 "ingress": "TDD and Extreme programming with Robert C. Martin",
-"description": "Robert C. Martin - Uncle Bob - has been a software professional since 1970. In the last 35 years, he has worked in various capacities on literally hundreds of software projects. He has authored \'landmark\' books on Agile Programming, Extreme Programming, UML, Object-Oriented Programming, and C   Programming.",
+"description": "Robert C. Martin - Uncle Bob - has been a software professional since 1970. In the last 35 years, he has worked in various capacities on literally hundreds of software projects. He has authored 'landmark' books on Agile Programming, Extreme Programming, UML, Object-Oriented Programming, and C Programming.",
 "place": "Gråkallen"
 },
 

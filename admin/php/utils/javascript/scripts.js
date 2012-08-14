@@ -31,7 +31,7 @@ $(function() {
         var content2 = $("textarea#hotelcontent2").val();
         var content3 = $("textarea#hotelcontent3").val();
         var content4 = $("input#hotelcontent4").val();
-        dataString = '?hotel=true&id=' + id + '&content1=' + content1 + '&content2='+ content2 + '&content3='+ content3 + '&content4='+ content4;
+        dataString = '?meta=hotel&id=' + id + '&content1=' + content1 + '&content2='+ content2 + '&content3='+ content3 + '&content4='+ content4;
     }
 
     else if(document.forms[1].disabled!==true){
@@ -42,13 +42,13 @@ $(function() {
         var mapHeader = $("input#infomapHeader").val();
         var map = $("input#infomap").val();
         
-        dataString = '?info=true&id=' + id + '&header=' + header + '&ingress='+ ingress + '&content1='+ content1 + '&mapHeader='+ mapHeader + '&map=' + map;
+        dataString = '?meta=info&id=' + id + '&header=' + header + '&ingress='+ ingress + '&content1='+ content1 + '&mapHeader='+ mapHeader + '&map=' + map;
         document.getElementById("maplink").href = "../../resources/images/"+map;
     }
 
     else if(document.forms[2].disabled!==true){
         var totalSessionCount = $("input#totalSessionCount").val();
-        dataString = '?agenda=true';
+        dataString = '?meta=agenda';
         for(var i=0; i<totalSessionCount; i++) {
 
             $('.error').hide();  

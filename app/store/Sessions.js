@@ -7,7 +7,7 @@ Ext.define("App.store.Sessions", {
         model: "App.model.Session",
         proxy: {
             type: 'ajax',
-            url: 'resources/data/data.json',
+            url: 'resources/data/agenda.json',
             reader: {
                 type: 'json',
                 rootProperty: 'items'

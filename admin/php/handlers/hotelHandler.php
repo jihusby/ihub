@@ -23,11 +23,11 @@ class hotelHandler implements genericContentHandler {
         $json = "[\n{";
         $firstChild = true;
         foreach ($postData as $key => $value){
-            if($key!=="?hotel" && $key!=="tab" && strpos($key, "btn") !== true){
+            if($key!=="?meta" && $key!=="tab" && strpos($key, "btn") !== true){
                 if(!$firstChild){
                     $json = $json . ",\n";
                 }
-                $json = $json . "\"" . $key . "\": \"" . formElementUtils::textToHtml($value) . "\"";
+                $json = $json . "\"" . $key . "\": \"" . stringUtils::textToHtml($value) . "\"";
                 $firstChild = false;
             }
         }
@@ -59,8 +59,8 @@ class hotelHandler implements genericContentHandler {
         $result = $result . formElementUtils::getHiddenField('hotelid', $hotel->get_id());
         $result = $result . "<table>";
         $result = $result . formElementUtils::getTextFieldSection("Overskrift", "hotelcontent1", "stdField", $hotel->get_header()) . "</td></tr>";
-        $result = $result . formElementUtils::getTextAreaSection("Ingress", "hotelcontent2", "stdBigArea", formElementUtils::htmlToText($hotel->get_ingress())) . "</td></tr>";        
-        $result = $result . formElementUtils::getTextAreaSection("Hovedtekst", "hotelcontent3", "stdHugeArea", formElementUtils::htmlToText($hotel->get_content())) . "</td></tr>";
+        $result = $result . formElementUtils::getTextAreaSection("Ingress", "hotelcontent2", "stdBigArea", stringUtils::htmlToText($hotel->get_ingress())) . "</td></tr>";        
+        $result = $result . formElementUtils::getTextAreaSection("Hovedtekst", "hotelcontent3", "stdHugeArea", stringUtils::htmlToText($hotel->get_content())) . "</td></tr>";
         $result = $result . formElementUtils::getTextFieldSection("Undertekst", "hotelcontent4", "stdField", $hotel->get_footer()) . "</td></tr>";
         $result = $result . "</table>";
         return $result;

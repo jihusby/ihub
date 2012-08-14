@@ -18,7 +18,6 @@ class agendaHandler implements genericContentHandler {
         $result = $result . '<div class="mainCol" id="agenda" style="display: none">';
         $result = $result . '<div id="agenda_form">';
         $result = $result . '<form name="agenda" id="agenda" action="" disabled>';
-        print_r ($json);
         foreach ($json as $key => $value){
             $conference = $this->getConferenceObject($value);
             
@@ -48,7 +47,7 @@ class agendaHandler implements genericContentHandler {
         $firstChild = true;
         $fullTime = "";
         foreach ($postData as $key => $value){
-            if($key!=="?agenda" && $key!=="tab" && strpos($key, "btn") === false){
+            if($key!=="?meta" && $key!=="tab" && strpos($key, "btn") === false){
                 if(strpos($key, "id") !== false ){ // New session
                     $num++;
                     if(!$firstChild){
@@ -71,7 +70,7 @@ class agendaHandler implements genericContentHandler {
                 }
                 
                 else {                
-                    $json = $json . "\"" . $key . "\": \"" . formElementUtils::textToHtml($value) . "\"";
+                    $json = $json . "\"" . $key . "\": \"" . stringUtils::textToHtml($value) . "\"";
                 }
                 $firstChild = false;
             }
@@ -158,8 +157,8 @@ class agendaHandler implements genericContentHandler {
         $result = $result . formElementUtils::getTextField("endTime".$sessionCounter, "stdSmallField", $session->get_endTime()) . "</td></tr>";
         $result = $result . formElementUtils::getTextFieldSection("Navn", "name".$sessionCounter, "stdField", $session->get_name()) . "</td></tr>";
         $result = $result . formElementUtils::getTextFieldSection("Speaker", "speaker".$sessionCounter, "stdField", $session->get_speaker()) . "</td></tr>";
-        $result = $result . formElementUtils::getTextAreaSection("Ingress", "ingress".$sessionCounter, "stdSmallArea", formElementUtils::htmlToText($session->get_ingress())) . "</td></tr>";
-        $result = $result . formElementUtils::getTextAreaSection("Beskrivelse", "description".$sessionCounter, "stdBigArea", formElementUtils::htmlToText($session->get_description())) . "</td></tr>";
+        $result = $result . formElementUtils::getTextAreaSection("Ingress", "ingress".$sessionCounter, "stdSmallArea", stringUtils::htmlToText($session->get_ingress())) . "</td></tr>";
+        $result = $result . formElementUtils::getTextAreaSection("Beskrivelse", "description".$sessionCounter, "stdBigArea", stringUtils::htmlToText($session->get_description())) . "</td></tr>";
         $result = $result . formElementUtils::getTextFieldSection("Sted", "place".$sessionCounter, "stdField", $session->get_place()) . "</td></tr>";
         $result = $result . "</table><br>";
         

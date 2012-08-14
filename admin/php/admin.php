@@ -62,22 +62,19 @@
     
 */    
     
-    $hotelStorage = new storage("../../resources/data/homepage.json");
-    $infoStorage = new storage("../../resources/data/info.json");
-    $agendaStorage = new storage("../../resources/data/data.json");
-
-    $hotelContent = $hotelStorage->getContent();
-    $infoContent = $infoStorage->getContent();
-    $agendaContent = $agendaStorage->getContent();
+    $storage = new storage();
 
     $hotelHandler = new hotelHandler();
     $infoHandler = new infoHandler();
     $agendaHandler = new agendaHandler();
     
     require ("view-elements/header.php");
-    print_r ($hotelHandler->getPageContentFromJSON($hotelContent));  
-    print_r ($infoHandler->getPageContentFromJSON($infoContent));  
-    print_r ($agendaHandler->getPageContentFromJSON($agendaContent));  
+    print_r ($hotelHandler->getPageContentFromJSON(
+            $storage->getContent("../../resources/data/hotel.json")));  
+    print_r ($infoHandler->getPageContentFromJSON(
+            $storage->getContent("../../resources/data/info.json")));  
+    print_r ($agendaHandler->getPageContentFromJSON(
+            $storage->getContent("../../resources/data/agenda.json")));  
     require ("view-elements/footer.php");
     
 ?>

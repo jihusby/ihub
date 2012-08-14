@@ -27,7 +27,7 @@ Ext.define("App.view.Homepage", {
                     fields: ['content1', 'content2', 'content3', 'content4'],
                     proxy: {
                         type: 'ajax',
-                        url: 'resources/data/homepage.json',
+                        url: 'resources/data/hotel.json',
                         reader: {
                             type: 'json',
                             rootProperty: 'responseData.feed.entries'
