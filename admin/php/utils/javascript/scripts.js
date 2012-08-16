@@ -1,6 +1,6 @@
 
 function showElement(elementIndex){
-    var elements = new Array("hotel", "info", "agenda");
+    var elements = new Array("hotel", "info", "agenda", "favorites");
     for(var i=elements.length-1; i>=0; i--) {
 	var value = elements[i];
         document.getElementById(value).style.display = "none";

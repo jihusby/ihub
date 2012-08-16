@@ -30,10 +30,37 @@ Ext.define("App.view.SessionList", {
     }
 });
 
-function showPlace(place) {
-    var body = "<img src='resources/images/map2.jpg' style='height:70%; width:90%'>";
+function showPlaceOrig(place) {
+    var body = "<img src='resources/images/maps/"+place+".jpg' style='height:78%; width:110%'>";
     Ext.Msg.alert(place, body);
 }
+
+function showPlace(place) {
+
+    var popup = new Ext.Panel({
+        floating: true,
+        modal: true,
+        width: 320,
+        height: 420,
+        html: '<body style="margin: 0px 0px 0px 0px; padding: 0px 0px 0px 0px;"><img src="resources/images/maps/'+place+'.jpg" style="height:100%; width:100%"></body>',
+        items: [{
+            xtype: 'toolbar',
+            title: place,
+            docked: 'top',
+            items: [{
+                xtype: 'spacer'
+            },{
+                text: 'Lukk',
+                handler: function(){
+                    popup.hide();
+                }
+            }]
+        }]
+    });
+    
+    popup.show();
+}
+
 
 
 

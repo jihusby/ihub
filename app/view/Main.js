@@ -36,7 +36,7 @@ Ext.define("App.view.Main", {
             {
                 id: 'info',
                 title: 'XP2010',
-                iconCls: 'team',
+                iconCls: 'info',
                 listeners: {
                     activate : function() {
                         setMainWindow(1);
@@ -52,7 +52,7 @@ Ext.define("App.view.Main", {
             {
                 id: 'agenda',
                 title: 'Agenda',
-                iconCls: 'bookmarks',
+                iconCls: 'time',
                 listeners: {
                     activate : function() {
                         setMainWindow(2);
@@ -69,7 +69,11 @@ Ext.define("App.view.Main", {
                 id: 'eventlist',
                 title: 'Min huskeliste',
                 iconCls: 'star',
-
+                listeners: {
+                    activate : function() {
+                        setMainWindow(3);
+                    }
+                },
                 items: [
                     {
                         xtype: 'eventlistcontainer'
@@ -94,14 +98,18 @@ Ext.define('App.Tabfix', {
 
 function setMainWindow(elementIndex){
     if(parent.document.getElementById("hotel")) {
-        var elements = new Array("hotel", "info", "agenda");
+        var elements = new Array("hotel", "info", "agenda", "favorites");
         for(var i=elements.length-1; i>=0; i--) {
             var value = elements[i];
+            console.log("the index is " + elementIndex + "(" + value + ")");
             parent.document.getElementById(value).style.display = "none";
             parent.document.getElementById(value).enabled = "false";
             parent.document.forms[i].disabled=true;
+            
         }    
-        parent.document.forms[elementIndex].disabled=false;
-        parent.document.getElementById(elements[elementIndex]).style.display = "block";
+        if(elementIndex >= 0) {
+            parent.document.forms[elementIndex].disabled=false;
+            parent.document.getElementById(elements[elementIndex]).style.display = "block";
+        }
     }
 }
