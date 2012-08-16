@@ -1,80 +1,27 @@
 
 <?php
 
-    require ("persistence/storage.php");
+
+    require ("config/config.php");
     require ("handlers/genericContentHandler.php");
     require ("handlers/hotelHandler.php");
     require ("handlers/infoHandler.php");
     require ("handlers/agendaHandler.php");
     
     
-/*
-    $realm = 'Restricted area';
-
-    //user => password
-    $users = array('admin' => 'mypass', 'admin' => 'admin');
-
-
-    if (empty($_SERVER['PHP_AUTH_DIGEST'])) {
-        header('HTTP/1.1 401 Unauthorized');
-        header('WWW-Authenticate: Digest realm="'.$realm.
-            '",qop="auth",nonce="'.uniqid().'",opaque="'.md5($realm).'"');
-
-        die('Du har ikke tilgang.');
-    }
-
-
-    // analyze the PHP_AUTH_DIGEST variable
-    if (!($data = http_digest_parse($_SERVER['PHP_AUTH_DIGEST'])) ||
-        !isset($users[$data['username']]))
-        die('Du har ikke tilgang.');
-
-
-    // generate the valid response
-    $A1 = md5($data['username'] . ':' . $realm . ':' . $users[$data['username']]);
-    $A2 = md5($_SERVER['REQUEST_METHOD'].':'.$data['uri']);
-    $valid_response = md5($A1.':'.$data['nonce'].':'.$data['nc'].':'.$data['cnonce'].':'.$data['qop'].':'.$A2);
-
-    if ($data['response'] != $valid_response)
-        die('Wrong Credentials!');
-
-    // ok, valid username & password
-    $loginMsg = 'Du er logget inn som ' . $data['username'] . ". ";
-
-
-    // function to parse the http auth header
-    function http_digest_parse($txt)
-    {
-        // protect against missing data
-        $needed_parts = array('nonce'=>1, 'nc'=>1, 'cnonce'=>1, 'qop'=>1, 'username'=>1, 'uri'=>1, 'response'=>1);
-        $data = array();
-        $keys = implode('|', array_keys($needed_parts));
-
-        preg_match_all('@(' . $keys . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@', $txt, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $m) {
-            $data[$m[1]] = $m[3] ? $m[3] : $m[4];
-            unset($needed_parts[$m[1]]);
-        }
-
-        return $needed_parts ? false : $data;
-    }    
-    
-*/    
-    
     $storage = new storage();
 
     $hotelHandler = new hotelHandler();
     $infoHandler = new infoHandler();
     $agendaHandler = new agendaHandler();
-    
+
     require ("view-elements/header.php");
     print_r ($hotelHandler->getPageContentFromJSON(
-            $storage->getContent("../../resources/data/hotel.json")));  
+            $storage->getContent(config::RESOURCE_PATH."hotel.json")));  
     print_r ($infoHandler->getPageContentFromJSON(
-            $storage->getContent("../../resources/data/info.json")));  
+            $storage->getContent(config::RESOURCE_PATH."info.json")));  
     print_r ($agendaHandler->getPageContentFromJSON(
-            $storage->getContent("../../resources/data/agenda.json")));  
+            $storage->getContent(config::RESOURCE_PATH."agenda.json")));  
     require ("view-elements/footer.php");
     
 ?>

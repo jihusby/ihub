@@ -1,5 +1,6 @@
 {
 "items": [
+
 {
 "id": "1",
 "start": "09.09.2012",
@@ -7,8 +8,8 @@
 "timestamp": "1347141632400",
 "endTime": "09:45",
 "name": "Presentation Patterns and Anti-patterns",
-"speaker": "Robert C. Martin",
-"ingress": "A different approach to how to build presentations",
+"speaker": "Robert C. Martin and friends",
+"ingress": "A different approach to how to build nice presentations",
 "description": "This session takes a different approach to how to build presentations, by providing patterns and anti-patterns you can use to make sure you’re getting the most leverage from your presentations. Don’t take a knife to a gunfight! The ability to create compelling presentations that explain your point is one of the things that keeps your job from disappearing.",
 "place": "Gråkallen"
 },

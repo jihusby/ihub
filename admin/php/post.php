@@ -1,14 +1,14 @@
 
 <?php
 
-    require ("persistence/storage.php");
+    require ("config/config.php");
     require ("handlers/genericContentHandler.php");
     require ("handlers/hotelHandler.php");
     require ("handlers/infoHandler.php");
     require ("handlers/agendaHandler.php");
     
     $meta = $_POST["?meta"];
-    $file = "../../resources/data/".$meta.".json";
+    $file = config::RESOURCE_PATH.$meta.".json";
     
     $handlerType = $meta."Handler";
     $handler = new $handlerType;
