@@ -68,7 +68,7 @@ class infoHandler implements genericContentHandler {
         $result = $result . formElementUtils::getTextAreaSection("Tekst 1", "infocontent1", "stdHugeArea", stringUtils::htmlToText($info->get_content1())) . "</td></tr>";
         $result = $result . formElementUtils::getTextAreaSection("Tekst 2", "infocontent2", "stdHugeArea", stringUtils::htmlToText($info->get_content2())) . "</td></tr>";
         $result = $result . formElementUtils::getTextFieldSection("Områdekart", "infomapHeader", "stdMediumField", $info->get_mapHeader());
-        $result = $result . formElementUtils::getTextField("infomap", "stdSmallField", $info->get_map()) . "&nbsp;<a name='maplink' id='maplink' target='_new' href='../../resources/images/".$info->get_map()."'>Vis bilde</a></td></tr>";
+        $result = $result . formElementUtils::getTextField("infomap", "stdSmallField", $info->get_map()) . "&nbsp;<a name='maplink' id='maplink' target='_new' href='../../resources/images/maps/".$info->get_map()."'>Vis bilde</a></td></tr>";
         $result = $result . "</table>";
         return $result;
     }

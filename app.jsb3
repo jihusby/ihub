@@ -1,6 +1,6 @@
 {
     "projectName": "XP 2010",
-    "licenseText": "Copyright(c) 2012 Company Name",
+    "licenseText": "Copyright(c) 2012 Itema as",
     "builds": [
         {
             "name": "All Classes",
@@ -60,13 +60,13 @@
                     "path": "sdk/src/"
                 },
                 {
-                    "clsName": "Ext.util.Sorter",
-                    "name": "Sorter.js",
+                    "clsName": "Ext.util.Filter",
+                    "name": "Filter.js",
                     "path": "sdk/src/util/"
                 },
                 {
-                    "clsName": "Ext.util.Filter",
-                    "name": "Filter.js",
+                    "clsName": "Ext.util.Sorter",
+                    "name": "Sorter.js",
                     "path": "sdk/src/util/"
                 },
                 {
@@ -75,13 +75,13 @@
                     "path": "sdk/src/fx/easing/"
                 },
                 {
-                    "clsName": "Ext.fx.easing.Bounce",
-                    "name": "Bounce.js",
+                    "clsName": "Ext.fx.easing.Momentum",
+                    "name": "Momentum.js",
                     "path": "sdk/src/fx/easing/"
                 },
                 {
-                    "clsName": "Ext.fx.easing.Momentum",
-                    "name": "Momentum.js",
+                    "clsName": "Ext.fx.easing.Bounce",
+                    "name": "Bounce.js",
                     "path": "sdk/src/fx/easing/"
                 },
                 {
@@ -365,13 +365,13 @@
                     "path": "sdk/src/"
                 },
                 {
-                    "clsName": "Ext.Spacer",
-                    "name": "Spacer.js",
+                    "clsName": "Ext.Title",
+                    "name": "Title.js",
                     "path": "sdk/src/"
                 },
                 {
-                    "clsName": "Ext.Title",
-                    "name": "Title.js",
+                    "clsName": "Ext.Spacer",
+                    "name": "Spacer.js",
                     "path": "sdk/src/"
                 },
                 {
@@ -425,13 +425,13 @@
                     "path": "sdk/src/scroll/indicator/"
                 },
                 {
-                    "clsName": "Ext.scroll.indicator.CssTransform",
-                    "name": "CssTransform.js",
+                    "clsName": "Ext.scroll.indicator.ScrollPosition",
+                    "name": "ScrollPosition.js",
                     "path": "sdk/src/scroll/indicator/"
                 },
                 {
-                    "clsName": "Ext.scroll.indicator.ScrollPosition",
-                    "name": "ScrollPosition.js",
+                    "clsName": "Ext.scroll.indicator.CssTransform",
+                    "name": "CssTransform.js",
                     "path": "sdk/src/scroll/indicator/"
                 },
                 {
@@ -670,8 +670,8 @@
                     "path": "sdk/src/app/"
                 },
                 {
-                    "clsName": "App.view.Detail",
-                    "name": "Detail.js",
+                    "clsName": "App.view.SessionDetail",
+                    "name": "SessionDetail.js",
                     "path": "app/view/"
                 },
                 {
@@ -683,11 +683,6 @@
                     "clsName": "Ext.TitleBar",
                     "name": "TitleBar.js",
                     "path": "sdk/src/"
-                },
-                {
-                    "clsName": "Ext.form.FieldSet",
-                    "name": "FieldSet.js",
-                    "path": "sdk/src/form/"
                 },
                 {
                     "clsName": "Ext.data.identifier.Simple",
@@ -710,11 +705,6 @@
                     "path": "sdk/src/dataview/"
                 },
                 {
-                    "clsName": "Ext.field.Checkbox",
-                    "name": "Checkbox.js",
-                    "path": "sdk/src/field/"
-                },
-                {
                     "clsName": "Ext.data.Operation",
                     "name": "Operation.js",
                     "path": "sdk/src/data/"
@@ -725,13 +715,13 @@
                     "path": "sdk/src/util/"
                 },
                 {
-                    "clsName": "Ext.mixin.Filterable",
-                    "name": "Filterable.js",
+                    "clsName": "Ext.mixin.Sortable",
+                    "name": "Sortable.js",
                     "path": "sdk/src/mixin/"
                 },
                 {
-                    "clsName": "Ext.mixin.Sortable",
-                    "name": "Sortable.js",
+                    "clsName": "Ext.mixin.Filterable",
+                    "name": "Filterable.js",
                     "path": "sdk/src/mixin/"
                 },
                 {
@@ -745,19 +735,14 @@
                     "path": "sdk/src/util/"
                 },
                 {
-                    "clsName": "Ext.tab.Tab",
-                    "name": "Tab.js",
-                    "path": "sdk/src/tab/"
-                },
-                {
                     "clsName": "Ext.data.Error",
                     "name": "Error.js",
                     "path": "sdk/src/data/"
                 },
                 {
-                    "clsName": "Ext.dataview.element.Container",
-                    "name": "Container.js",
-                    "path": "sdk/src/dataview/element/"
+                    "clsName": "Ext.tab.Tab",
+                    "name": "Tab.js",
+                    "path": "sdk/src/tab/"
                 },
                 {
                     "clsName": "Ext.mixin.Selectable",
@@ -765,13 +750,18 @@
                     "path": "sdk/src/mixin/"
                 },
                 {
-                    "clsName": "Ext.data.Connection",
-                    "name": "Connection.js",
-                    "path": "sdk/src/data/"
+                    "clsName": "Ext.dataview.element.Container",
+                    "name": "Container.js",
+                    "path": "sdk/src/dataview/element/"
                 },
                 {
                     "clsName": "Ext.data.Request",
                     "name": "Request.js",
+                    "path": "sdk/src/data/"
+                },
+                {
+                    "clsName": "Ext.data.Connection",
+                    "name": "Connection.js",
                     "path": "sdk/src/data/"
                 },
                 {
@@ -805,19 +795,24 @@
                     "path": "sdk/src/navigation/"
                 },
                 {
-                    "clsName": "App.view.Info",
-                    "name": "Info.js",
+                    "clsName": "App.view.Homepage",
+                    "name": "Homepage.js",
                     "path": "app/view/"
                 },
                 {
-                    "clsName": "App.view.Homepage",
-                    "name": "Homepage.js",
+                    "clsName": "App.view.Info",
+                    "name": "Info.js",
                     "path": "app/view/"
                 },
                 {
                     "clsName": "Ext.util.Collection",
                     "name": "Collection.js",
                     "path": "sdk/src/util/"
+                },
+                {
+                    "clsName": "Ext.data.Errors",
+                    "name": "Errors.js",
+                    "path": "sdk/src/data/"
                 },
                 {
                     "clsName": "Ext.tab.Bar",
@@ -835,34 +830,14 @@
                     "path": "app/view/"
                 },
                 {
-                    "clsName": "Ext.data.Errors",
-                    "name": "Errors.js",
-                    "path": "sdk/src/data/"
-                },
-                {
-                    "clsName": "Ext.data.StoreManager",
-                    "name": "StoreManager.js",
-                    "path": "sdk/src/data/"
-                },
-                {
                     "clsName": "Ext.dataview.element.List",
                     "name": "List.js",
                     "path": "sdk/src/dataview/element/"
                 },
                 {
-                    "clsName": "Ext.Ajax",
-                    "name": "Ajax.js",
-                    "path": "sdk/src/"
-                },
-                {
-                    "clsName": "Ext.form.Panel",
-                    "name": "Panel.js",
-                    "path": "sdk/src/form/"
-                },
-                {
-                    "clsName": "App.view.EventEditor",
-                    "name": "EventEditor.js",
-                    "path": "app/view/"
+                    "clsName": "Ext.data.StoreManager",
+                    "name": "StoreManager.js",
+                    "path": "sdk/src/data/"
                 },
                 {
                     "clsName": "Ext.data.Types",
@@ -875,6 +850,11 @@
                     "path": "sdk/src/data/"
                 },
                 {
+                    "clsName": "Ext.Ajax",
+                    "name": "Ajax.js",
+                    "path": "sdk/src/"
+                },
+                {
                     "clsName": "Ext.AbstractManager",
                     "name": "AbstractManager.js",
                     "path": "sdk/src/"
@@ -885,9 +865,24 @@
                     "path": "sdk/src/data/"
                 },
                 {
-                    "clsName": "Ext.data.NodeInterface",
-                    "name": "NodeInterface.js",
-                    "path": "sdk/src/data/"
+                    "clsName": "Ext.data.association.Association",
+                    "name": "Association.js",
+                    "path": "sdk/src/data/association/"
+                },
+                {
+                    "clsName": "Ext.data.association.HasMany",
+                    "name": "HasMany.js",
+                    "path": "sdk/src/data/association/"
+                },
+                {
+                    "clsName": "Ext.data.association.BelongsTo",
+                    "name": "BelongsTo.js",
+                    "path": "sdk/src/data/association/"
+                },
+                {
+                    "clsName": "Ext.data.association.HasOne",
+                    "name": "HasOne.js",
+                    "path": "sdk/src/data/association/"
                 },
                 {
                     "clsName": "Ext.dataview.component.Container",
@@ -935,6 +930,16 @@
                     "path": "sdk/src/data/proxy/"
                 },
                 {
+                    "clsName": "Ext.data.Model",
+                    "name": "Model.js",
+                    "path": "sdk/src/data/"
+                },
+                {
+                    "clsName": "App.model.Session",
+                    "name": "Session.js",
+                    "path": "app/model/"
+                },
+                {
                     "clsName": "Ext.data.proxy.Client",
                     "name": "Client.js",
                     "path": "sdk/src/data/proxy/"
@@ -943,6 +948,26 @@
                     "clsName": "Ext.data.proxy.Memory",
                     "name": "Memory.js",
                     "path": "sdk/src/data/proxy/"
+                },
+                {
+                    "clsName": "Ext.data.Store",
+                    "name": "Store.js",
+                    "path": "sdk/src/data/"
+                },
+                {
+                    "clsName": "App.store.Sessions",
+                    "name": "Sessions.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "App.view.SessionList",
+                    "name": "SessionList.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "App.view.SessionListContainer",
+                    "name": "SessionListContainer.js",
+                    "path": "app/view/"
                 },
                 {
                     "clsName": "Ext.data.proxy.WebStorage",
@@ -955,69 +980,9 @@
                     "path": "sdk/src/data/proxy/"
                 },
                 {
-                    "clsName": "Ext.data.association.Association",
-                    "name": "Association.js",
-                    "path": "sdk/src/data/association/"
-                },
-                {
-                    "clsName": "Ext.data.association.BelongsTo",
-                    "name": "BelongsTo.js",
-                    "path": "sdk/src/data/association/"
-                },
-                {
-                    "clsName": "Ext.data.association.HasOne",
-                    "name": "HasOne.js",
-                    "path": "sdk/src/data/association/"
-                },
-                {
-                    "clsName": "Ext.data.association.HasMany",
-                    "name": "HasMany.js",
-                    "path": "sdk/src/data/association/"
-                },
-                {
-                    "clsName": "Ext.data.Model",
-                    "name": "Model.js",
-                    "path": "sdk/src/data/"
-                },
-                {
-                    "clsName": "App.model.Sections",
-                    "name": "Sections.js",
-                    "path": "app/model/"
-                },
-                {
-                    "clsName": "Ext.data.Store",
-                    "name": "Store.js",
-                    "path": "sdk/src/data/"
-                },
-                {
                     "clsName": "App.store.Events",
                     "name": "Events.js",
                     "path": "app/store/"
-                },
-                {
-                    "clsName": "Ext.data.NodeStore",
-                    "name": "NodeStore.js",
-                    "path": "sdk/src/data/"
-                },
-                {
-                    "clsName": "Ext.data.TreeStore",
-                    "name": "TreeStore.js",
-                    "path": "sdk/src/data/"
-                },
-                {
-                    "clsName": "App.store.Sections",
-                    "name": "Sections.js",
-                    "path": "app/store/"
-                },
-                {
-                    "clsName": "Ext.dataview.NestedList",
-                    "name": "NestedList.js",
-                    "path": "sdk/src/dataview/"
-                },
-                {
-                    "clsName": "App.view.Sections",
-                    "name": "Sections.js",
-                    "path": "app/view/"
                 },
                 {
                     "clsName": "Ext.data.Validations",

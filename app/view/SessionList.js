@@ -25,27 +25,23 @@ Ext.define("App.view.SessionList", {
                 '<div class="list-item-title">{startTime} - {endTime}: {name}</div>'+
                 '<div class="list-item-title">{speaker}</div>'+
                 '<div class="list-item-description">{ingress}</div>'+
-                '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPlace(\'{place}\');" value="{place}" /></div>'+
+                '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPopupMap(\'{place}\', \'{place}\');" value="{place}" /></div>'+
                 '<pre>'
     }
 });
 
-function showPlaceOrig(place) {
-    var body = "<img src='resources/images/maps/"+place+".jpg' style='height:78%; width:110%'>";
-    Ext.Msg.alert(place, body);
-}
-
-function showPlace(place) {
-
+function showPopupMap(image, imageTitle){
+    //showPopup(image, imageTitle);
+    
     var popup = new Ext.Panel({
         floating: true,
         modal: true,
         width: 320,
         height: 420,
-        html: '<body style="margin: 0px 0px 0px 0px; padding: 0px 0px 0px 0px;"><img src="resources/images/maps/'+place+'.jpg" style="height:100%; width:100%"></body>',
+        html: '<body style="margin: 0px 0px 0px 0px; padding: 0px 0px 0px 0px;"><img src="resources/images/maps/'+image+'" style="height:100%; width:100%"></body>',
         items: [{
             xtype: 'toolbar',
-            title: place,
+            title: imageTitle,
             docked: 'top',
             items: [{
                 xtype: 'spacer'
@@ -59,8 +55,7 @@ function showPlace(place) {
     });
     
     popup.show();
+    
 }
-
-
 
 

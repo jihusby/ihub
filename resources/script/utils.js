@@ -78,3 +78,29 @@ function getDateWithWeekdayFromDateString(dateString) {
     return myDays[date.getDay()] + " " + dateString;
 }
 
+function showPopup(image, imageTitle) {
+    var popup = new Ext.Panel({
+        floating: true,
+        modal: true,
+        width: 320,
+        height: 420,
+        html: '<body style="margin: 0px 0px 0px 0px; padding: 0px 0px 0px 0px;"><img src="resources/images/maps/'+image+'" style="height:100%; width:100%"></body>',
+        items: [{
+            xtype: 'toolbar',
+            title: imageTitle,
+            docked: 'top',
+            items: [{
+                xtype: 'spacer'
+            },{
+                text: 'Lukk',
+                handler: function(){
+                    popup.hide();
+                }
+            }]
+        }]
+    });
+    
+    popup.show();
+}
+
+
