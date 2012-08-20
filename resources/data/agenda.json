@@ -11,7 +11,7 @@
 "speaker": "Robert C. Martin and friends",
 "ingress": "A different approach to how to build nice presentations",
 "description": "This session takes a different approach to how to build presentations, by providing patterns and anti-patterns you can use to make sure you’re getting the most leverage from your presentations. Don’t take a knife to a gunfight! The ability to create compelling presentations that explain your point is one of the things that keeps your job from disappearing.",
-"place": "Gråkallen"
+"place": "Møllenberg"
 },
 
 {
@@ -63,7 +63,7 @@
 "speaker": "Robert C. Martin",
 "ingress": "Web 2.0 development with the help of jQuery and Prototype",
 "description": "For the last few years, the web has been all a-twitter about web 2.0 (and even the occasional reference to web 3.0.) Yes, the days of static web applications are officially over and while libraries like jQuery and Prototype make it easier to build modern applications, ultimately they are papering over issues in the web standards (and the browsers that implement them.)",
-"place": "Gråkallen"
+"place": "Møllenberg"
 },
 
 {
@@ -76,7 +76,7 @@
 "speaker": "Robert C. Martin",
 "ingress": "Strengths and weaknesses in Service Oriented Architecture",
 "description": "At JavaZone 2005, I gave a talk with the title Why I hate SOA. In the talk, I outlined several weaknesses with the then much-hyped term Service Oriented Architecture. Six years have passed, and I have learned much. The question is: Has SOA learned the same things?",
-"place": "Gråkallen"
+"place": "Møllenberg"
 },
 
 {
@@ -89,7 +89,7 @@
 "speaker": "",
 "ingress": "Pros and cons of comet, servlet 3, and websockets",
 "description": "The world is all about the asynchronous web these days. There are an increasing number of options for Java developers. In this presentation we'll cover 3 such options: comet, servlet 3, and websockets. We'll look at code and discuss pros and cons of each approach.",
-"place": "Gråkallen"
+"place": "Møllenberg"
 },
 
 {
@@ -102,7 +102,7 @@
 "speaker": "",
 "ingress": "TDD and Extreme programming with Robert C. Martin",
 "description": "Robert C. Martin - Uncle Bob - has been a software professional since 1970. In the last 35 years, he has worked in various capacities on literally hundreds of software projects. He has authored 'landmark' books on Agile Programming, Extreme Programming, UML, Object-Oriented Programming, and C Programming.",
-"place": "Gråkallen"
+"place": "Møllenberg"
 },
 
 {
@@ -115,7 +115,7 @@
 "speaker": "",
 "ingress": "Kent Beck was one of the 17 original signatories of the Agile Manifesto in 2001",
 "description": "Kent Beck is an American software engineer and the creator of the Extreme Programming[1] and Test Driven Development software development methodologies, also named agile software development. Beck was one of the 17 original signatories of the Agile Manifesto in 2001.",
-"place": "Gråkallen"
+"place": "Møllenberg"
 },
 
 {
@@ -128,6 +128,6 @@
 "speaker": "",
 "ingress": "Siste dag på seminaret!",
 "description": "Vi oppsummerer",
-"place": "Gråkallen"}
+"place": "Møllenberg"}
 ]
 }

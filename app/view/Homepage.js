@@ -1,7 +1,6 @@
 Ext.define("App.view.Homepage", {
     extend: 'Ext.navigation.View',
     xtype: 'homepage',
-    //alias: "widget.Home",
     requires: [
         'Ext.TitleBar'
     ],
@@ -10,7 +9,6 @@ Ext.define("App.view.Homepage", {
         scrollable: true,
         items: [
             {
-                // styleHtmlContent: true,
                 title: 'Rica Nidelven',
                 maxWidth: 750,
                 xtype: 'dataview',
@@ -36,7 +34,6 @@ Ext.define("App.view.Homepage", {
                 }
             }
         ]
-
     }
 
 });

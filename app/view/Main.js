@@ -101,7 +101,6 @@ function setMainWindow(elementIndex){
         var elements = new Array("hotel", "info", "agenda", "favorites");
         for(var i=elements.length-1; i>=0; i--) {
             var value = elements[i];
-            console.log("the index is " + elementIndex + "(" + value + ")");
             parent.document.getElementById(value).style.display = "none";
             parent.document.getElementById(value).enabled = "false";
             parent.document.forms[i].disabled=true;

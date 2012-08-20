@@ -7,14 +7,12 @@ Ext.define("App.view.Info", {
 
     config: {
         scrollable: true,
-        
         items: [
             {
-                styleHtmlContent: true,
                 title: 'XP2010',
                 maxWidth: 750,
                 xtype: 'dataview',
-                ui: 'light',
+                //ui: 'light',
                 itemTpl: [
                     '<div class="textBlock">',
                     '<div class="header">{header}</div>',

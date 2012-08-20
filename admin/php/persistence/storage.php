@@ -6,15 +6,23 @@ class storage {
     }
     
     public static function getContent($file){
-        $string = file_get_contents($file);
-        return json_decode($string, true);
+        try {
+            $string = file_get_contents($file);
+            return json_decode($string, true);
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public static function saveContent($file, $content){
-        $fh = fopen($file, 'w') or die;
-        fwrite($fh, $content);
-        fclose($fh);
-        return true;
+        try {
+            $fh = fopen($file, 'w') or die;
+            fwrite($fh, $content);
+            fclose($fh);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
     
 }

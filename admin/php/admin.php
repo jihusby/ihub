@@ -1,8 +1,8 @@
 
 <?php
 
-
     require ("config/config.php");
+    require ("persistence/storage.php");
     require ("handlers/genericContentHandler.php");
     require ("handlers/hotelHandler.php");
     require ("handlers/infoHandler.php");
