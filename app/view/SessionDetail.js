@@ -14,10 +14,34 @@ Ext.define('App.view.SessionDetail', {
 });
 
 function saveSessionDetail(id) {
-    if(toggleSession(id)){
-        document.getElementById("btn").value = "Fjern fra huskeliste";
-    }else {
-        document.getElementById("btn").value = "Legg til i huskeliste";
+    
+    var hasAddedToEventList = toggleSession(id);
+    setListButtonText(hasAddedToEventList);
+    setImageSource(id);
+}
+
+function setListButtonText(removeFromList){
+    if(document.getElementById("btn")) {
+        if(removeFromList){
+            document.getElementById("btn").value = "Fjern fra huskeliste";
+        }else {
+            document.getElementById("btn").value = "Legg til i huskeliste";
+        }
     }
 }
+
+function setImageSource(id){
+    console.log("setImageSource invoked");
+    var saved = isEventSaved(id) ? "color" : "gray";
+    console.log("setImageSource: saved is " + saved);
+    setSource(id, saved);
+}
+
+function setSource(id, color){
+    if(document.getElementById("img"+id)){
+        console.log("setting source: color is " + color);
+        document.getElementById("img"+id).src = "resources/icons/star_"+ color +"_small.png";
+    }
+}
+
 

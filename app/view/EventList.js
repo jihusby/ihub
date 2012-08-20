@@ -23,7 +23,8 @@ Ext.define("App.view.EventList", {
         itemTpl:
                 '</pre>'+
                 '<div class="list-item-title">'+
-                '<input class="buttonLeft" type="button" onClick="removeEvent({externalId});" value="Fjern" />' + 
+                //'<image id="img{id}" type="image" src="resources/icons/star_color_small.png" onclick="removeEvent({externalId});" />' +
+                '<input type="image" src="resources/icons/star_color_small.png" onClick="removeEvent({externalId});" value="Fjern" />' + 
                 '{name}</div>'+
                 '<div class="list-item-title"></div>'+
                 '<div class="list-item-description">{ingress}</div>'+

@@ -22,7 +22,8 @@ Ext.define("App.view.SessionList", {
         iconCls: "button",
         itemTpl:
                 '</pre>'+
-                '<div class="list-item-title">{startTime} - {endTime}: {name}</div>'+
+                '<div class="list-item-title"><input id="img{id}" type="image" src="resources/icons/star_gray_small.png" onClick="saveSessionDetail(\'{id}\');" onLoad="setImageSource({id});" />{startTime} - {endTime}: {name}</div>'+
+                '<image id="img2{id}" src="resources/icons/star_gray_small.png" onLoad="setImageSource({id});" style="display:none;" />'+
                 '<div class="list-item-title">{speaker}</div>'+
                 '<div class="list-item-description">{ingress}</div>'+
                 '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPopupMap(\'{place}\', \'{place}\');" value="{place}" /></div>'+
@@ -31,7 +32,6 @@ Ext.define("App.view.SessionList", {
 });
 
 function showPopupMap(image, imageTitle){
-    //showPopup(image, imageTitle);
     
     var popup = new Ext.Panel({
         floating: true,
@@ -55,7 +55,6 @@ function showPopupMap(image, imageTitle){
     });
     
     popup.show();
-    
 }
 
 
