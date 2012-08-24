@@ -14,15 +14,15 @@ Ext.define("App.view.Homepage", {
                 xtype: 'dataview',
                 itemTpl: [
                     '<div class="textBlock">',
-                    '<div class="header">{content1}</div>',
-                    '<div class="contentText">{content2}</div>',
-                    '<div class="contentText">{content3}</div>',
-                    '<div class="footer">{content4}</div></div>'
+                    '<div class="header">{item1}</div>',
+                    '<div class="contentText">{item2}</div>',
+                    '<div class="contentText">{item3}</div>',
+                    '<div class="footer">{item4}</div></div>'
                 ],
 
                 store: {
                     autoLoad: true,
-                    fields: ['content1', 'content2', 'content3', 'content4'],
+                    fields: ['item1', 'item2', 'item3', 'item4'],
                     proxy: {
                         type: 'ajax',
                         url: 'resources/data/hotel.json',

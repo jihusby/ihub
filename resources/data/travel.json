@@ -1,8 +1,7 @@
 [
-{"id": "1",
-"header": "Reiseinformasjon",
-"ingress": "Slik kommer du deg til konferansen.<br>",
-"content1": "Blah blah blah blah Ta bussen!",
-"mapHeader": "Omradekart",
-"map": "map.jpg"}
+{"item0": "1",
+"item1": "Oppdatert reiseinfo",
+"item2": "Ta bussen ned til byen med en gang!",
+"item3": "Områdekart",
+"item4": "map.jpg"}
 ]

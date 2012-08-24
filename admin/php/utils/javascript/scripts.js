@@ -22,41 +22,34 @@ function saveForm() {
     document.getElementById('submit_btn').click();
 }
 
+function getParameterString(form, meta) {
+    var parameters = new Array();
+    var parameterString = '?meta='+meta;
+    for(var i=0; i<form.elements.length-1; i++) {
+        parameters[i] = $("input#" + meta + i+"").val() ? 
+            $("input#" + meta + i+"").val() : 
+            $("textarea#" + meta + i+"").val();
+        parameterString += "&item"+i+"="+parameters[i];
+    }
+    return parameterString;
+}
+
 $(function() { 
   $('.error').hide();  
   $(".button").click(function() {  
     var dataString = "";
     if(document.forms[0].disabled!==true){
-        var id = $("input#hotelid").val();  
-        var content1 = $("input#hotelcontent1").val();
-        var content2 = $("textarea#hotelcontent2").val();
-        var content3 = $("textarea#hotelcontent3").val();
-        var content4 = $("input#hotelcontent4").val();
-        dataString = '?meta=hotel&id=' + id + '&content1=' + content1 + '&content2='+ content2 + '&content3='+ content3 + '&content4='+ content4;
+        dataString = getParameterString(document.forms[1], "hotel");
     }
 
     else if(document.forms[1].disabled!==true){
-        id = $("input#infoid").val();  
-        var header = $("input#infoheader").val();
-        var ingress = $("textarea#infoingress").val();
-        content1 = $("textarea#infocontent1").val();
-        var mapHeader = $("input#infomapHeader").val();
-        var map = $("input#infomap").val();
-        
-        dataString = '?meta=info&id=' + id + '&header=' + header + '&ingress='+ ingress + '&content1='+ content1 + '&mapHeader='+ mapHeader + '&map=' + map;
-        document.getElementById("maplink").href = "../../resources/images/"+map;
+        dataString = getParameterString(document.forms[1], "info");
+        document.getElementById("infomap").href = "../../resources/images/maps/"+$("input#infomap").val();
     }
 
     else if(document.forms[2].disabled!==true){
-        id = $("input#travelid").val();  
-        var header = $("input#travelheader").val();
-        var ingress = $("textarea#travelingress").val();
-        content1 = $("textarea#travelcontent1").val();
-        var mapHeader = $("input#travelmapHeader").val();
-        var map = $("input#travelmap").val();
-        
-        dataString = '?meta=travel&id=' + id + '&header=' + header + '&ingress='+ ingress + '&content1='+ content1 + '&mapHeader='+ mapHeader + '&map=' + map;
-        document.getElementById("maplink").href = "../../resources/images/"+map;
+        dataString = getParameterString(document.forms[2], "travel");
+        document.getElementById("travelmap").href = "../../resources/images/maps/"+$("input#travelmap").val();
     }
 
     else if(document.forms[3].disabled!==true){
@@ -122,10 +115,10 @@ $(function() {
     url: "post.php",
     data: dataString,
     success: function() {
-        //document.write("success: " + dataString);
+//        document.write("Success: " + dataString);
     },
     error: function() {
-        document.write("Error");
+        document.write("Error: " + dataString);
     }
   });
   return false;

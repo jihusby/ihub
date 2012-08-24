@@ -143,7 +143,6 @@ td {
 
 .div0, .div1, .div2, .div3, .div0_active, .div1_active, .div2_active, .div3_active {
     margin: 15px 15px 15px 15px;
-    font-size: 15pt;
     font-weight: bold;
     padding: 25px 15px 25px 15px;
 }
@@ -151,14 +150,17 @@ td {
 .div0, .div1, .div2, .div3 {
     background-color: #DDDDDD;
     color: #888888;
+    font-size: 15pt;
 }
 
 .div0:hover, .div1:hover, .div2:hover, .div3:hover {
     background-color: #FFFFFF;
     color: #782069;
+    font-size: 16pt;
 }
 
 .div0_active, .div1_active, .div2_active, .div3_active {
     background-color: #FFFFFF;
     color: #782069;
+    font-size: 16pt;
 }

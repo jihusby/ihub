@@ -5,11 +5,9 @@ class info {
     var $id;
     var $header;
     var $ingress;
-    var $content1;
-    var $content2;
+    var $content;
     var $mapHeader;
     var $map;
-    var $footer;
     
     function set_id($new_id){
         $this->id = $new_id;
@@ -29,17 +27,11 @@ class info {
     function get_ingress(){
         return $this->ingress;
     }
-    function set_content1($new_content1){
-        $this->content1 = $new_content1;
+    function set_content($new_content){
+        $this->content = $new_content;
     }
-    function get_content1(){
-        return $this->content1;
-    }
-    function set_content2($new_content2){
-        $this->content2 = $new_content2;
-    }
-    function get_content2(){
-        return $this->content2;
+    function get_content(){
+        return $this->content;
     }
     function set_mapHeader($new_mapHeader){
         $this->mapHeader = $new_mapHeader;
@@ -52,9 +44,6 @@ class info {
     }
     function get_map(){
         return $this->map;
-    }
-    function set_footer($new_footer){
-        $this->footer = $new_footer;
     }
 }
 

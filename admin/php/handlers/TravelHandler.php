@@ -39,19 +39,15 @@ class travelHandler implements genericContentHandler {
     private function getTravelFromJsonArray($list) {
         $travel = new travel();
         foreach ($list as $key => $value){            
-            if($key === "id"){
+            if($key === "item0"){
                 $travel->set_id($value);
-            }else if($key === "header"){
+            }else if($key === "item1"){
                 $travel->set_header($value);
-            }else if($key === "ingress"){
-                $travel->set_ingress($value);
-            }else if($key === "content1"){
-                $travel->set_content1($value);
-            }else if($key === "content2"){
-                $travel->set_content2($value);
-            }else if($key === "mapHeader"){
+            }else if($key === "item2"){
+                $travel->set_content($value);
+            }else if($key === "item3"){
                 $travel->set_mapHeader($value);
-            }else if($key === "map"){
+            }else if($key === "item4"){
                 $travel->set_map($value);
             }
         }
@@ -59,14 +55,12 @@ class travelHandler implements genericContentHandler {
     }
     
     private function getFormattedTravel($travel){
-        $result = $result . formElementUtils::getHiddenField('travelid', $travel->get_id());
+        $result = $result . formElementUtils::getHiddenField('travel0', $travel->get_id());
         $result = $result . "<table>";
-        $result = $result . formElementUtils::getTextFieldSection("Overskrift", "travelheader", "stdField", $travel->get_header()) . "</td></tr>";
-        $result = $result . formElementUtils::getTextAreaSection("Ingress", "travelingress", "stdBigArea", stringUtils::htmlToText($travel->get_ingress())) . "</td></tr>";        
-        $result = $result . formElementUtils::getTextAreaSection("Tekst 1", "travelcontent1", "stdHugeArea", stringUtils::htmlToText($travel->get_content1())) . "</td></tr>";
-        $result = $result . formElementUtils::getTextAreaSection("Tekst 2", "travelcontent2", "stdHugeArea", stringUtils::htmlToText($travel->get_content2())) . "</td></tr>";
-        $result = $result . formElementUtils::getTextFieldSection("Områdekart", "travelmapHeader", "stdMediumField", $travel->get_mapHeader());
-        $result = $result . formElementUtils::getTextField("travelmap", "stdSmallField", $travel->get_map()) . "&nbsp;<a name='maplink' id='maplink' target='_new' href='../../resources/images/maps/".$travel->get_map()."'>Vis bilde</a></td></tr>";
+        $result = $result . formElementUtils::getTextFieldSection("Overskrift", "travel1", "stdField", $travel->get_header()) . "</td></tr>";
+        $result = $result . formElementUtils::getTextAreaSection("Reisebeskrivelse", "travel2", "stdHugeArea", stringUtils::htmlToText($travel->get_content())) . "</td></tr>";
+        $result = $result . formElementUtils::getTextFieldSection("Kart", "travel3", "stdMediumField", $travel->get_mapHeader());
+        $result = $result . formElementUtils::getTextField("travel4", "stdSmallField", $travel->get_map()) . "&nbsp;<a name='travelmap' id='travelmap' target='_new' href='../../resources/images/maps/".$travel->get_map()."'>Vis bilde</a></td></tr>";
         $result = $result . "</table>";
         return $result;
     }

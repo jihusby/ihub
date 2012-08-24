@@ -40,15 +40,15 @@ class hotelHandler implements genericContentHandler {
     private function getHotelFromJsonArray($list) {
         $hotel = new hotel();
         foreach ($list as $key => $value){ 
-            if($key === "id"){
+            if($key === "item0"){
                 $hotel->set_id($value);
-            }else if($key === "content1"){
+            }else if($key === "item1"){
                 $hotel->set_header($value);
-            }else if($key === "content2"){
+            }else if($key === "item2"){
                 $hotel->set_ingress($value);
-            }else if($key === "content3"){
+            }else if($key === "item3"){
                 $hotel->set_content($value);
-            }else if($key === "content4"){
+            }else if($key === "item4"){
                 $hotel->set_footer($value);
             }
         }
@@ -58,10 +58,10 @@ class hotelHandler implements genericContentHandler {
     private function getFormattedHotel($hotel){
         $result = $result . formElementUtils::getHiddenField('hotelid', $hotel->get_id());
         $result = $result . "<table>";
-        $result = $result . formElementUtils::getTextFieldSection("Overskrift", "hotelcontent1", "stdField", $hotel->get_header()) . "</td></tr>";
-        $result = $result . formElementUtils::getTextAreaSection("Ingress", "hotelcontent2", "stdBigArea", stringUtils::htmlToText($hotel->get_ingress())) . "</td></tr>";        
-        $result = $result . formElementUtils::getTextAreaSection("Hovedtekst", "hotelcontent3", "stdHugeArea", stringUtils::htmlToText($hotel->get_content())) . "</td></tr>";
-        $result = $result . formElementUtils::getTextFieldSection("Undertekst", "hotelcontent4", "stdField", $hotel->get_footer()) . "</td></tr>";
+        $result = $result . formElementUtils::getTextFieldSection("Overskrift", "hotel1", "stdField", $hotel->get_header()) . "</td></tr>";
+        $result = $result . formElementUtils::getTextAreaSection("Ingress", "hotel2", "stdBigArea", stringUtils::htmlToText($hotel->get_ingress())) . "</td></tr>";        
+        $result = $result . formElementUtils::getTextAreaSection("Hovedtekst", "hotel3", "stdHugeArea", stringUtils::htmlToText($hotel->get_content())) . "</td></tr>";
+        $result = $result . formElementUtils::getTextFieldSection("Undertekst", "hotel4", "stdField", $hotel->get_footer()) . "</td></tr>";
         $result = $result . "</table>";
         return $result;
     }

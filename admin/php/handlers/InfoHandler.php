@@ -39,36 +39,31 @@ class infoHandler implements genericContentHandler {
     private function getInfoFromJsonArray($list) {
         $info = new info();
         foreach ($list as $key => $value){            
-            if($key === "id"){
+            if($key === "item0"){
                 $info->set_id($value);
-            }else if($key === "header"){
+            }else if($key === "item1"){
                 $info->set_header($value);
-            }else if($key === "ingress"){
+            }else if($key === "item2"){
                 $info->set_ingress($value);
-            }else if($key === "content1"){
-                $info->set_content1($value);
-            }else if($key === "content2"){
-                $info->set_content2($value);
-            }else if($key === "mapHeader"){
+            }else if($key === "item3"){
+                $info->set_content($value);
+            }else if($key === "item4"){
                 $info->set_mapHeader($value);
-            }else if($key === "map"){
+            }else if($key === "item5"){
                 $info->set_map($value);
-            }else if($key === "footer"){
-                $info->set_footer($value);
             }
         }
         return $info;
     }
     
     private function getFormattedInfo($info){
-        $result = $result . formElementUtils::getHiddenField('infoid', $info->get_id());
+        $result = $result . formElementUtils::getHiddenField('info0', $info->get_id());
         $result = $result . "<table>";
-        $result = $result . formElementUtils::getTextFieldSection("Overskrift", "infoheader", "stdField", $info->get_header()) . "</td></tr>";
-        $result = $result . formElementUtils::getTextAreaSection("Ingress", "infoingress", "stdBigArea", stringUtils::htmlToText($info->get_ingress())) . "</td></tr>";        
-        $result = $result . formElementUtils::getTextAreaSection("Tekst 1", "infocontent1", "stdHugeArea", stringUtils::htmlToText($info->get_content1())) . "</td></tr>";
-        $result = $result . formElementUtils::getTextAreaSection("Tekst 2", "infocontent2", "stdHugeArea", stringUtils::htmlToText($info->get_content2())) . "</td></tr>";
-        $result = $result . formElementUtils::getTextFieldSection("Områdekart", "infomapHeader", "stdMediumField", $info->get_mapHeader());
-        $result = $result . formElementUtils::getTextField("infomap", "stdSmallField", $info->get_map()) . "&nbsp;<a name='maplink' id='maplink' target='_new' href='../../resources/images/maps/".$info->get_map()."'>Vis bilde</a></td></tr>";
+        $result = $result . formElementUtils::getTextFieldSection("Overskrift", "info1", "stdField", $info->get_header()) . "</td></tr>";
+        $result = $result . formElementUtils::getTextAreaSection("Ingress", "info2", "stdBigArea", stringUtils::htmlToText($info->get_ingress())) . "</td></tr>";        
+        $result = $result . formElementUtils::getTextAreaSection("Hovedtekst", "info3", "stdHugeArea", stringUtils::htmlToText($info->get_content())) . "</td></tr>";
+        $result = $result . formElementUtils::getTextFieldSection("Områdekart", "info4", "stdMediumField", $info->get_mapHeader());
+        $result = $result . formElementUtils::getTextField("info5", "stdSmallField", $info->get_map()) . "&nbsp;<a name='infomap' id='infomap' target='_new' href='../../resources/images/maps/".$info->get_map()."'>Vis bilde</a></td></tr>";
         $result = $result . "</table>";
         return $result;
     }
