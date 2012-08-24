@@ -1,6 +1,7 @@
 
 function showElement(elementIndex){
-    var elements = new Array("hotel", "info", "agenda", "favorites");
+    //var elements = new Array("hotel", "info", "travel", "agenda", "favorites");
+    var elements = new Array("hotel", "info", "travel", "agenda");
     for(var i=elements.length-1; i>=0; i--) {
 	var value = elements[i];
         document.getElementById(value).style.display = "none";
@@ -47,6 +48,18 @@ $(function() {
     }
 
     else if(document.forms[2].disabled!==true){
+        id = $("input#travelid").val();  
+        var header = $("input#travelheader").val();
+        var ingress = $("textarea#travelingress").val();
+        content1 = $("textarea#travelcontent1").val();
+        var mapHeader = $("input#travelmapHeader").val();
+        var map = $("input#travelmap").val();
+        
+        dataString = '?meta=travel&id=' + id + '&header=' + header + '&ingress='+ ingress + '&content1='+ content1 + '&mapHeader='+ mapHeader + '&map=' + map;
+        document.getElementById("maplink").href = "../../resources/images/"+map;
+    }
+
+    else if(document.forms[3].disabled!==true){
         var totalSessionCount = $("input#totalSessionCount").val();
         dataString = '?meta=agenda';
         for(var i=0; i<totalSessionCount; i++) {

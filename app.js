@@ -9,6 +9,7 @@ Ext.application({
         'Main',
         'Homepage',
         'Info',
+        'Travel',
         'SessionListContainer',
         'SessionList',
         'SessionDetail',
@@ -31,14 +32,14 @@ Ext.application({
     ],
 
     icon: {
-        57: 'resources/icons/Icon.png',
-        72: 'resources/icons/Icon~ipad.png',
-        114: 'resources/icons/Icon@2x.png',
-        144: 'resources/icons/Icon-spot~ipad@2x.png'
+        57: 'resources/loading/Default.png',
+        72: 'resources/loading/Default.png',
+        114: 'resources/loading/Default.png',
+        144: 'resources/loading/Default.png'
     },
 
     phoneStartupScreen: 'resources/loading/Default.png',
-    tabletStartupScreen: 'resources/loading/Default~ipad.png',
+    tabletStartupScreen: 'resources/loading/Default.png',
 
     launch: function() {
         // Destroy the #appLoadingIndicator element

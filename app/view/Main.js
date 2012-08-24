@@ -50,12 +50,28 @@ Ext.define("App.view.Main", {
             },
 
             {
+                id: 'travel',
+                title: 'Reiseinfo',
+                iconCls: 'search',
+                listeners: {
+                    activate : function() {
+                        setMainWindow(2);
+                    }
+                },
+                items: [
+                    {
+                        xtype: 'travel'
+                    }
+                ]
+            },
+
+            {
                 id: 'agenda',
                 title: 'Agenda',
                 iconCls: 'time',
                 listeners: {
                     activate : function() {
-                        setMainWindow(2);
+                        setMainWindow(3);
                     }
                 },
                 items: [
@@ -71,7 +87,7 @@ Ext.define("App.view.Main", {
                 iconCls: 'star',
                 listeners: {
                     activate : function() {
-                        setMainWindow(3);
+                        setMainWindow(4);
                     }
                 },
                 items: [
@@ -97,8 +113,8 @@ Ext.define('App.Tabfix', {
 });
 
 function setMainWindow(elementIndex){
-    if(parent.document.getElementById("hotel")) {
-        var elements = new Array("hotel", "info", "agenda", "favorites");
+    if(parent.document.getElementById("hotel")!==null) {
+        var elements = new Array("hotel", "info", "travel", "agenda", "favorites");
         for(var i=elements.length-1; i>=0; i--) {
             var value = elements[i];
             parent.document.getElementById(value).style.display = "none";
@@ -107,8 +123,10 @@ function setMainWindow(elementIndex){
             
         }    
         if(elementIndex >= 0) {
-            parent.document.forms[elementIndex].disabled=false;
-            parent.document.getElementById(elements[elementIndex]).style.display = "block";
+            if(parent.document.forms[elementIndex]){
+                parent.document.forms[elementIndex].disabled=false;
+                parent.document.getElementById(elements[elementIndex]).style.display = "block";
+            }
         }
     }
 }
