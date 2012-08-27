@@ -30,11 +30,6 @@
                     "path": "sdk/src/event/"
                 },
                 {
-                    "clsName": "Ext.util.Point",
-                    "name": "Point.js",
-                    "path": "sdk/src/util/"
-                },
-                {
                     "clsName": "Ext.ComponentManager",
                     "name": "ComponentManager.js",
                     "path": "sdk/src/"
@@ -45,9 +40,9 @@
                     "path": "sdk/src/behavior/"
                 },
                 {
-                    "clsName": "Ext.fx.State",
-                    "name": "State.js",
-                    "path": "sdk/src/fx/"
+                    "clsName": "Ext.util.Point",
+                    "name": "Point.js",
+                    "path": "sdk/src/util/"
                 },
                 {
                     "clsName": "Ext.mixin.Mixin",
@@ -55,18 +50,23 @@
                     "path": "sdk/src/mixin/"
                 },
                 {
+                    "clsName": "Ext.fx.State",
+                    "name": "State.js",
+                    "path": "sdk/src/fx/"
+                },
+                {
                     "clsName": "Ext.XTemplateParser",
                     "name": "XTemplateParser.js",
                     "path": "sdk/src/"
                 },
                 {
-                    "clsName": "Ext.util.Filter",
-                    "name": "Filter.js",
+                    "clsName": "Ext.util.Sorter",
+                    "name": "Sorter.js",
                     "path": "sdk/src/util/"
                 },
                 {
-                    "clsName": "Ext.util.Sorter",
-                    "name": "Sorter.js",
+                    "clsName": "Ext.util.Filter",
+                    "name": "Filter.js",
                     "path": "sdk/src/util/"
                 },
                 {
@@ -130,6 +130,11 @@
                     "path": "sdk/src/"
                 },
                 {
+                    "clsName": "Ext.AbstractComponent",
+                    "name": "AbstractComponent.js",
+                    "path": "sdk/src/"
+                },
+                {
                     "clsName": "Ext.fx.animation.Abstract",
                     "name": "Abstract.js",
                     "path": "sdk/src/fx/animation/"
@@ -175,11 +180,6 @@
                     "path": "sdk/src/fx/"
                 },
                 {
-                    "clsName": "Ext.AbstractComponent",
-                    "name": "AbstractComponent.js",
-                    "path": "sdk/src/"
-                },
-                {
                     "clsName": "Ext.layout.Default",
                     "name": "Default.js",
                     "path": "sdk/src/layout/"
@@ -195,13 +195,13 @@
                     "path": "sdk/src/layout/"
                 },
                 {
-                    "clsName": "Ext.layout.HBox",
-                    "name": "HBox.js",
+                    "clsName": "Ext.layout.VBox",
+                    "name": "VBox.js",
                     "path": "sdk/src/layout/"
                 },
                 {
-                    "clsName": "Ext.layout.VBox",
-                    "name": "VBox.js",
+                    "clsName": "Ext.layout.HBox",
+                    "name": "HBox.js",
                     "path": "sdk/src/layout/"
                 },
                 {
@@ -640,13 +640,13 @@
                     "path": "sdk/src/app/"
                 },
                 {
-                    "clsName": "Ext.app.History",
-                    "name": "History.js",
+                    "clsName": "Ext.app.Profile",
+                    "name": "Profile.js",
                     "path": "sdk/src/app/"
                 },
                 {
-                    "clsName": "Ext.app.Profile",
-                    "name": "Profile.js",
+                    "clsName": "Ext.app.History",
+                    "name": "History.js",
                     "path": "sdk/src/app/"
                 },
                 {
@@ -745,19 +745,19 @@
                     "path": "sdk/src/tab/"
                 },
                 {
-                    "clsName": "Ext.mixin.Selectable",
-                    "name": "Selectable.js",
-                    "path": "sdk/src/mixin/"
-                },
-                {
                     "clsName": "Ext.dataview.element.Container",
                     "name": "Container.js",
                     "path": "sdk/src/dataview/element/"
                 },
                 {
-                    "clsName": "Ext.data.Request",
-                    "name": "Request.js",
-                    "path": "sdk/src/data/"
+                    "clsName": "Ext.mixin.Selectable",
+                    "name": "Selectable.js",
+                    "path": "sdk/src/mixin/"
+                },
+                {
+                    "clsName": "Ext.util.HashMap",
+                    "name": "HashMap.js",
+                    "path": "sdk/src/util/"
                 },
                 {
                     "clsName": "Ext.data.Connection",
@@ -765,9 +765,9 @@
                     "path": "sdk/src/data/"
                 },
                 {
-                    "clsName": "Ext.util.HashMap",
-                    "name": "HashMap.js",
-                    "path": "sdk/src/util/"
+                    "clsName": "Ext.data.Request",
+                    "name": "Request.js",
+                    "path": "sdk/src/data/"
                 },
                 {
                     "clsName": "Ext.dataview.component.DataItem",
@@ -802,6 +802,11 @@
                 {
                     "clsName": "App.view.Info",
                     "name": "Info.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "App.view.Travel",
+                    "name": "Travel.js",
                     "path": "app/view/"
                 },
                 {
@@ -840,6 +845,16 @@
                     "path": "sdk/src/data/"
                 },
                 {
+                    "clsName": "Ext.AbstractManager",
+                    "name": "AbstractManager.js",
+                    "path": "sdk/src/"
+                },
+                {
+                    "clsName": "Ext.data.ModelManager",
+                    "name": "ModelManager.js",
+                    "path": "sdk/src/data/"
+                },
+                {
                     "clsName": "Ext.data.Types",
                     "name": "Types.js",
                     "path": "sdk/src/data/"
@@ -855,16 +870,6 @@
                     "path": "sdk/src/"
                 },
                 {
-                    "clsName": "Ext.AbstractManager",
-                    "name": "AbstractManager.js",
-                    "path": "sdk/src/"
-                },
-                {
-                    "clsName": "Ext.data.ModelManager",
-                    "name": "ModelManager.js",
-                    "path": "sdk/src/data/"
-                },
-                {
                     "clsName": "Ext.data.association.Association",
                     "name": "Association.js",
                     "path": "sdk/src/data/association/"
@@ -875,13 +880,13 @@
                     "path": "sdk/src/data/association/"
                 },
                 {
-                    "clsName": "Ext.data.association.BelongsTo",
-                    "name": "BelongsTo.js",
+                    "clsName": "Ext.data.association.HasOne",
+                    "name": "HasOne.js",
                     "path": "sdk/src/data/association/"
                 },
                 {
-                    "clsName": "Ext.data.association.HasOne",
-                    "name": "HasOne.js",
+                    "clsName": "Ext.data.association.BelongsTo",
+                    "name": "BelongsTo.js",
                     "path": "sdk/src/data/association/"
                 },
                 {
@@ -945,6 +950,16 @@
                     "path": "sdk/src/data/proxy/"
                 },
                 {
+                    "clsName": "Ext.data.proxy.WebStorage",
+                    "name": "WebStorage.js",
+                    "path": "sdk/src/data/proxy/"
+                },
+                {
+                    "clsName": "Ext.data.proxy.LocalStorage",
+                    "name": "LocalStorage.js",
+                    "path": "sdk/src/data/proxy/"
+                },
+                {
                     "clsName": "Ext.data.proxy.Memory",
                     "name": "Memory.js",
                     "path": "sdk/src/data/proxy/"
@@ -968,16 +983,6 @@
                     "clsName": "App.view.SessionListContainer",
                     "name": "SessionListContainer.js",
                     "path": "app/view/"
-                },
-                {
-                    "clsName": "Ext.data.proxy.WebStorage",
-                    "name": "WebStorage.js",
-                    "path": "sdk/src/data/proxy/"
-                },
-                {
-                    "clsName": "Ext.data.proxy.LocalStorage",
-                    "name": "LocalStorage.js",
-                    "path": "sdk/src/data/proxy/"
                 },
                 {
                     "clsName": "App.store.Events",
