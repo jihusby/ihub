@@ -3,8 +3,8 @@ Ext.define('App.controller.Main', {
     extend: 'Ext.app.Controller',
     
     requires: [
-        'App.view.SessionDetail',
-        'Ext.MessageBox'
+        'App.view.SessionDetail'
+        //'Ext.MessageBox'
     ],
 
     config: {

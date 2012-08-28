@@ -26,7 +26,7 @@ Ext.define("App.view.SessionList", {
                 '<image id="img2{id}" src="resources/icons/star_gray_small.png" onLoad="setImageSource({id});" style="display:none;" />'+
                 '<div class="list-item-title">{speaker}</div>'+
                 '<div class="list-item-description">{ingress}</div>'+
-                '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPopupMap(\'{place}\', \'{place}\');" value="{place}" /></div>'+
+                '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPopupMap(\'{place}.jpg\', \'{place}\');" value="{place}" /></div>'+
                 '<pre>'
     }
 });

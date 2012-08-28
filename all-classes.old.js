@@ -567,6 +567,126 @@ Ext.define('Ext.event.Event', {
 });
 
 /**
+ * @private
+ *
+ * <p>Provides a registry of all Components (instances of {@link Ext.Component} or any subclass
+ * thereof) on a page so that they can be easily accessed by {@link Ext.Component component}
+ * {@link Ext.Component#getId id} (see {@link #get}, or the convenience method {@link Ext#getCmp Ext.getCmp}).</p>
+ * <p>This object also provides a registry of available Component <i>classes</i>
+ * indexed by a mnemonic code known as the Component's `xtype`.
+ * The <code>xtype</code> provides a way to avoid instantiating child Components
+ * when creating a full, nested config object for a complete Ext page.</p>
+ * <p>A child Component may be specified simply as a <i>config object</i>
+ * as long as the correct `xtype` is specified so that if and when the Component
+ * needs rendering, the correct type can be looked up for lazy instantiation.</p>
+ * <p>For a list of all available `xtype`, see {@link Ext.Component}.</p>
+ */
+Ext.define('Ext.ComponentManager', {
+    alternateClassName: 'Ext.ComponentMgr',
+    singleton: true,
+
+    constructor: function() {
+        var map = {};
+
+        // The sole reason for this is just to support the old code of ComponentQuery
+        this.all = {
+            map: map,
+
+            getArray: function() {
+                var list = [],
+                    id;
+
+                for (id in map) {
+                    list.push(map[id]);
+                }
+
+                return list;
+            }
+        };
+
+        this.map = map;
+    },
+
+    /**
+     * Registers an item to be managed
+     * @param {Object} component The item to register
+     */
+    register: function(component) {
+        var id = component.getId();
+
+        if (this.map[id]) {
+            Ext.Logger.warn('Registering a component with a id (`' + id + '`) which has already been used. Please ensure the existing component has been destroyed (`Ext.Component#destroy()`.');
+        }
+
+        this.map[component.getId()] = component;
+    },
+
+    /**
+     * Unregisters an item by removing it from this manager
+     * @param {Object} component The item to unregister
+     */
+    unregister: function(component) {
+        delete this.map[component.getId()];
+    },
+
+    /**
+     * Checks if an item type is registered.
+     * @param {String} component The mnemonic string by which the class may be looked up
+     * @return {Boolean} Whether the type is registered.
+     */
+    isRegistered : function(component){
+        return this.map[component] !== undefined;
+    },
+
+    /**
+     * Returns an item by id.
+     * For additional details see {@link Ext.util.HashMap#get}.
+     * @param {String} id The id of the item
+     * @return {Object} The item, undefined if not found.
+     */
+    get: function(id) {
+        return this.map[id];
+    },
+
+    /**
+     * Creates a new Component from the specified config object using the
+     * config object's xtype to determine the class to instantiate.
+     * @param {Object} config A configuration object for the Component you wish to create.
+     * @param {Function} defaultType (optional) The constructor to provide the default Component type if
+     * the config object does not contain a <code>xtype</code>. (Optional if the config contains a <code>xtype</code>).
+     * @return {Ext.Component} The newly instantiated Component.
+     */
+    create: function(component, defaultType) {
+        if (component.isComponent) {
+            return component;
+        }
+        else if (Ext.isString(component)) {
+            return Ext.createByAlias('widget.' + component);
+        }
+        else {
+            var type = component.xtype || defaultType;
+
+            return Ext.createByAlias('widget.' + type, component);
+        }
+    },
+
+    registerType: Ext.emptyFn
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.behavior.Behavior', {
+    constructor: function(component) {
+        this.component = component;
+
+        component.on('destroy', 'onComponentDestroy', this);
+    },
+
+    onComponentDestroy: Ext.emptyFn
+});
+
+/**
  * Represents a 2D point with x and y properties, useful for comparison and instantiation
  * from an event:
  *
@@ -757,123 +877,56 @@ Ext.define('Ext.util.Point', {
 });
 
 /**
+ * Base class for all mixins.
  * @private
- *
- * <p>Provides a registry of all Components (instances of {@link Ext.Component} or any subclass
- * thereof) on a page so that they can be easily accessed by {@link Ext.Component component}
- * {@link Ext.Component#getId id} (see {@link #get}, or the convenience method {@link Ext#getCmp Ext.getCmp}).</p>
- * <p>This object also provides a registry of available Component <i>classes</i>
- * indexed by a mnemonic code known as the Component's `xtype`.
- * The <code>xtype</code> provides a way to avoid instantiating child Components
- * when creating a full, nested config object for a complete Ext page.</p>
- * <p>A child Component may be specified simply as a <i>config object</i>
- * as long as the correct `xtype` is specified so that if and when the Component
- * needs rendering, the correct type can be looked up for lazy instantiation.</p>
- * <p>For a list of all available `xtype`, see {@link Ext.Component}.</p>
  */
-Ext.define('Ext.ComponentManager', {
-    alternateClassName: 'Ext.ComponentMgr',
-    singleton: true,
+Ext.define('Ext.mixin.Mixin', {
+    onClassExtended: function(cls, data) {
+        var mixinConfig = data.mixinConfig,
+            parentClassMixinConfig,
+            beforeHooks, afterHooks;
 
-    constructor: function() {
-        var map = {};
+        if (mixinConfig) {
+            parentClassMixinConfig = cls.superclass.mixinConfig;
 
-        // The sole reason for this is just to support the old code of ComponentQuery
-        this.all = {
-            map: map,
-
-            getArray: function() {
-                var list = [],
-                    id;
-
-                for (id in map) {
-                    list.push(map[id]);
-                }
-
-                return list;
+            if (parentClassMixinConfig) {
+                mixinConfig = data.mixinConfig = Ext.merge({}, parentClassMixinConfig, mixinConfig);
             }
-        };
 
-        this.map = map;
-    },
+            data.mixinId = mixinConfig.id;
 
-    /**
-     * Registers an item to be managed
-     * @param {Object} component The item to register
-     */
-    register: function(component) {
-        var id = component.getId();
+            beforeHooks = mixinConfig.beforeHooks;
+            afterHooks = mixinConfig.hooks || mixinConfig.afterHooks;
 
-        if (this.map[id]) {
-            Ext.Logger.warn('Registering a component with a id (`' + id + '`) which has already been used. Please ensure the existing component has been destroyed (`Ext.Component#destroy()`.');
+            if (beforeHooks || afterHooks) {
+                Ext.Function.interceptBefore(data, 'onClassMixedIn', function(targetClass) {
+                    var mixin = this.prototype;
+
+                    if (beforeHooks) {
+                        Ext.Object.each(beforeHooks, function(from, to) {
+                            targetClass.override(to, function() {
+                                if (mixin[from].apply(this, arguments) !== false) {
+                                    return this.callOverridden(arguments);
+                                }
+                            });
+                        });
+                    }
+
+                    if (afterHooks) {
+                        Ext.Object.each(afterHooks, function(from, to) {
+                            targetClass.override(to, function() {
+                                var ret = this.callOverridden(arguments);
+
+                                mixin[from].apply(this, arguments);
+
+                                return ret;
+                            });
+                        });
+                    }
+                });
+            }
         }
-
-        this.map[component.getId()] = component;
-    },
-
-    /**
-     * Unregisters an item by removing it from this manager
-     * @param {Object} component The item to unregister
-     */
-    unregister: function(component) {
-        delete this.map[component.getId()];
-    },
-
-    /**
-     * Checks if an item type is registered.
-     * @param {String} component The mnemonic string by which the class may be looked up
-     * @return {Boolean} Whether the type is registered.
-     */
-    isRegistered : function(component){
-        return this.map[component] !== undefined;
-    },
-
-    /**
-     * Returns an item by id.
-     * For additional details see {@link Ext.util.HashMap#get}.
-     * @param {String} id The id of the item
-     * @return {Object} The item, undefined if not found.
-     */
-    get: function(id) {
-        return this.map[id];
-    },
-
-    /**
-     * Creates a new Component from the specified config object using the
-     * config object's xtype to determine the class to instantiate.
-     * @param {Object} config A configuration object for the Component you wish to create.
-     * @param {Function} defaultType (optional) The constructor to provide the default Component type if
-     * the config object does not contain a <code>xtype</code>. (Optional if the config contains a <code>xtype</code>).
-     * @return {Ext.Component} The newly instantiated Component.
-     */
-    create: function(component, defaultType) {
-        if (component.isComponent) {
-            return component;
-        }
-        else if (Ext.isString(component)) {
-            return Ext.createByAlias('widget.' + component);
-        }
-        else {
-            var type = component.xtype || defaultType;
-
-            return Ext.createByAlias('widget.' + type, component);
-        }
-    },
-
-    registerType: Ext.emptyFn
-});
-
-/**
- * @private
- */
-Ext.define('Ext.behavior.Behavior', {
-    constructor: function(component) {
-        this.component = component;
-
-        component.on('destroy', 'onComponentDestroy', this);
-    },
-
-    onComponentDestroy: Ext.emptyFn
+    }
 });
 
 /**
@@ -1124,59 +1177,6 @@ Ext.define('Ext.fx.State', {
 
 
 /**
- * Base class for all mixins.
- * @private
- */
-Ext.define('Ext.mixin.Mixin', {
-    onClassExtended: function(cls, data) {
-        var mixinConfig = data.mixinConfig,
-            parentClassMixinConfig,
-            beforeHooks, afterHooks;
-
-        if (mixinConfig) {
-            parentClassMixinConfig = cls.superclass.mixinConfig;
-
-            if (parentClassMixinConfig) {
-                mixinConfig = data.mixinConfig = Ext.merge({}, parentClassMixinConfig, mixinConfig);
-            }
-
-            data.mixinId = mixinConfig.id;
-
-            beforeHooks = mixinConfig.beforeHooks;
-            afterHooks = mixinConfig.hooks || mixinConfig.afterHooks;
-
-            if (beforeHooks || afterHooks) {
-                Ext.Function.interceptBefore(data, 'onClassMixedIn', function(targetClass) {
-                    var mixin = this.prototype;
-
-                    if (beforeHooks) {
-                        Ext.Object.each(beforeHooks, function(from, to) {
-                            targetClass.override(to, function() {
-                                if (mixin[from].apply(this, arguments) !== false) {
-                                    return this.callOverridden(arguments);
-                                }
-                            });
-                        });
-                    }
-
-                    if (afterHooks) {
-                        Ext.Object.each(afterHooks, function(from, to) {
-                            targetClass.override(to, function() {
-                                var ret = this.callOverridden(arguments);
-
-                                mixin[from].apply(this, arguments);
-
-                                return ret;
-                            });
-                        });
-                    }
-                });
-            }
-        }
-    }
-});
-
-/**
  * This class parses the XTemplate syntax and calls abstract methods to process the parts.
  * @private
  */
@@ -1415,193 +1415,6 @@ Ext.define('Ext.XTemplateParser', {
     elseRe:    /^\s*else\s*$/
 });
 /**
- * Represents a filter that can be applied to a {@link Ext.util.MixedCollection MixedCollection}. Can either simply
- * filter on a property/value pair or pass in a filter function with custom logic. Filters are always used in the
- * context of MixedCollections, though {@link Ext.data.Store Store}s frequently create them when filtering and searching
- * on their records. Example usage:
- *
- *     // Set up a fictional MixedCollection containing a few people to filter on
- *     var allNames = new Ext.util.MixedCollection();
- *     allNames.addAll([
- *         { id: 1, name: 'Ed',    age: 25 },
- *         { id: 2, name: 'Jamie', age: 37 },
- *         { id: 3, name: 'Abe',   age: 32 },
- *         { id: 4, name: 'Aaron', age: 26 },
- *         { id: 5, name: 'David', age: 32 }
- *     ]);
- *
- *     var ageFilter = new Ext.util.Filter({
- *         property: 'age',
- *         value   : 32
- *     });
- *
- *     var longNameFilter = new Ext.util.Filter({
- *         filterFn: function(item) {
- *             return item.name.length > 4;
- *         }
- *     });
- *
- *     // a new MixedCollection with the 3 names longer than 4 characters
- *     var longNames = allNames.filter(longNameFilter);
- *
- *     // a new MixedCollection with the 2 people of age 24:
- *     var youngFolk = allNames.filter(ageFilter);
- */
-Ext.define('Ext.util.Filter', {
-    isFilter: true,
-
-    config: {
-        /**
-         * @cfg {String} [property=null]
-         * The property to filter on. Required unless a `filter` is passed
-         */
-        property: null,
-
-        /**
-         * @cfg {RegExp/Mixed} [value=null]
-         * The value you want to match against. Can be a regular expression which will be used as matcher or any other
-         * value.
-         */
-        value: null,
-
-        /**
-         * @cfg {Function} filterFn
-         * A custom filter function which is passed each item in the {@link Ext.util.MixedCollection} in turn. Should
-         * return true to accept each item or false to reject it
-         */
-        filterFn: Ext.emptyFn,
-
-        /**
-         * @cfg {Boolean} [anyMatch=false]
-         * True to allow any match - no regex start/end line anchors will be added.
-         */
-        anyMatch: false,
-
-        /**
-         * @cfg {Boolean} [exactMatch=false]
-         * True to force exact match (^ and $ characters added to the regex). Ignored if anyMatch is true.
-         */
-        exactMatch: false,
-
-        /**
-         * @cfg {Boolean} [caseSensitive=false]
-         * True to make the regex case sensitive (adds 'i' switch to regex).
-         */
-        caseSensitive: false,
-
-        /**
-         * @cfg {String} [root=null]
-         * Optional root property. This is mostly useful when filtering a Store, in which case we set the root to 'data'
-         * to make the filter pull the {@link #property} out of the data object of each item
-         */
-        root: null,
-
-        /**
-         * @cfg {String} id
-         * An optional id this filter can be keyed by in Collections. If no id is specified it will generate an id by
-         * first trying a combination of property-value, and if none if these were specified (like when having a
-         * filterFn) it will generate a random id.
-         */
-        id: undefined,
-
-        /**
-         * @cfg {Object} [scope=null]
-         * The scope in which to run the filterFn
-         */
-        scope: null
-    },
-
-    applyId: function(id) {
-        if (!id) {
-            if (this.getProperty()) {
-                id = this.getProperty() + '-' + String(this.getValue());
-            }
-            if (!id) {
-                id = Ext.id(null, 'ext-filter-');
-            }
-        }
-
-        return id;
-    },
-
-    /**
-     * Creates new Filter.
-     * @param {Object} config Config object
-     */
-    constructor: function(config) {
-        this.initConfig(config);
-    },
-
-    applyFilterFn: function(filterFn) {
-        if (filterFn === Ext.emptyFn) {
-            filterFn = this.getInitialConfig('filter');
-            if (filterFn) {
-                return filterFn;
-            }
-
-            var value = this.getValue();
-            if (!this.getProperty() && !value && value !== 0) {
-                Ext.Logger.error('A Filter requires either a property and value, or a filterFn to be set');
-                return Ext.emptyFn;
-            }
-            else {
-                return this.createFilterFn();
-            }
-        }
-        return filterFn;
-    },
-
-    /**
-     * @private
-     * Creates a filter function for the configured property/value/anyMatch/caseSensitive options for this Filter
-     */
-    createFilterFn: function() {
-        var me       = this,
-            matcher  = me.createValueMatcher();
-
-        return function(item) {
-            var root     = me.getRoot(),
-                property = me.getProperty();
-
-            if (root) {
-                item = item[root];
-            }
-
-            return matcher.test(item[property]);
-        };
-    },
-
-    /**
-     * @private
-     * Returns a regular expression based on the given value and matching options
-     */
-    createValueMatcher: function() {
-        var me            = this,
-            value         = me.getValue(),
-            anyMatch      = me.getAnyMatch(),
-            exactMatch    = me.getExactMatch(),
-            caseSensitive = me.getCaseSensitive(),
-            escapeRe      = Ext.String.escapeRegex;
-
-        if (value === null || value === undefined || !value.exec) { // not a regex
-            value = String(value);
-
-            if (anyMatch === true) {
-                value = escapeRe(value);
-            } else {
-                value = '^' + escapeRe(value);
-                if (exactMatch === true) {
-                    value += '$';
-                }
-            }
-            value = new RegExp(value, caseSensitive ? '' : 'i');
-         }
-
-         return value;
-    }
-});
-
-/**
  * Represents a single sorter that can be used as part of the sorters configuration in Ext.mixin.Sortable.
  *
  * A common place for Sorters to be used are {@link Ext.data.Store Stores}. For example:
@@ -1791,6 +1604,193 @@ Ext.define('Ext.util.Sorter', {
      */
     toggle: function() {
         this.setDirection(Ext.String.toggle(this.getDirection(), "ASC", "DESC"));
+    }
+});
+
+/**
+ * Represents a filter that can be applied to a {@link Ext.util.MixedCollection MixedCollection}. Can either simply
+ * filter on a property/value pair or pass in a filter function with custom logic. Filters are always used in the
+ * context of MixedCollections, though {@link Ext.data.Store Store}s frequently create them when filtering and searching
+ * on their records. Example usage:
+ *
+ *     // Set up a fictional MixedCollection containing a few people to filter on
+ *     var allNames = new Ext.util.MixedCollection();
+ *     allNames.addAll([
+ *         { id: 1, name: 'Ed',    age: 25 },
+ *         { id: 2, name: 'Jamie', age: 37 },
+ *         { id: 3, name: 'Abe',   age: 32 },
+ *         { id: 4, name: 'Aaron', age: 26 },
+ *         { id: 5, name: 'David', age: 32 }
+ *     ]);
+ *
+ *     var ageFilter = new Ext.util.Filter({
+ *         property: 'age',
+ *         value   : 32
+ *     });
+ *
+ *     var longNameFilter = new Ext.util.Filter({
+ *         filterFn: function(item) {
+ *             return item.name.length > 4;
+ *         }
+ *     });
+ *
+ *     // a new MixedCollection with the 3 names longer than 4 characters
+ *     var longNames = allNames.filter(longNameFilter);
+ *
+ *     // a new MixedCollection with the 2 people of age 24:
+ *     var youngFolk = allNames.filter(ageFilter);
+ */
+Ext.define('Ext.util.Filter', {
+    isFilter: true,
+
+    config: {
+        /**
+         * @cfg {String} [property=null]
+         * The property to filter on. Required unless a `filter` is passed
+         */
+        property: null,
+
+        /**
+         * @cfg {RegExp/Mixed} [value=null]
+         * The value you want to match against. Can be a regular expression which will be used as matcher or any other
+         * value.
+         */
+        value: null,
+
+        /**
+         * @cfg {Function} filterFn
+         * A custom filter function which is passed each item in the {@link Ext.util.MixedCollection} in turn. Should
+         * return true to accept each item or false to reject it
+         */
+        filterFn: Ext.emptyFn,
+
+        /**
+         * @cfg {Boolean} [anyMatch=false]
+         * True to allow any match - no regex start/end line anchors will be added.
+         */
+        anyMatch: false,
+
+        /**
+         * @cfg {Boolean} [exactMatch=false]
+         * True to force exact match (^ and $ characters added to the regex). Ignored if anyMatch is true.
+         */
+        exactMatch: false,
+
+        /**
+         * @cfg {Boolean} [caseSensitive=false]
+         * True to make the regex case sensitive (adds 'i' switch to regex).
+         */
+        caseSensitive: false,
+
+        /**
+         * @cfg {String} [root=null]
+         * Optional root property. This is mostly useful when filtering a Store, in which case we set the root to 'data'
+         * to make the filter pull the {@link #property} out of the data object of each item
+         */
+        root: null,
+
+        /**
+         * @cfg {String} id
+         * An optional id this filter can be keyed by in Collections. If no id is specified it will generate an id by
+         * first trying a combination of property-value, and if none if these were specified (like when having a
+         * filterFn) it will generate a random id.
+         */
+        id: undefined,
+
+        /**
+         * @cfg {Object} [scope=null]
+         * The scope in which to run the filterFn
+         */
+        scope: null
+    },
+
+    applyId: function(id) {
+        if (!id) {
+            if (this.getProperty()) {
+                id = this.getProperty() + '-' + String(this.getValue());
+            }
+            if (!id) {
+                id = Ext.id(null, 'ext-filter-');
+            }
+        }
+
+        return id;
+    },
+
+    /**
+     * Creates new Filter.
+     * @param {Object} config Config object
+     */
+    constructor: function(config) {
+        this.initConfig(config);
+    },
+
+    applyFilterFn: function(filterFn) {
+        if (filterFn === Ext.emptyFn) {
+            filterFn = this.getInitialConfig('filter');
+            if (filterFn) {
+                return filterFn;
+            }
+
+            var value = this.getValue();
+            if (!this.getProperty() && !value && value !== 0) {
+                Ext.Logger.error('A Filter requires either a property and value, or a filterFn to be set');
+                return Ext.emptyFn;
+            }
+            else {
+                return this.createFilterFn();
+            }
+        }
+        return filterFn;
+    },
+
+    /**
+     * @private
+     * Creates a filter function for the configured property/value/anyMatch/caseSensitive options for this Filter
+     */
+    createFilterFn: function() {
+        var me       = this,
+            matcher  = me.createValueMatcher();
+
+        return function(item) {
+            var root     = me.getRoot(),
+                property = me.getProperty();
+
+            if (root) {
+                item = item[root];
+            }
+
+            return matcher.test(item[property]);
+        };
+    },
+
+    /**
+     * @private
+     * Returns a regular expression based on the given value and matching options
+     */
+    createValueMatcher: function() {
+        var me            = this,
+            value         = me.getValue(),
+            anyMatch      = me.getAnyMatch(),
+            exactMatch    = me.getExactMatch(),
+            caseSensitive = me.getCaseSensitive(),
+            escapeRe      = Ext.String.escapeRegex;
+
+        if (value === null || value === undefined || !value.exec) { // not a regex
+            value = String(value);
+
+            if (anyMatch === true) {
+                value = escapeRe(value);
+            } else {
+                value = '^' + escapeRe(value);
+                if (exactMatch === true) {
+                    value += '$';
+                }
+            }
+            value = new RegExp(value, caseSensitive ? '' : 'i');
+         }
+
+         return value;
     }
 });
 
@@ -4536,6 +4536,191 @@ Ext.define('Ext.Evented', {
 
 /**
  * @private
+ * This is the abstract class for {@link Ext.Component}.
+ *
+ * This should never be overriden.
+ */
+Ext.define('Ext.AbstractComponent', {
+    extend: 'Ext.Evented',
+
+    onClassExtended: function(Class, members) {
+        if (!members.hasOwnProperty('cachedConfig')) {
+            return;
+        }
+
+        var prototype = Class.prototype,
+            config = members.config,
+            cachedConfig = members.cachedConfig,
+            cachedConfigList = prototype.cachedConfigList,
+            hasCachedConfig = prototype.hasCachedConfig,
+            name, value;
+
+        delete members.cachedConfig;
+
+        prototype.cachedConfigList = cachedConfigList = (cachedConfigList) ? cachedConfigList.slice() : [];
+        prototype.hasCachedConfig = hasCachedConfig = (hasCachedConfig) ? Ext.Object.chain(hasCachedConfig) : {};
+
+        if (!config) {
+            members.config = config = {};
+        }
+
+        for (name in cachedConfig) {
+            if (cachedConfig.hasOwnProperty(name)) {
+                value = cachedConfig[name];
+
+                if (!hasCachedConfig[name]) {
+                    hasCachedConfig[name] = true;
+                    cachedConfigList.push(name);
+                }
+
+                config[name] = value;
+            }
+        }
+    },
+
+    getElementConfig: Ext.emptyFn,
+
+    referenceAttributeName: 'reference',
+
+    referenceSelector: '[reference]',
+
+    /**
+     * @private
+     * Significantly improve instantiation time for Component with multiple references
+     * Ext.Element instance of the reference domNode is only created the very first time
+     * it's ever used
+     */
+    addReferenceNode: function(name, domNode) {
+        Ext.Object.defineProperty(this, name, {
+            get: function() {
+                var reference;
+
+                delete this[name];
+                this[name] = reference = new Ext.Element(domNode);
+                return reference;
+            },
+            configurable: true
+        });
+    },
+
+    initElement: function() {
+        var prototype = this.self.prototype,
+            id = this.getId(),
+            referenceList = [],
+            cleanAttributes = true,
+            referenceAttributeName = this.referenceAttributeName,
+            needsOptimization = false,
+            renderTemplate, renderElement, element,
+            referenceNodes, i, ln, referenceNode, reference,
+            configNameCache, defaultConfig, cachedConfigList, initConfigList, initConfigMap, configList,
+            elements, name, nameMap, internalName;
+
+        if (prototype.hasOwnProperty('renderTemplate')) {
+            renderTemplate = this.renderTemplate.cloneNode(true);
+            renderElement = renderTemplate.firstChild;
+        }
+        else {
+            cleanAttributes = false;
+            needsOptimization = true;
+            renderTemplate = document.createDocumentFragment();
+            renderElement = Ext.Element.create(this.getElementConfig(), true);
+            renderTemplate.appendChild(renderElement);
+        }
+
+        referenceNodes = renderTemplate.querySelectorAll(this.referenceSelector);
+
+        for (i = 0,ln = referenceNodes.length; i < ln; i++) {
+            referenceNode = referenceNodes[i];
+            reference = referenceNode.getAttribute(referenceAttributeName);
+
+            if (cleanAttributes) {
+                referenceNode.removeAttribute(referenceAttributeName);
+            }
+
+            if (reference == 'element') {
+                referenceNode.id = id;
+                this.element = element = new Ext.Element(referenceNode);
+            }
+            else {
+                this.addReferenceNode(reference, referenceNode);
+            }
+
+            referenceList.push(reference);
+        }
+
+        this.referenceList = referenceList;
+
+        if (!this.innerElement) {
+            this.innerElement = element;
+        }
+
+        if (renderElement === element.dom) {
+            this.renderElement = element;
+        }
+        else {
+            this.addReferenceNode('renderElement', renderElement);
+        }
+
+        // This happens only *once* per class, during the very first instantiation
+        // to optimize renderTemplate based on cachedConfig
+        if (needsOptimization) {
+            configNameCache = Ext.Class.configNameCache;
+            defaultConfig = this.config;
+            cachedConfigList = this.cachedConfigList;
+            initConfigList = this.initConfigList;
+            initConfigMap = this.initConfigMap;
+            configList = [];
+
+            for (i = 0,ln = cachedConfigList.length; i < ln; i++) {
+                name = cachedConfigList[i];
+                nameMap = configNameCache[name];
+
+                if (initConfigMap[name]) {
+                    initConfigMap[name] = false;
+                    Ext.Array.remove(initConfigList, name);
+                }
+
+                if (defaultConfig[name] !== null) {
+                    configList.push(name);
+                    this[nameMap.get] = this[nameMap.initGet];
+                }
+            }
+
+            for (i = 0,ln = configList.length; i < ln; i++) {
+                name = configList[i];
+                nameMap = configNameCache[name];
+                internalName = nameMap.internal;
+
+                this[internalName] = null;
+                this[nameMap.set].call(this, defaultConfig[name]);
+                delete this[nameMap.get];
+
+                prototype[internalName] = this[internalName];
+            }
+
+            renderElement = this.renderElement.dom;
+            prototype.renderTemplate = renderTemplate = document.createDocumentFragment();
+            renderTemplate.appendChild(renderElement.cloneNode(true));
+
+            elements = renderTemplate.querySelectorAll('[id]');
+
+            for (i = 0,ln = elements.length; i < ln; i++) {
+                element = elements[i];
+                element.removeAttribute('id');
+            }
+
+            for (i = 0,ln = referenceList.length; i < ln; i++) {
+                reference = referenceList[i];
+                this[reference].dom.removeAttribute('reference');
+            }
+        }
+
+        return this;
+    }
+});
+
+/**
+ * @private
  */
 Ext.define('Ext.fx.animation.Abstract', {
 
@@ -5199,191 +5384,6 @@ Ext.define('Ext.fx.Animation', {
         }
 
         return Ext.factory(config, defaultClass);
-    }
-});
-
-/**
- * @private
- * This is the abstract class for {@link Ext.Component}.
- *
- * This should never be overriden.
- */
-Ext.define('Ext.AbstractComponent', {
-    extend: 'Ext.Evented',
-
-    onClassExtended: function(Class, members) {
-        if (!members.hasOwnProperty('cachedConfig')) {
-            return;
-        }
-
-        var prototype = Class.prototype,
-            config = members.config,
-            cachedConfig = members.cachedConfig,
-            cachedConfigList = prototype.cachedConfigList,
-            hasCachedConfig = prototype.hasCachedConfig,
-            name, value;
-
-        delete members.cachedConfig;
-
-        prototype.cachedConfigList = cachedConfigList = (cachedConfigList) ? cachedConfigList.slice() : [];
-        prototype.hasCachedConfig = hasCachedConfig = (hasCachedConfig) ? Ext.Object.chain(hasCachedConfig) : {};
-
-        if (!config) {
-            members.config = config = {};
-        }
-
-        for (name in cachedConfig) {
-            if (cachedConfig.hasOwnProperty(name)) {
-                value = cachedConfig[name];
-
-                if (!hasCachedConfig[name]) {
-                    hasCachedConfig[name] = true;
-                    cachedConfigList.push(name);
-                }
-
-                config[name] = value;
-            }
-        }
-    },
-
-    getElementConfig: Ext.emptyFn,
-
-    referenceAttributeName: 'reference',
-
-    referenceSelector: '[reference]',
-
-    /**
-     * @private
-     * Significantly improve instantiation time for Component with multiple references
-     * Ext.Element instance of the reference domNode is only created the very first time
-     * it's ever used
-     */
-    addReferenceNode: function(name, domNode) {
-        Ext.Object.defineProperty(this, name, {
-            get: function() {
-                var reference;
-
-                delete this[name];
-                this[name] = reference = new Ext.Element(domNode);
-                return reference;
-            },
-            configurable: true
-        });
-    },
-
-    initElement: function() {
-        var prototype = this.self.prototype,
-            id = this.getId(),
-            referenceList = [],
-            cleanAttributes = true,
-            referenceAttributeName = this.referenceAttributeName,
-            needsOptimization = false,
-            renderTemplate, renderElement, element,
-            referenceNodes, i, ln, referenceNode, reference,
-            configNameCache, defaultConfig, cachedConfigList, initConfigList, initConfigMap, configList,
-            elements, name, nameMap, internalName;
-
-        if (prototype.hasOwnProperty('renderTemplate')) {
-            renderTemplate = this.renderTemplate.cloneNode(true);
-            renderElement = renderTemplate.firstChild;
-        }
-        else {
-            cleanAttributes = false;
-            needsOptimization = true;
-            renderTemplate = document.createDocumentFragment();
-            renderElement = Ext.Element.create(this.getElementConfig(), true);
-            renderTemplate.appendChild(renderElement);
-        }
-
-        referenceNodes = renderTemplate.querySelectorAll(this.referenceSelector);
-
-        for (i = 0,ln = referenceNodes.length; i < ln; i++) {
-            referenceNode = referenceNodes[i];
-            reference = referenceNode.getAttribute(referenceAttributeName);
-
-            if (cleanAttributes) {
-                referenceNode.removeAttribute(referenceAttributeName);
-            }
-
-            if (reference == 'element') {
-                referenceNode.id = id;
-                this.element = element = new Ext.Element(referenceNode);
-            }
-            else {
-                this.addReferenceNode(reference, referenceNode);
-            }
-
-            referenceList.push(reference);
-        }
-
-        this.referenceList = referenceList;
-
-        if (!this.innerElement) {
-            this.innerElement = element;
-        }
-
-        if (renderElement === element.dom) {
-            this.renderElement = element;
-        }
-        else {
-            this.addReferenceNode('renderElement', renderElement);
-        }
-
-        // This happens only *once* per class, during the very first instantiation
-        // to optimize renderTemplate based on cachedConfig
-        if (needsOptimization) {
-            configNameCache = Ext.Class.configNameCache;
-            defaultConfig = this.config;
-            cachedConfigList = this.cachedConfigList;
-            initConfigList = this.initConfigList;
-            initConfigMap = this.initConfigMap;
-            configList = [];
-
-            for (i = 0,ln = cachedConfigList.length; i < ln; i++) {
-                name = cachedConfigList[i];
-                nameMap = configNameCache[name];
-
-                if (initConfigMap[name]) {
-                    initConfigMap[name] = false;
-                    Ext.Array.remove(initConfigList, name);
-                }
-
-                if (defaultConfig[name] !== null) {
-                    configList.push(name);
-                    this[nameMap.get] = this[nameMap.initGet];
-                }
-            }
-
-            for (i = 0,ln = configList.length; i < ln; i++) {
-                name = configList[i];
-                nameMap = configNameCache[name];
-                internalName = nameMap.internal;
-
-                this[internalName] = null;
-                this[nameMap.set].call(this, defaultConfig[name]);
-                delete this[nameMap.get];
-
-                prototype[internalName] = this[internalName];
-            }
-
-            renderElement = this.renderElement.dom;
-            prototype.renderTemplate = renderTemplate = document.createDocumentFragment();
-            renderTemplate.appendChild(renderElement.cloneNode(true));
-
-            elements = renderTemplate.querySelectorAll('[id]');
-
-            for (i = 0,ln = elements.length; i < ln; i++) {
-                element = elements[i];
-                element.removeAttribute('id');
-            }
-
-            for (i = 0,ln = referenceList.length; i < ln; i++) {
-                reference = referenceList[i];
-                this[reference].dom.removeAttribute('reference');
-            }
-        }
-
-        return this;
     }
 });
 
@@ -6099,6 +6099,85 @@ Ext.define('Ext.layout.AbstractBox', {
 /**
  * @aside guide layouts
  *
+ * The VBox (short for vertical box) layout makes it easy to position items horizontally in a
+ * {@link Ext.Container Container}. It can size items based on a fixed height or a fraction of the total height
+ * available.
+ *
+ * For example, let's say we want a banner to take one third of the available height, and an information panel in the
+ * rest of the screen. We can achieve this with vbox layout's *flex* config:
+ *
+ *     @example
+ *     Ext.create('Ext.Container', {
+ *         fullscreen: true,
+ *         layout: 'vbox',
+ *         items: [
+ *             {
+ *                 html: 'Awesome banner',
+ *                 style: 'background-color: #759E60;',
+ *                 flex: 1
+ *             },
+ *             {
+ *                 html: 'Some wonderful information',
+ *                 style: 'background-color: #5E99CC;',
+ *                 flex: 2
+ *             }
+ *         ]
+ *     });
+ *
+ * This will give us two boxes - one that's one third of the available height, the other being two thirds of the
+ * available height:
+ *
+ * {@img ../guides/layouts/vbox.jpg}
+ *
+ * We can also specify fixed heights for child items, or mix fixed heights and flexes. For example, here we have 3
+ * items - one at the top and bottom with flex: 1, and one in the center with a fixed width of 100px:
+ *
+ *     @example preview portrait
+ *     Ext.create('Ext.Container', {
+ *         fullscreen: true,
+ *         layout: 'vbox',
+ *         items: [
+ *             {
+ *                 html: 'Top item',
+ *                 style: 'background-color: #5E99CC;',
+ *                 flex: 1
+ *             },
+ *             {
+ *                 html: 'Center item',
+ *                 height: 100
+ *             },
+ *             {
+ *                 html: 'Bottom item',
+ *                 style: 'background-color: #759E60;',
+ *                 flex: 1
+ *             }
+ *         ]
+ *     });
+ *
+ * Which gives us an effect like this:
+ *
+ * {@img ../guides/layouts/vboxfixed.jpg}
+ *
+ * For a more detailed overview of what layouts are and the types of layouts shipped with Sencha Touch 2, check out the
+ * [Layout Guide](#!/guide/layouts).
+ *
+ */
+Ext.define('Ext.layout.VBox', {
+    extend: 'Ext.layout.AbstractBox',
+    alternateClassName: 'Ext.layout.VBoxLayout',
+
+    alias: 'layout.vbox',
+
+    sizePropertyName: 'height',
+
+    sizeChangeEventName: 'heightchange',
+
+    cls: Ext.baseCSSPrefix + 'layout-vbox'
+});
+
+/**
+ * @aside guide layouts
+ *
  * The HBox (short for horizontal box) layout makes it easy to position items horizontally in a
  * {@link Ext.Container Container}. It can size items based on a fixed width or a fraction of the total width
  * available.
@@ -6175,85 +6254,6 @@ Ext.define('Ext.layout.HBox', {
 });
 
 
-
-/**
- * @aside guide layouts
- *
- * The VBox (short for vertical box) layout makes it easy to position items horizontally in a
- * {@link Ext.Container Container}. It can size items based on a fixed height or a fraction of the total height
- * available.
- *
- * For example, let's say we want a banner to take one third of the available height, and an information panel in the
- * rest of the screen. We can achieve this with vbox layout's *flex* config:
- *
- *     @example
- *     Ext.create('Ext.Container', {
- *         fullscreen: true,
- *         layout: 'vbox',
- *         items: [
- *             {
- *                 html: 'Awesome banner',
- *                 style: 'background-color: #759E60;',
- *                 flex: 1
- *             },
- *             {
- *                 html: 'Some wonderful information',
- *                 style: 'background-color: #5E99CC;',
- *                 flex: 2
- *             }
- *         ]
- *     });
- *
- * This will give us two boxes - one that's one third of the available height, the other being two thirds of the
- * available height:
- *
- * {@img ../guides/layouts/vbox.jpg}
- *
- * We can also specify fixed heights for child items, or mix fixed heights and flexes. For example, here we have 3
- * items - one at the top and bottom with flex: 1, and one in the center with a fixed width of 100px:
- *
- *     @example preview portrait
- *     Ext.create('Ext.Container', {
- *         fullscreen: true,
- *         layout: 'vbox',
- *         items: [
- *             {
- *                 html: 'Top item',
- *                 style: 'background-color: #5E99CC;',
- *                 flex: 1
- *             },
- *             {
- *                 html: 'Center item',
- *                 height: 100
- *             },
- *             {
- *                 html: 'Bottom item',
- *                 style: 'background-color: #759E60;',
- *                 flex: 1
- *             }
- *         ]
- *     });
- *
- * Which gives us an effect like this:
- *
- * {@img ../guides/layouts/vboxfixed.jpg}
- *
- * For a more detailed overview of what layouts are and the types of layouts shipped with Sencha Touch 2, check out the
- * [Layout Guide](#!/guide/layouts).
- *
- */
-Ext.define('Ext.layout.VBox', {
-    extend: 'Ext.layout.AbstractBox',
-    alternateClassName: 'Ext.layout.VBoxLayout',
-
-    alias: 'layout.vbox',
-
-    sizePropertyName: 'height',
-
-    sizeChangeEventName: 'heightchange',
-
-    cls: Ext.baseCSSPrefix + 'layout-vbox'
-});
 
 /**
  * @private
@@ -27794,112 +27794,6 @@ Ext.define('Ext.app.Controller', {
 
 /**
  * @author Ed Spencer
- * @private
- *
- * Manages the stack of {@link Ext.app.Action} instances that have been decoded, pushes new urls into the browser's
- * location object and listens for changes in url, firing the {@link #change} event when a change is detected.
- *
- * This is tied to an {@link Ext.app.Application Application} instance. The Application performs all of the
- * interactions with the History object, no additional integration should be required.
- */
-Ext.define('Ext.app.History', {
-    mixins: ['Ext.mixin.Observable'],
-
-    /**
-     * @event change
-     * Fires when a change in browser url is detected
-     * @param {String} url The new url, after the hash (e.g. http://myapp.com/#someUrl returns 'someUrl')
-     */
-
-    config: {
-        /**
-         * @cfg {Array} actions The stack of {@link Ext.app.Action action} instances that have occured so far
-         */
-        actions: [],
-
-        /**
-         * @cfg {Boolean} updateUrl True to automatically update the browser's url when {@link #add} is called
-         */
-        updateUrl: true,
-
-        /**
-         * @cfg {String} token The current token as read from the browser's location object
-         */
-        token: ''
-    },
-
-    constructor: function(config) {
-        if (Ext.feature.has.History) {
-            window.addEventListener('hashchange', Ext.bind(this.detectStateChange, this));
-        }
-        else {
-            setInterval(Ext.bind(this.detectStateChange, this), 50);
-        }
-
-        this.initConfig(config);
-    },
-
-    /**
-     * Adds an {@link Ext.app.Action Action} to the stack, optionally updating the browser's url and firing the
-     * {@link #change} event.
-     * @param {Ext.app.Action} action The Action to add to the stack
-     * @param {Boolean} silent Cancels the firing of the {@link #change} event if true
-     */
-    add: function(action, silent) {
-        this.getActions().push(Ext.factory(action, Ext.app.Action));
-
-        var url = action.getUrl();
-
-        if (this.getUpdateUrl()) {
-            // history.pushState({}, action.getTitle(), "#" + action.getUrl());
-            this.setToken(url);
-            window.location.hash = url;
-        }
-
-        if (silent !== true) {
-            this.fireEvent('change', url);
-        }
-
-        this.setToken(url);
-    },
-
-    /**
-     * @private
-     */
-    back: function() {
-        this.getActions().pop().run();
-    },
-
-    /**
-     * @private
-     */
-    applyToken: function(token) {
-        return token[0] == '#' ? token.substr(1) : token;
-    },
-
-    /**
-     * @private
-     */
-    detectStateChange: function() {
-        var newToken = this.applyToken(window.location.hash),
-            oldToken = this.getToken();
-
-        if (newToken != oldToken) {
-            this.onStateChange();
-            this.setToken(newToken);
-        }
-    },
-
-    /**
-     * @private
-     */
-    onStateChange: function() {
-        this.fireEvent('change', window.location.hash.substr(1));
-    }
-});
-
-/**
- * @author Ed Spencer
  *
  * A Profile represents a range of devices that fall under a common category. For the vast majority of apps that use
  * device profiles, the app defines a Phone profile and a Tablet profile. Doing this enables you to easily customize
@@ -28148,6 +28042,112 @@ Ext.define('Ext.app.Profile', {
         return map;
     }
 });
+/**
+ * @author Ed Spencer
+ * @private
+ *
+ * Manages the stack of {@link Ext.app.Action} instances that have been decoded, pushes new urls into the browser's
+ * location object and listens for changes in url, firing the {@link #change} event when a change is detected.
+ *
+ * This is tied to an {@link Ext.app.Application Application} instance. The Application performs all of the
+ * interactions with the History object, no additional integration should be required.
+ */
+Ext.define('Ext.app.History', {
+    mixins: ['Ext.mixin.Observable'],
+
+    /**
+     * @event change
+     * Fires when a change in browser url is detected
+     * @param {String} url The new url, after the hash (e.g. http://myapp.com/#someUrl returns 'someUrl')
+     */
+
+    config: {
+        /**
+         * @cfg {Array} actions The stack of {@link Ext.app.Action action} instances that have occured so far
+         */
+        actions: [],
+
+        /**
+         * @cfg {Boolean} updateUrl True to automatically update the browser's url when {@link #add} is called
+         */
+        updateUrl: true,
+
+        /**
+         * @cfg {String} token The current token as read from the browser's location object
+         */
+        token: ''
+    },
+
+    constructor: function(config) {
+        if (Ext.feature.has.History) {
+            window.addEventListener('hashchange', Ext.bind(this.detectStateChange, this));
+        }
+        else {
+            setInterval(Ext.bind(this.detectStateChange, this), 50);
+        }
+
+        this.initConfig(config);
+    },
+
+    /**
+     * Adds an {@link Ext.app.Action Action} to the stack, optionally updating the browser's url and firing the
+     * {@link #change} event.
+     * @param {Ext.app.Action} action The Action to add to the stack
+     * @param {Boolean} silent Cancels the firing of the {@link #change} event if true
+     */
+    add: function(action, silent) {
+        this.getActions().push(Ext.factory(action, Ext.app.Action));
+
+        var url = action.getUrl();
+
+        if (this.getUpdateUrl()) {
+            // history.pushState({}, action.getTitle(), "#" + action.getUrl());
+            this.setToken(url);
+            window.location.hash = url;
+        }
+
+        if (silent !== true) {
+            this.fireEvent('change', url);
+        }
+
+        this.setToken(url);
+    },
+
+    /**
+     * @private
+     */
+    back: function() {
+        this.getActions().pop().run();
+    },
+
+    /**
+     * @private
+     */
+    applyToken: function(token) {
+        return token[0] == '#' ? token.substr(1) : token;
+    },
+
+    /**
+     * @private
+     */
+    detectStateChange: function() {
+        var newToken = this.applyToken(window.location.hash),
+            oldToken = this.getToken();
+
+        if (newToken != oldToken) {
+            this.onStateChange();
+            this.setToken(newToken);
+        }
+    },
+
+    /**
+     * @private
+     */
+    onStateChange: function() {
+        this.fireEvent('change', window.location.hash.substr(1));
+    }
+});
+
 /**
  * @author Ed Spencer
  * @private
@@ -29451,12 +29451,36 @@ Ext.define('App.view.SessionDetail', {
 });
 
 function saveSessionDetail(id) {
-    if(toggleSession(id)){
-        document.getElementById("btn").value = "Fjern fra huskeliste";
-    }else {
-        document.getElementById("btn").value = "Legg til i huskeliste";
+    
+    var hasAddedToEventList = toggleSession(id);
+    setListButtonText(hasAddedToEventList);
+    setImageSource(id);
+}
+
+function setListButtonText(removeFromList){
+    if(document.getElementById("btn")) {
+        if(removeFromList){
+            document.getElementById("btn").value = "Fjern fra huskeliste";
+        }else {
+            document.getElementById("btn").value = "Legg til i huskeliste";
+        }
     }
 }
+
+function setImageSource(id){
+    console.log("setImageSource invoked");
+    var saved = isEventSaved(id) ? "color" : "gray";
+    console.log("setImageSource: saved is " + saved);
+    setSource(id, saved);
+}
+
+function setSource(id, color){
+    if(document.getElementById("img"+id)){
+        console.log("setting source: color is " + color);
+        document.getElementById("img"+id).src = "resources/icons/star_"+ color +"_small.png";
+    }
+}
+
 
 
 
@@ -33001,6 +33025,305 @@ Ext.define('Ext.tab.Tab', {
 });
 
 /**
+ * @private
+ */
+Ext.define('Ext.dataview.element.Container', {
+    extend: 'Ext.Component',
+
+    /**
+     * @event itemtouchstart
+     * Fires whenever an item is touched
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item touched
+     * @param {Number} index The index of the item touched
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemtouchmove
+     * Fires whenever an item is moved
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item moved
+     * @param {Number} index The index of the item moved
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemtouchend
+     * Fires whenever an item is touched
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item touched
+     * @param {Number} index The index of the item touched
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemtap
+     * Fires whenever an item is tapped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item tapped
+     * @param {Number} index The index of the item tapped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemtaphold
+     * Fires whenever an item is tapped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item tapped
+     * @param {Number} index The index of the item tapped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemsingletap
+     * Fires whenever an item is doubletapped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item singletapped
+     * @param {Number} index The index of the item singletapped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemdoubletap
+     * Fires whenever an item is doubletapped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item doubletapped
+     * @param {Number} index The index of the item doubletapped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    /**
+     * @event itemswipe
+     * Fires whenever an item is swiped
+     * @param {Ext.dataview.element.Container} this
+     * @param {Ext.dataview.component.DataItem} item The item swiped
+     * @param {Number} index The index of the item swiped
+     * @param {Ext.EventObject} e The event object
+     */
+
+    doInitialize: function() {
+        this.element.on({
+            touchstart: 'onItemTouchStart',
+            touchend: 'onItemTouchEnd',
+            tap: 'onItemTap',
+            taphold: 'onItemTapHold',
+            touchmove: 'onItemTouchMove',
+            singletap: 'onItemSingleTap',
+            doubletap: 'onItemDoubleTap',
+            swipe: 'onItemSwipe',
+            delegate: '> div',
+            scope: this
+        });
+    },
+
+    //@private
+    initialize: function() {
+        this.callParent();
+        this.doInitialize();
+    },
+
+    updateBaseCls: function(newBaseCls, oldBaseCls) {
+        var me = this;
+
+        me.callParent([newBaseCls + '-container', oldBaseCls]);
+    },
+
+    onItemTouchStart: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        Ext.get(target).on({
+            touchmove: 'onItemTouchMove',
+            scope   : me,
+            single: true
+        });
+
+        me.fireEvent('itemtouchstart', me, Ext.get(target), index, e);
+    },
+
+    onItemTouchEnd: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        Ext.get(target).un({
+            touchmove: 'onItemTouchMove',
+            scope   : me
+        });
+
+        me.fireEvent('itemtouchend', me, Ext.get(target), index, e);
+    },
+
+    onItemTouchMove: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemtouchmove', me, Ext.get(target), index, e);
+    },
+
+    onItemTap: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemtap', me, Ext.get(target), index, e);
+    },
+
+    onItemTapHold: function(e) {
+        var me     = this,
+            target = e.getTarget(),
+            index  = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemtaphold', me, Ext.get(target), index, e);
+    },
+
+    onItemDoubleTap: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemdoubletap', me, Ext.get(target), index, e);
+    },
+
+    onItemSingleTap: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemsingletap', me, Ext.get(target), index, e);
+    },
+
+    onItemSwipe: function(e) {
+        var me = this,
+            target = e.getTarget(),
+            index = me.getViewItems().indexOf(target);
+
+        me.fireEvent('itemswipe', me,  Ext.get(target), index, e);
+    },
+
+    updateListItem: function(record, item) {
+        var me = this,
+            dataview = me.dataview,
+            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record);
+        item.innerHTML = me.dataview.getItemTpl().apply(data);
+    },
+
+    addListItem: function(index, record) {
+        var me = this,
+            dataview = me.dataview,
+            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record),
+            element = me.element,
+            childNodes = element.dom.childNodes,
+            ln = childNodes.length,
+            wrapElement;
+
+        wrapElement = Ext.Element.create(this.getItemElementConfig(index, data));
+
+        if (!ln || index == ln) {
+            wrapElement.appendTo(element);
+        } else {
+            wrapElement.insertBefore(childNodes[index]);
+        }
+    },
+
+    getItemElementConfig: function(index, data) {
+        var dataview = this.dataview,
+            itemCls = dataview.getItemCls(),
+            cls = dataview.getBaseCls() + '-item';
+
+        if (itemCls) {
+            cls += ' ' + itemCls;
+        }
+        return {
+            cls: cls,
+            html: dataview.getItemTpl().apply(data)
+        };
+    },
+
+    doRemoveItemCls: function(cls) {
+        var elements = this.getViewItems(),
+            ln = elements.length,
+            i = 0;
+
+        for (; i < ln; i++) {
+            Ext.fly(elements[i]).removeCls(cls);
+        }
+    },
+
+    doAddItemCls: function(cls) {
+        var elements = this.getViewItems(),
+            ln = elements.length,
+            i = 0;
+
+        for (; i < ln; i++) {
+            Ext.fly(elements[i]).addCls(cls);
+        }
+    },
+
+    // Remove
+    moveItemsToCache: function(from, to) {
+        var me = this,
+            items = me.getViewItems(),
+            i = to - from,
+            item;
+
+        for (; i >= 0; i--) {
+            item = items[from + i];
+            item.parentNode.removeChild(item);
+        }
+        if (me.getViewItems().length == 0) {
+            this.dataview.showEmptyText();
+        }
+    },
+
+    // Add
+    moveItemsFromCache: function(records) {
+        var me = this,
+            dataview = me.dataview,
+            store = dataview.getStore(),
+            ln = records.length,
+            i, record;
+
+        if (ln) {
+            dataview.hideEmptyText();
+        }
+
+        for (i = 0; i < ln; i++) {
+            records[i]._tmpIndex = store.indexOf(records[i]);
+        }
+
+        Ext.Array.sort(records, function(record1, record2) {
+            return record1._tmpIndex > record2._tmpIndex ? 1 : -1;
+        });
+
+        for (i = 0; i < ln; i++) {
+            record = records[i];
+            me.addListItem(record._tmpIndex, record);
+            delete record._tmpIndex;
+        }
+    },
+
+    // Transform ChildNodes into a proper Array so we can do indexOf...
+    getViewItems: function() {
+        return Array.prototype.slice.call(this.element.dom.childNodes);
+    },
+
+    destroy: function() {
+        var elements = this.getViewItems(),
+            ln = elements.length,
+            i = 0;
+
+        for (; i < ln; i++) {
+            Ext.removeNode(elements[i]);
+        }
+        this.callParent();
+    }
+});
+
+/**
  * Tracks what records are currently selected in a databound widget. This class is mixed in to {@link Ext.dataview.DataView} and
  * all subclasses.
  * @private
@@ -33574,413 +33897,327 @@ Ext.define('Ext.mixin.Selectable', {
 });
 
 /**
- * @private
+Represents a collection of a set of key and value pairs. Each key in the HashMap must be unique, the same
+key cannot exist twice. Access to items is provided via the key only. Sample usage:
+
+    var map = Ext.create('Ext.util.HashMap');
+    map.add('key1', 1);
+    map.add('key2', 2);
+    map.add('key3', 3);
+
+    map.each(function(key, value, length){
+        console.log(key, value, length);
+    });
+
+The HashMap is an unordered class, there is no guarantee when iterating over the items that they will be in
+any particular order. If this is required, then use a {@link Ext.util.MixedCollection}.
+
  */
-Ext.define('Ext.dataview.element.Container', {
-    extend: 'Ext.Component',
+Ext.define('Ext.util.HashMap', {
+    mixins: {
+        observable: 'Ext.mixin.Observable'
+    },
 
     /**
-     * @event itemtouchstart
-     * Fires whenever an item is touched
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item touched
-     * @param {Number} index The index of the item touched
-     * @param {Ext.EventObject} e The event object
+     * @cfg {Function} keyFn
+     * A function that is used to retrieve a default key for a passed object.
+     * A default is provided that returns the **id** property on the object.
+     * This function is only used if the add method is called with a single argument.
      */
 
     /**
-     * @event itemtouchmove
-     * Fires whenever an item is moved
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item moved
-     * @param {Number} index The index of the item moved
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemtouchend
-     * Fires whenever an item is touched
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item touched
-     * @param {Number} index The index of the item touched
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemtap
-     * Fires whenever an item is tapped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item tapped
-     * @param {Number} index The index of the item tapped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemtaphold
-     * Fires whenever an item is tapped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item tapped
-     * @param {Number} index The index of the item tapped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemsingletap
-     * Fires whenever an item is doubletapped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item singletapped
-     * @param {Number} index The index of the item singletapped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemdoubletap
-     * Fires whenever an item is doubletapped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item doubletapped
-     * @param {Number} index The index of the item doubletapped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    /**
-     * @event itemswipe
-     * Fires whenever an item is swiped
-     * @param {Ext.dataview.element.Container} this
-     * @param {Ext.dataview.component.DataItem} item The item swiped
-     * @param {Number} index The index of the item swiped
-     * @param {Ext.EventObject} e The event object
-     */
-
-    doInitialize: function() {
-        this.element.on({
-            touchstart: 'onItemTouchStart',
-            touchend: 'onItemTouchEnd',
-            tap: 'onItemTap',
-            taphold: 'onItemTapHold',
-            touchmove: 'onItemTouchMove',
-            singletap: 'onItemSingleTap',
-            doubletap: 'onItemDoubleTap',
-            swipe: 'onItemSwipe',
-            delegate: '> div',
-            scope: this
-        });
-    },
-
-    //@private
-    initialize: function() {
-        this.callParent();
-        this.doInitialize();
-    },
-
-    updateBaseCls: function(newBaseCls, oldBaseCls) {
-        var me = this;
-
-        me.callParent([newBaseCls + '-container', oldBaseCls]);
-    },
-
-    onItemTouchStart: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        Ext.get(target).on({
-            touchmove: 'onItemTouchMove',
-            scope   : me,
-            single: true
-        });
-
-        me.fireEvent('itemtouchstart', me, Ext.get(target), index, e);
-    },
-
-    onItemTouchEnd: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        Ext.get(target).un({
-            touchmove: 'onItemTouchMove',
-            scope   : me
-        });
-
-        me.fireEvent('itemtouchend', me, Ext.get(target), index, e);
-    },
-
-    onItemTouchMove: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemtouchmove', me, Ext.get(target), index, e);
-    },
-
-    onItemTap: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemtap', me, Ext.get(target), index, e);
-    },
-
-    onItemTapHold: function(e) {
-        var me     = this,
-            target = e.getTarget(),
-            index  = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemtaphold', me, Ext.get(target), index, e);
-    },
-
-    onItemDoubleTap: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemdoubletap', me, Ext.get(target), index, e);
-    },
-
-    onItemSingleTap: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemsingletap', me, Ext.get(target), index, e);
-    },
-
-    onItemSwipe: function(e) {
-        var me = this,
-            target = e.getTarget(),
-            index = me.getViewItems().indexOf(target);
-
-        me.fireEvent('itemswipe', me,  Ext.get(target), index, e);
-    },
-
-    updateListItem: function(record, item) {
-        var me = this,
-            dataview = me.dataview,
-            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record);
-        item.innerHTML = me.dataview.getItemTpl().apply(data);
-    },
-
-    addListItem: function(index, record) {
-        var me = this,
-            dataview = me.dataview,
-            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record),
-            element = me.element,
-            childNodes = element.dom.childNodes,
-            ln = childNodes.length,
-            wrapElement;
-
-        wrapElement = Ext.Element.create(this.getItemElementConfig(index, data));
-
-        if (!ln || index == ln) {
-            wrapElement.appendTo(element);
-        } else {
-            wrapElement.insertBefore(childNodes[index]);
-        }
-    },
-
-    getItemElementConfig: function(index, data) {
-        var dataview = this.dataview,
-            itemCls = dataview.getItemCls(),
-            cls = dataview.getBaseCls() + '-item';
-
-        if (itemCls) {
-            cls += ' ' + itemCls;
-        }
-        return {
-            cls: cls,
-            html: dataview.getItemTpl().apply(data)
-        };
-    },
-
-    doRemoveItemCls: function(cls) {
-        var elements = this.getViewItems(),
-            ln = elements.length,
-            i = 0;
-
-        for (; i < ln; i++) {
-            Ext.fly(elements[i]).removeCls(cls);
-        }
-    },
-
-    doAddItemCls: function(cls) {
-        var elements = this.getViewItems(),
-            ln = elements.length,
-            i = 0;
-
-        for (; i < ln; i++) {
-            Ext.fly(elements[i]).addCls(cls);
-        }
-    },
-
-    // Remove
-    moveItemsToCache: function(from, to) {
-        var me = this,
-            items = me.getViewItems(),
-            i = to - from,
-            item;
-
-        for (; i >= 0; i--) {
-            item = items[from + i];
-            item.parentNode.removeChild(item);
-        }
-        if (me.getViewItems().length == 0) {
-            this.dataview.showEmptyText();
-        }
-    },
-
-    // Add
-    moveItemsFromCache: function(records) {
-        var me = this,
-            dataview = me.dataview,
-            store = dataview.getStore(),
-            ln = records.length,
-            i, record;
-
-        if (ln) {
-            dataview.hideEmptyText();
-        }
-
-        for (i = 0; i < ln; i++) {
-            records[i]._tmpIndex = store.indexOf(records[i]);
-        }
-
-        Ext.Array.sort(records, function(record1, record2) {
-            return record1._tmpIndex > record2._tmpIndex ? 1 : -1;
-        });
-
-        for (i = 0; i < ln; i++) {
-            record = records[i];
-            me.addListItem(record._tmpIndex, record);
-            delete record._tmpIndex;
-        }
-    },
-
-    // Transform ChildNodes into a proper Array so we can do indexOf...
-    getViewItems: function() {
-        return Array.prototype.slice.call(this.element.dom.childNodes);
-    },
-
-    destroy: function() {
-        var elements = this.getViewItems(),
-            ln = elements.length,
-            i = 0;
-
-        for (; i < ln; i++) {
-            Ext.removeNode(elements[i]);
-        }
-        this.callParent();
-    }
-});
-
-/**
- * @author Ed Spencer
- *
- * Simple class that represents a Request that will be made by any {@link Ext.data.proxy.Server} subclass.
- * All this class does is standardize the representation of a Request as used by any ServerProxy subclass,
- * it does not contain any actual logic or perform the request itself.
- */
-Ext.define('Ext.data.Request', {
-    config: {
-        /**
-         * @cfg {String} action
-         * The name of the action this Request represents. Usually one of 'create', 'read', 'update' or 'destroy'.
-         */
-        action: null,
-
-        /**
-         * @cfg {Object} params
-         * HTTP request params. The Proxy and its Writer have access to and can modify this object.
-         */
-        params: null,
-
-        /**
-         * @cfg {String} method
-         * The HTTP method to use on this Request. Should be one of 'GET', 'POST', 'PUT' or 'DELETE'.
-         */
-        method: 'GET',
-
-        /**
-         * @cfg {String} url
-         * The url to access on this Request.
-         */
-        url: null,
-
-        /**
-         * @cfg {Ext.data.Operation} operation
-         * The operation this request belongs to.
-         */
-        operation: null,
-
-        /**
-         * @cfg {Ext.data.proxy.Proxy} proxy
-         * The proxy this request belongs to.
-         */
-        proxy: null,
-
-        /**
-         * @cfg {Boolean} disableCaching
-         * Wether or not to disable caching for this request.
-         * Defaults to false.
-         */
-        disableCaching: false,
-
-        /**
-         * @cfg {Object} headers
-         * Some requests (like XMLHttpRequests) want to send additional server headers.
-         * This configuration can be set for those types of requests.
-         */
-        headers: {},
-
-        /**
-         * @cfg {String} callbackKey
-         * Some requests (like JsonP) want to send an additional key that contains
-         * the name of the callback function.
-         */
-        callbackKey: null,
-
-        /**
-         * @cfg {Ext.data.JsonP} jsonp
-         * JsonP requests return a handle that might be useful in the callback function.
-         */
-        jsonP: null,
-
-        /**
-         * @cfg {Object} jsonData
-         * This is used by some write actions to attach data to the request without encoding it
-         * as a parameter.
-         */
-        jsonData: null,
-
-        /**
-         * @cfg {Object} xmlData
-         * This is used by some write actions to attach data to the request without encoding it
-         * as a parameter, but instead sending it as XML.
-         */
-        xmlData: null,
-
-        /**
-         * @cfg {Boolean} withCredentials
-         * This field is necessary when using cross-origin resource sharing.
-         */
-        withCredentials: null,
-
-        callback: null,
-        scope: null,
-        timeout: 30000,
-        records: null,
-
-        // The following two configurations are only used by Ext.data.proxy.Direct and are just
-        // for being able to retrieve them after the request comes back from the server.
-        directFn: null,
-        args: null
-    },
-
-    /**
-     * Creates the Request object.
-     * @param {Object} [config] Config object.
+     * Creates new HashMap.
+     * @param {Object} config The configuration options
      */
     constructor: function(config) {
-        this.initConfig(config);
+        /**
+         * @event add
+         * Fires when a new item is added to the hash
+         * @param {Ext.util.HashMap} this.
+         * @param {String} key The key of the added item.
+         * @param {Object} value The value of the added item.
+         */
+        /**
+         * @event clear
+         * Fires when the hash is cleared.
+         * @param {Ext.util.HashMap} this.
+         */
+        /**
+         * @event remove
+         * Fires when an item is removed from the hash.
+         * @param {Ext.util.HashMap} this.
+         * @param {String} key The key of the removed item.
+         * @param {Object} value The value of the removed item.
+         */
+        /**
+         * @event replace
+         * Fires when an item is replaced in the hash.
+         * @param {Ext.util.HashMap} this.
+         * @param {String} key The key of the replaced item.
+         * @param {Object} value The new value for the item.
+         * @param {Object} old The old value for the item.
+         */
+
+        this.callParent();
+
+        this.mixins.observable.constructor.call(this);
+
+        this.clear(true);
+    },
+
+    /**
+     * Gets the number of items in the hash.
+     * @return {Number} The number of items in the hash.
+     */
+    getCount: function() {
+        return this.length;
+    },
+
+    /**
+     * Implementation for being able to extract the key from an object if only
+     * a single argument is passed.
+     * @private
+     * @param {String} key The key
+     * @param {Object} value The value
+     * @return {Array} [key, value]
+     */
+    getData: function(key, value) {
+        // if we have no value, it means we need to get the key from the object
+        if (value === undefined) {
+            value = key;
+            key = this.getKey(value);
+        }
+
+        return [key, value];
+    },
+
+    /**
+     * Extracts the key from an object. This is a default implementation, it may be overridden
+     * @private
+     * @param {Object} o The object to get the key from
+     * @return {String} The key to use.
+     */
+    getKey: function(o) {
+        return o.id;
+    },
+
+    /**
+     * Add a new item to the hash. An exception will be thrown if the key already exists.
+     * @param {String} key The key of the new item.
+     * @param {Object} value The value of the new item.
+     * @return {Object} The value of the new item added.
+     */
+    add: function(key, value) {
+        var me = this,
+            data;
+
+        if (me.containsKey(key)) {
+            throw new Error('This key already exists in the HashMap');
+        }
+
+        data = this.getData(key, value);
+        key = data[0];
+        value = data[1];
+        me.map[key] = value;
+        ++me.length;
+        me.fireEvent('add', me, key, value);
+        return value;
+    },
+
+    /**
+     * Replaces an item in the hash. If the key doesn't exist, the
+     * {@link #method-add} method will be used.
+     * @param {String} key The key of the item.
+     * @param {Object} value The new value for the item.
+     * @return {Object} The new value of the item.
+     */
+    replace: function(key, value) {
+        var me = this,
+            map = me.map,
+            old;
+
+        if (!me.containsKey(key)) {
+            me.add(key, value);
+        }
+        old = map[key];
+        map[key] = value;
+        me.fireEvent('replace', me, key, value, old);
+        return value;
+    },
+
+    /**
+     * Remove an item from the hash.
+     * @param {Object} o The value of the item to remove.
+     * @return {Boolean} True if the item was successfully removed.
+     */
+    remove: function(o) {
+        var key = this.findKey(o);
+        if (key !== undefined) {
+            return this.removeByKey(key);
+        }
+        return false;
+    },
+
+    /**
+     * Remove an item from the hash.
+     * @param {String} key The key to remove.
+     * @return {Boolean} True if the item was successfully removed.
+     */
+    removeByKey: function(key) {
+        var me = this,
+            value;
+
+        if (me.containsKey(key)) {
+            value = me.map[key];
+            delete me.map[key];
+            --me.length;
+            me.fireEvent('remove', me, key, value);
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * Retrieves an item with a particular key.
+     * @param {String} key The key to lookup.
+     * @return {Object} The value at that key. If it doesn't exist, <tt>undefined</tt> is returned.
+     */
+    get: function(key) {
+        return this.map[key];
+    },
+
+    /**
+     * Removes all items from the hash.
+     * @return {Ext.util.HashMap} this
+     */
+    clear: function(/* private */ initial) {
+        var me = this;
+        me.map = {};
+        me.length = 0;
+        if (initial !== true) {
+            me.fireEvent('clear', me);
+        }
+        return me;
+    },
+
+    /**
+     * Checks whether a key exists in the hash.
+     * @param {String} key The key to check for.
+     * @return {Boolean} True if they key exists in the hash.
+     */
+    containsKey: function(key) {
+        return this.map[key] !== undefined;
+    },
+
+    /**
+     * Checks whether a value exists in the hash.
+     * @param {Object} value The value to check for.
+     * @return {Boolean} True if the value exists in the dictionary.
+     */
+    contains: function(value) {
+        return this.containsKey(this.findKey(value));
+    },
+
+    /**
+     * Return all of the keys in the hash.
+     * @return {Array} An array of keys.
+     */
+    getKeys: function() {
+        return this.getArray(true);
+    },
+
+    /**
+     * Return all of the values in the hash.
+     * @return {Array} An array of values.
+     */
+    getValues: function() {
+        return this.getArray(false);
+    },
+
+    /**
+     * Gets either the keys/values in an array from the hash.
+     * @private
+     * @param {Boolean} isKey True to extract the keys, otherwise, the value
+     * @return {Array} An array of either keys/values from the hash.
+     */
+    getArray: function(isKey) {
+        var arr = [],
+            key,
+            map = this.map;
+        for (key in map) {
+            if (map.hasOwnProperty(key)) {
+                arr.push(isKey ? key : map[key]);
+            }
+        }
+        return arr;
+    },
+
+    /**
+     * Executes the specified function once for each item in the hash.
+     * Returning false from the function will cease iteration.
+     *
+     * The paramaters passed to the function are:
+     * <div class="mdetail-params"><ul>
+     * <li><b>key</b> : String<p class="sub-desc">The key of the item</p></li>
+     * <li><b>value</b> : Number<p class="sub-desc">The value of the item</p></li>
+     * <li><b>length</b> : Number<p class="sub-desc">The total number of items in the hash</p></li>
+     * </ul></div>
+     * @param {Function} fn The function to execute.
+     * @param {Object} scope The scope to execute in. Defaults to <tt>this</tt>.
+     * @return {Ext.util.HashMap} this
+     */
+    each: function(fn, scope) {
+        // copy items so they may be removed during iteration.
+        var items = Ext.apply({}, this.map),
+            key,
+            length = this.length;
+
+        scope = scope || this;
+        for (key in items) {
+            if (items.hasOwnProperty(key)) {
+                if (fn.call(scope, key, items[key], length) === false) {
+                    break;
+                }
+            }
+        }
+        return this;
+    },
+
+    /**
+     * Performs a shallow copy on this hash.
+     * @return {Ext.util.HashMap} The new hash object.
+     */
+    clone: function() {
+        var hash = new Ext.util.HashMap(),
+            map = this.map,
+            key;
+
+        hash.suspendEvents();
+        for (key in map) {
+            if (map.hasOwnProperty(key)) {
+                hash.add(key, map[key]);
+            }
+        }
+        hash.resumeEvents();
+        return hash;
+    },
+
+    /**
+     * @private
+     * Find the key for a value.
+     * @param {Object} value The value to find.
+     * @return {Object} The value of the item. Returns <tt>undefined</tt> if not found.
+     */
+    findKey: function(value) {
+        var key,
+            map = this.map;
+
+        for (key in map) {
+            if (map.hasOwnProperty(key) && map[key] === value) {
+                return key;
+            }
+        }
+        return undefined;
     }
 });
 /**
@@ -34881,327 +35118,114 @@ Ext.define('Ext.data.Connection', {
 });
 
 /**
-Represents a collection of a set of key and value pairs. Each key in the HashMap must be unique, the same
-key cannot exist twice. Access to items is provided via the key only. Sample usage:
-
-    var map = Ext.create('Ext.util.HashMap');
-    map.add('key1', 1);
-    map.add('key2', 2);
-    map.add('key3', 3);
-
-    map.each(function(key, value, length){
-        console.log(key, value, length);
-    });
-
-The HashMap is an unordered class, there is no guarantee when iterating over the items that they will be in
-any particular order. If this is required, then use a {@link Ext.util.MixedCollection}.
-
+ * @author Ed Spencer
+ *
+ * Simple class that represents a Request that will be made by any {@link Ext.data.proxy.Server} subclass.
+ * All this class does is standardize the representation of a Request as used by any ServerProxy subclass,
+ * it does not contain any actual logic or perform the request itself.
  */
-Ext.define('Ext.util.HashMap', {
-    mixins: {
-        observable: 'Ext.mixin.Observable'
+Ext.define('Ext.data.Request', {
+    config: {
+        /**
+         * @cfg {String} action
+         * The name of the action this Request represents. Usually one of 'create', 'read', 'update' or 'destroy'.
+         */
+        action: null,
+
+        /**
+         * @cfg {Object} params
+         * HTTP request params. The Proxy and its Writer have access to and can modify this object.
+         */
+        params: null,
+
+        /**
+         * @cfg {String} method
+         * The HTTP method to use on this Request. Should be one of 'GET', 'POST', 'PUT' or 'DELETE'.
+         */
+        method: 'GET',
+
+        /**
+         * @cfg {String} url
+         * The url to access on this Request.
+         */
+        url: null,
+
+        /**
+         * @cfg {Ext.data.Operation} operation
+         * The operation this request belongs to.
+         */
+        operation: null,
+
+        /**
+         * @cfg {Ext.data.proxy.Proxy} proxy
+         * The proxy this request belongs to.
+         */
+        proxy: null,
+
+        /**
+         * @cfg {Boolean} disableCaching
+         * Wether or not to disable caching for this request.
+         * Defaults to false.
+         */
+        disableCaching: false,
+
+        /**
+         * @cfg {Object} headers
+         * Some requests (like XMLHttpRequests) want to send additional server headers.
+         * This configuration can be set for those types of requests.
+         */
+        headers: {},
+
+        /**
+         * @cfg {String} callbackKey
+         * Some requests (like JsonP) want to send an additional key that contains
+         * the name of the callback function.
+         */
+        callbackKey: null,
+
+        /**
+         * @cfg {Ext.data.JsonP} jsonp
+         * JsonP requests return a handle that might be useful in the callback function.
+         */
+        jsonP: null,
+
+        /**
+         * @cfg {Object} jsonData
+         * This is used by some write actions to attach data to the request without encoding it
+         * as a parameter.
+         */
+        jsonData: null,
+
+        /**
+         * @cfg {Object} xmlData
+         * This is used by some write actions to attach data to the request without encoding it
+         * as a parameter, but instead sending it as XML.
+         */
+        xmlData: null,
+
+        /**
+         * @cfg {Boolean} withCredentials
+         * This field is necessary when using cross-origin resource sharing.
+         */
+        withCredentials: null,
+
+        callback: null,
+        scope: null,
+        timeout: 30000,
+        records: null,
+
+        // The following two configurations are only used by Ext.data.proxy.Direct and are just
+        // for being able to retrieve them after the request comes back from the server.
+        directFn: null,
+        args: null
     },
 
     /**
-     * @cfg {Function} keyFn
-     * A function that is used to retrieve a default key for a passed object.
-     * A default is provided that returns the **id** property on the object.
-     * This function is only used if the add method is called with a single argument.
-     */
-
-    /**
-     * Creates new HashMap.
-     * @param {Object} config The configuration options
+     * Creates the Request object.
+     * @param {Object} [config] Config object.
      */
     constructor: function(config) {
-        /**
-         * @event add
-         * Fires when a new item is added to the hash
-         * @param {Ext.util.HashMap} this.
-         * @param {String} key The key of the added item.
-         * @param {Object} value The value of the added item.
-         */
-        /**
-         * @event clear
-         * Fires when the hash is cleared.
-         * @param {Ext.util.HashMap} this.
-         */
-        /**
-         * @event remove
-         * Fires when an item is removed from the hash.
-         * @param {Ext.util.HashMap} this.
-         * @param {String} key The key of the removed item.
-         * @param {Object} value The value of the removed item.
-         */
-        /**
-         * @event replace
-         * Fires when an item is replaced in the hash.
-         * @param {Ext.util.HashMap} this.
-         * @param {String} key The key of the replaced item.
-         * @param {Object} value The new value for the item.
-         * @param {Object} old The old value for the item.
-         */
-
-        this.callParent();
-
-        this.mixins.observable.constructor.call(this);
-
-        this.clear(true);
-    },
-
-    /**
-     * Gets the number of items in the hash.
-     * @return {Number} The number of items in the hash.
-     */
-    getCount: function() {
-        return this.length;
-    },
-
-    /**
-     * Implementation for being able to extract the key from an object if only
-     * a single argument is passed.
-     * @private
-     * @param {String} key The key
-     * @param {Object} value The value
-     * @return {Array} [key, value]
-     */
-    getData: function(key, value) {
-        // if we have no value, it means we need to get the key from the object
-        if (value === undefined) {
-            value = key;
-            key = this.getKey(value);
-        }
-
-        return [key, value];
-    },
-
-    /**
-     * Extracts the key from an object. This is a default implementation, it may be overridden
-     * @private
-     * @param {Object} o The object to get the key from
-     * @return {String} The key to use.
-     */
-    getKey: function(o) {
-        return o.id;
-    },
-
-    /**
-     * Add a new item to the hash. An exception will be thrown if the key already exists.
-     * @param {String} key The key of the new item.
-     * @param {Object} value The value of the new item.
-     * @return {Object} The value of the new item added.
-     */
-    add: function(key, value) {
-        var me = this,
-            data;
-
-        if (me.containsKey(key)) {
-            throw new Error('This key already exists in the HashMap');
-        }
-
-        data = this.getData(key, value);
-        key = data[0];
-        value = data[1];
-        me.map[key] = value;
-        ++me.length;
-        me.fireEvent('add', me, key, value);
-        return value;
-    },
-
-    /**
-     * Replaces an item in the hash. If the key doesn't exist, the
-     * {@link #method-add} method will be used.
-     * @param {String} key The key of the item.
-     * @param {Object} value The new value for the item.
-     * @return {Object} The new value of the item.
-     */
-    replace: function(key, value) {
-        var me = this,
-            map = me.map,
-            old;
-
-        if (!me.containsKey(key)) {
-            me.add(key, value);
-        }
-        old = map[key];
-        map[key] = value;
-        me.fireEvent('replace', me, key, value, old);
-        return value;
-    },
-
-    /**
-     * Remove an item from the hash.
-     * @param {Object} o The value of the item to remove.
-     * @return {Boolean} True if the item was successfully removed.
-     */
-    remove: function(o) {
-        var key = this.findKey(o);
-        if (key !== undefined) {
-            return this.removeByKey(key);
-        }
-        return false;
-    },
-
-    /**
-     * Remove an item from the hash.
-     * @param {String} key The key to remove.
-     * @return {Boolean} True if the item was successfully removed.
-     */
-    removeByKey: function(key) {
-        var me = this,
-            value;
-
-        if (me.containsKey(key)) {
-            value = me.map[key];
-            delete me.map[key];
-            --me.length;
-            me.fireEvent('remove', me, key, value);
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Retrieves an item with a particular key.
-     * @param {String} key The key to lookup.
-     * @return {Object} The value at that key. If it doesn't exist, <tt>undefined</tt> is returned.
-     */
-    get: function(key) {
-        return this.map[key];
-    },
-
-    /**
-     * Removes all items from the hash.
-     * @return {Ext.util.HashMap} this
-     */
-    clear: function(/* private */ initial) {
-        var me = this;
-        me.map = {};
-        me.length = 0;
-        if (initial !== true) {
-            me.fireEvent('clear', me);
-        }
-        return me;
-    },
-
-    /**
-     * Checks whether a key exists in the hash.
-     * @param {String} key The key to check for.
-     * @return {Boolean} True if they key exists in the hash.
-     */
-    containsKey: function(key) {
-        return this.map[key] !== undefined;
-    },
-
-    /**
-     * Checks whether a value exists in the hash.
-     * @param {Object} value The value to check for.
-     * @return {Boolean} True if the value exists in the dictionary.
-     */
-    contains: function(value) {
-        return this.containsKey(this.findKey(value));
-    },
-
-    /**
-     * Return all of the keys in the hash.
-     * @return {Array} An array of keys.
-     */
-    getKeys: function() {
-        return this.getArray(true);
-    },
-
-    /**
-     * Return all of the values in the hash.
-     * @return {Array} An array of values.
-     */
-    getValues: function() {
-        return this.getArray(false);
-    },
-
-    /**
-     * Gets either the keys/values in an array from the hash.
-     * @private
-     * @param {Boolean} isKey True to extract the keys, otherwise, the value
-     * @return {Array} An array of either keys/values from the hash.
-     */
-    getArray: function(isKey) {
-        var arr = [],
-            key,
-            map = this.map;
-        for (key in map) {
-            if (map.hasOwnProperty(key)) {
-                arr.push(isKey ? key : map[key]);
-            }
-        }
-        return arr;
-    },
-
-    /**
-     * Executes the specified function once for each item in the hash.
-     * Returning false from the function will cease iteration.
-     *
-     * The paramaters passed to the function are:
-     * <div class="mdetail-params"><ul>
-     * <li><b>key</b> : String<p class="sub-desc">The key of the item</p></li>
-     * <li><b>value</b> : Number<p class="sub-desc">The value of the item</p></li>
-     * <li><b>length</b> : Number<p class="sub-desc">The total number of items in the hash</p></li>
-     * </ul></div>
-     * @param {Function} fn The function to execute.
-     * @param {Object} scope The scope to execute in. Defaults to <tt>this</tt>.
-     * @return {Ext.util.HashMap} this
-     */
-    each: function(fn, scope) {
-        // copy items so they may be removed during iteration.
-        var items = Ext.apply({}, this.map),
-            key,
-            length = this.length;
-
-        scope = scope || this;
-        for (key in items) {
-            if (items.hasOwnProperty(key)) {
-                if (fn.call(scope, key, items[key], length) === false) {
-                    break;
-                }
-            }
-        }
-        return this;
-    },
-
-    /**
-     * Performs a shallow copy on this hash.
-     * @return {Ext.util.HashMap} The new hash object.
-     */
-    clone: function() {
-        var hash = new Ext.util.HashMap(),
-            map = this.map,
-            key;
-
-        hash.suspendEvents();
-        for (key in map) {
-            if (map.hasOwnProperty(key)) {
-                hash.add(key, map[key]);
-            }
-        }
-        hash.resumeEvents();
-        return hash;
-    },
-
-    /**
-     * @private
-     * Find the key for a value.
-     * @param {Object} value The value to find.
-     * @return {Object} The value of the item. Returns <tt>undefined</tt> if not found.
-     */
-    findKey: function(value) {
-        var key,
-            map = this.map;
-
-        for (key in map) {
-            if (map.hasOwnProperty(key) && map[key] === value) {
-                return key;
-            }
-        }
-        return undefined;
+        this.initConfig(config);
     }
 });
 /**
@@ -36190,7 +36214,6 @@ Ext.define('Ext.navigation.View', {
 Ext.define("App.view.Homepage", {
     extend: 'Ext.navigation.View',
     xtype: 'homepage',
-    //alias: "widget.Home",
     requires: [
         'Ext.TitleBar'
     ],
@@ -36199,21 +36222,20 @@ Ext.define("App.view.Homepage", {
         scrollable: true,
         items: [
             {
-                // styleHtmlContent: true,
                 title: 'Rica Nidelven',
                 maxWidth: 750,
                 xtype: 'dataview',
                 itemTpl: [
                     '<div class="textBlock">',
-                    '<div class="header">{content1}</div>',
-                    '<div class="contentText">{content2}</div>',
-                    '<div class="contentText">{content3}</div>',
-                    '<div class="footer">{content4}</div></div>'
+                    '<div class="header">{item1}</div>',
+                    '<div class="contentText">{item2}</div>',
+                    '<div class="contentText">{item3}</div>',
+                    '<div class="footer">{item4}</div></div>'
                 ],
 
                 store: {
                     autoLoad: true,
-                    fields: ['content1', 'content2', 'content3', 'content4'],
+                    fields: ['item1', 'item2', 'item3', 'item4'],
                     proxy: {
                         type: 'ajax',
                         url: 'resources/data/hotel.json',
@@ -36225,7 +36247,6 @@ Ext.define("App.view.Homepage", {
                 }
             }
         ]
-
     }
 
 });
@@ -36239,29 +36260,70 @@ Ext.define("App.view.Info", {
 
     config: {
         scrollable: true,
-        
         items: [
             {
-                styleHtmlContent: true,
                 title: 'XP2010',
                 maxWidth: 750,
                 xtype: 'dataview',
-                ui: 'light',
+                //ui: 'light',
                 itemTpl: [
                     '<div class="textBlock">',
-                    '<div class="header">{header}</div>',
-                    '<div class="contentText">{ingress}</div>',
-                    '<div class="contentText">{content1}</div></div>',
-                    '<input type="button" class="buttonWide" onClick="showPopupMap(\'{map}\', \'{mapHeader}\');" value="{mapHeader}" />',
-                    '<div class="footer">{footer}</div>'
+                    '<div class="header">{item1}</div>',
+                    '<div class="contentText">{item2}</div>',
+                    '<div class="contentText">{item3}</div></div>',
+                    '<input type="button" class="buttonWide" onClick="showPopupMap(\'{item5}\', \'{item4}\');" value="{item4}" />',
                 ],
 
                 store: {
                     autoLoad: true,
-                    fields: ['header', 'ingress', 'content1', 'mapHeader', 'map', 'footer'],
+                    fields: ['item0', 'item1', 'item2', 'item3', 'item4', 'item5'],
                     proxy: {
                         type: 'ajax',
                         url: 'resources/data/info.json',
+                        reader: {
+                            type: 'json',
+                            rootProperty: 'responseData.feed.entries'
+                    }
+                }
+            }
+        }]
+    }
+    
+});
+
+function showPopupMap(image, title){
+    showPopup(image, title);
+}
+
+Ext.define("App.view.Travel", {
+    extend: 'Ext.navigation.View',
+    xtype: 'travel',
+    requires: [
+        'Ext.TitleBar'
+    ],
+
+    config: {
+        scrollable: true,
+        items: [
+            {
+                title: 'Reiseinfo',
+                maxWidth: 750,
+                xtype: 'dataview',
+                //ui: 'light',
+                itemTpl: [
+                    '<div class="textBlock">',
+                    '<div class="header">{item1}</div>',
+                    '<div class="contentText">{item2}</div></div>',
+                    '<input type="button" class="buttonWide" onClick="showPopupMap(\'{item4}\', \'{item3}\');" value="{item3}" />',
+                    '</div>'
+                ],
+
+                store: {
+                    autoLoad: true,
+                    fields: ['item1', 'item2', 'item3', 'item4'],
+                    proxy: {
+                        type: 'ajax',
+                        url: 'resources/data/travel.json',
                         reader: {
                             type: 'json',
                             rootProperty: 'responseData.feed.entries'
@@ -37879,12 +37941,28 @@ Ext.define("App.view.Main", {
             },
 
             {
+                id: 'travel',
+                title: 'Reiseinfo',
+                iconCls: 'search',
+                listeners: {
+                    activate : function() {
+                        setMainWindow(2);
+                    }
+                },
+                items: [
+                    {
+                        xtype: 'travel'
+                    }
+                ]
+            },
+
+            {
                 id: 'agenda',
                 title: 'Agenda',
                 iconCls: 'time',
                 listeners: {
                     activate : function() {
-                        setMainWindow(2);
+                        setMainWindow(3);
                     }
                 },
                 items: [
@@ -37900,7 +37978,7 @@ Ext.define("App.view.Main", {
                 iconCls: 'star',
                 listeners: {
                     activate : function() {
-                        setMainWindow(3);
+                        setMainWindow(4);
                     }
                 },
                 items: [
@@ -37926,19 +38004,20 @@ Ext.define('App.Tabfix', {
 });
 
 function setMainWindow(elementIndex){
-    if(parent.document.getElementById("hotel")) {
-        var elements = new Array("hotel", "info", "agenda", "favorites");
+    if(parent.document.getElementById("hotel")!==null) {
+        var elements = new Array("hotel", "info", "travel", "agenda", "favorites");
         for(var i=elements.length-1; i>=0; i--) {
             var value = elements[i];
-            console.log("the index is " + elementIndex + "(" + value + ")");
             parent.document.getElementById(value).style.display = "none";
             parent.document.getElementById(value).enabled = "false";
             parent.document.forms[i].disabled=true;
             
         }    
         if(elementIndex >= 0) {
-            parent.document.forms[elementIndex].disabled=false;
-            parent.document.getElementById(elements[elementIndex]).style.display = "block";
+            if(parent.document.forms[elementIndex]){
+                parent.document.forms[elementIndex].disabled=false;
+                parent.document.getElementById(elements[elementIndex]).style.display = "block";
+            }
         }
     }
 }
@@ -38237,6 +38316,336 @@ Ext.define('Ext.data.StoreManager', {
      */
     Ext.getStore = function(name) {
         return Ext.data.StoreManager.lookup(name);
+    };
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.AbstractManager', {
+
+    /* Begin Definitions */
+
+    requires: ['Ext.util.HashMap'],
+
+    /* End Definitions */
+
+    typeName: 'type',
+
+    constructor: function(config) {
+        Ext.apply(this, config || {});
+
+        /**
+         * @property {Ext.util.HashMap} all
+         * Contains all of the items currently managed
+         */
+        this.all = Ext.create('Ext.util.HashMap');
+
+        this.types = {};
+    },
+
+    /**
+     * Returns an item by id.
+     * For additional details see {@link Ext.util.HashMap#get}.
+     * @param {String} id The id of the item
+     * @return {Object} The item, undefined if not found.
+     */
+    get : function(id) {
+        return this.all.get(id);
+    },
+
+    /**
+     * Registers an item to be managed
+     * @param {Object} item The item to register
+     */
+    register: function(item) {
+        this.all.add(item);
+    },
+
+    /**
+     * Unregisters an item by removing it from this manager
+     * @param {Object} item The item to unregister
+     */
+    unregister: function(item) {
+        this.all.remove(item);
+    },
+
+    /**
+     * Registers a new item constructor, keyed by a type key.
+     * @param {String} type The mnemonic string by which the class may be looked up.
+     * @param {Function} cls The new instance class.
+     */
+    registerType : function(type, cls) {
+        this.types[type] = cls;
+        cls[this.typeName] = type;
+    },
+
+    /**
+     * Checks if an item type is registered.
+     * @param {String} type The mnemonic string by which the class may be looked up
+     * @return {Boolean} Whether the type is registered.
+     */
+    isRegistered : function(type){
+        return this.types[type] !== undefined;
+    },
+
+    /**
+     * Creates and returns an instance of whatever this manager manages, based on the supplied type and
+     * config object.
+     * @param {Object} config The config object
+     * @param {String} defaultType If no type is discovered in the config object, we fall back to this type
+     * @return {Object} The instance of whatever this manager is managing
+     */
+    create: function(config, defaultType) {
+        var type        = config[this.typeName] || config.type || defaultType,
+            Constructor = this.types[type];
+
+        if (Constructor == undefined) {
+            Ext.Error.raise("The '" + type + "' type has not been registered with this manager");
+        }
+
+        return new Constructor(config);
+    },
+
+    /**
+     * Registers a function that will be called when an item with the specified id is added to the manager.
+     * This will happen on instantiation.
+     * @param {String} id The item id
+     * @param {Function} fn The callback function. Called with a single parameter, the item.
+     * @param {Object} scope The scope (this reference) in which the callback is executed.
+     * Defaults to the item.
+     */
+    onAvailable : function(id, fn, scope){
+        var all = this.all,
+            item;
+
+        if (all.containsKey(id)) {
+            item = all.get(id);
+            fn.call(scope || item, item);
+        } else {
+            all.on('add', function(map, key, item){
+                if (key == id) {
+                    fn.call(scope || item, item);
+                    all.un('add', fn, scope);
+                }
+            });
+        }
+    },
+
+    /**
+     * Executes the specified function once for each item in the collection.
+     * @param {Function} fn The function to execute.
+     * @param {String} fn.key The key of the item
+     * @param {Number} fn.value The value of the item
+     * @param {Number} fn.length The total number of items in the collection
+     * @param {Boolean} fn.return False to cease iteration.
+     * @param {Object} scope The scope to execute in. Defaults to `this`.
+     */
+    each: function(fn, scope){
+        this.all.each(fn, scope || this);
+    },
+
+    /**
+     * Gets the number of items in the collection.
+     * @return {Number} The number of items in the collection.
+     */
+    getCount: function(){
+        return this.all.getCount();
+    }
+});
+
+/**
+ * @author Ed Spencer
+
+The ModelManager keeps track of all {@link Ext.data.Model} types defined in your application.
+
+__Creating Model Instances__
+
+Model instances can be created by using the {@link Ext#create Ext.create} method. Ext.create replaces
+the deprecated {@link #create Ext.ModelManager.create} method. It is also possible to create a model instance
+this by using the Model type directly. The following 3 snippets are equivalent:
+
+    Ext.define('User', {
+        extend: 'Ext.data.Model',
+        config: {
+            fields: ['first', 'last']
+        }
+    });
+
+    // method 1, create using Ext.create (recommended)
+    Ext.create('User', {
+        first: 'Ed',
+        last: 'Spencer'
+    });
+
+    // method 2, create through the manager (deprecated)
+    Ext.ModelManager.create({
+        first: 'Ed',
+        last: 'Spencer'
+    }, 'User');
+
+    // method 3, create on the type directly
+    new User({
+        first: 'Ed',
+        last: 'Spencer'
+    });
+
+__Accessing Model Types__
+
+A reference to a Model type can be obtained by using the {@link #getModel} function. Since models types
+are normal classes, you can access the type directly. The following snippets are equivalent:
+
+    Ext.define('User', {
+        extend: 'Ext.data.Model',
+        config: {
+            fields: ['first', 'last']
+        }
+    });
+
+    // method 1, access model type through the manager
+    var UserType = Ext.ModelManager.getModel('User');
+
+    // method 2, reference the type directly
+    var UserType = User;
+
+ * @markdown
+ */
+Ext.define('Ext.data.ModelManager', {
+    extend: 'Ext.AbstractManager',
+    alternateClassName: ['Ext.ModelMgr', 'Ext.ModelManager'],
+
+    singleton: true,
+
+    /**
+     * @property defaultProxyType
+     * The string type of the default Model Proxy.
+     * @removed 2.0.0
+     */
+
+    /**
+     * @property associationStack
+     * Private stack of associations that must be created once their associated model has been defined.
+     * @removed 2.0.0
+     */
+
+    modelNamespace: null,
+
+    /**
+     * Registers a model definition. All model plugins marked with isDefault: true are bootstrapped
+     * immediately, as are any addition plugins defined in the model config.
+     */
+    registerType: function(name, config) {
+        var proto = config.prototype,
+            model;
+
+        if (proto && proto.isModel) {
+            // registering an already defined model
+            model = config;
+        } else {
+            config = {
+                extend: config.extend || 'Ext.data.Model',
+                config: config
+            };
+            model = Ext.define(name, config);
+        }
+        this.types[name] = model;
+        return model;
+    },
+
+    onModelDefined: Ext.emptyFn,
+
+    // /**
+    //  * @private
+    //  * Private callback called whenever a model has just been defined. This sets up any associations
+    //  * that were waiting for the given model to be defined
+    //  * @param {Function} model The model that was just created
+    //  */
+    // onModelDefined: function(model) {
+    //     var stack  = this.associationStack,
+    //         length = stack.length,
+    //         create = [],
+    //         association, i, created;
+    //
+    //     for (i = 0; i < length; i++) {
+    //         association = stack[i];
+    //
+    //         if (association.associatedModel == model.modelName) {
+    //             create.push(association);
+    //         }
+    //     }
+    //
+    //     for (i = 0, length = create.length; i < length; i++) {
+    //         created = create[i];
+    //         this.types[created.ownerModel].prototype.associations.add(Ext.data.association.Association.create(created));
+    //         Ext.Array.remove(stack, created);
+    //     }
+    // },
+    //
+    // /**
+    //  * Registers an association where one of the models defined doesn't exist yet.
+    //  * The ModelManager will check when new models are registered if it can link them
+    //  * together
+    //  * @private
+    //  * @param {Ext.data.association.Association} association The association
+    //  */
+    // registerDeferredAssociation: function(association){
+    //     this.associationStack.push(association);
+    // },
+
+    /**
+     * Returns the {@link Ext.data.Model} for a given model name
+     * @param {String/Object} id The id of the model or the model instance.
+     * @return {Ext.data.Model} a model class.
+     */
+    getModel: function(id) {
+        var model = id;
+        if (typeof model == 'string') {
+            model = this.types[model];
+            if (!model && this.modelNamespace) {
+                model = this.types[this.modelNamespace + '.' + model];
+            }
+        }
+        return model;
+    },
+
+    /**
+     * Creates a new instance of a Model using the given data.
+     *
+     * This method is deprecated.  Use {@link Ext#create Ext.create} instead.  For example:
+     *
+     *     Ext.create('User', {
+     *         first: 'Ed',
+     *         last: 'Spencer'
+     *     });
+     *
+     * @param {Object} data Data to initialize the Model's fields with
+     * @param {String} name The name of the model to create
+     * @param {Number} id (Optional) unique id of the Model instance (see {@link Ext.data.Model})
+     */
+    create: function(config, name, id) {
+        var con = typeof name == 'function' ? name : this.types[name || config.name];
+        return new con(config, id);
+    }
+}, function() {
+
+    /**
+     * Old way for creating Model classes.  Instead use:
+     *
+     *     Ext.define("MyModel", {
+     *         extend: "Ext.data.Model",
+     *         fields: []
+     *     });
+     *
+     * @param {String} name Name of the Model class.
+     * @param {Object} config A configuration object for the Model you wish to create.
+     * @return {Ext.data.Model} The newly registered Model
+     * @member Ext
+     * @deprecated 2.0.0 Please use {@link Ext#define} instead.
+     */
+    Ext.regModel = function() {
+        Ext.Logger.deprecate('Ext.regModel has been deprecated. Models can now be created by ' +
+            'extending Ext.data.Model: Ext.define("MyModel", {extend: "Ext.data.Model", fields: []});.');
+        return this.ModelManager.registerType.apply(this.ModelManager, arguments);
     };
 });
 
@@ -38901,336 +39310,6 @@ Ext.define('Ext.Ajax', {
 });
 
 /**
- * @private
- */
-Ext.define('Ext.AbstractManager', {
-
-    /* Begin Definitions */
-
-    requires: ['Ext.util.HashMap'],
-
-    /* End Definitions */
-
-    typeName: 'type',
-
-    constructor: function(config) {
-        Ext.apply(this, config || {});
-
-        /**
-         * @property {Ext.util.HashMap} all
-         * Contains all of the items currently managed
-         */
-        this.all = Ext.create('Ext.util.HashMap');
-
-        this.types = {};
-    },
-
-    /**
-     * Returns an item by id.
-     * For additional details see {@link Ext.util.HashMap#get}.
-     * @param {String} id The id of the item
-     * @return {Object} The item, undefined if not found.
-     */
-    get : function(id) {
-        return this.all.get(id);
-    },
-
-    /**
-     * Registers an item to be managed
-     * @param {Object} item The item to register
-     */
-    register: function(item) {
-        this.all.add(item);
-    },
-
-    /**
-     * Unregisters an item by removing it from this manager
-     * @param {Object} item The item to unregister
-     */
-    unregister: function(item) {
-        this.all.remove(item);
-    },
-
-    /**
-     * Registers a new item constructor, keyed by a type key.
-     * @param {String} type The mnemonic string by which the class may be looked up.
-     * @param {Function} cls The new instance class.
-     */
-    registerType : function(type, cls) {
-        this.types[type] = cls;
-        cls[this.typeName] = type;
-    },
-
-    /**
-     * Checks if an item type is registered.
-     * @param {String} type The mnemonic string by which the class may be looked up
-     * @return {Boolean} Whether the type is registered.
-     */
-    isRegistered : function(type){
-        return this.types[type] !== undefined;
-    },
-
-    /**
-     * Creates and returns an instance of whatever this manager manages, based on the supplied type and
-     * config object.
-     * @param {Object} config The config object
-     * @param {String} defaultType If no type is discovered in the config object, we fall back to this type
-     * @return {Object} The instance of whatever this manager is managing
-     */
-    create: function(config, defaultType) {
-        var type        = config[this.typeName] || config.type || defaultType,
-            Constructor = this.types[type];
-
-        if (Constructor == undefined) {
-            Ext.Error.raise("The '" + type + "' type has not been registered with this manager");
-        }
-
-        return new Constructor(config);
-    },
-
-    /**
-     * Registers a function that will be called when an item with the specified id is added to the manager.
-     * This will happen on instantiation.
-     * @param {String} id The item id
-     * @param {Function} fn The callback function. Called with a single parameter, the item.
-     * @param {Object} scope The scope (this reference) in which the callback is executed.
-     * Defaults to the item.
-     */
-    onAvailable : function(id, fn, scope){
-        var all = this.all,
-            item;
-
-        if (all.containsKey(id)) {
-            item = all.get(id);
-            fn.call(scope || item, item);
-        } else {
-            all.on('add', function(map, key, item){
-                if (key == id) {
-                    fn.call(scope || item, item);
-                    all.un('add', fn, scope);
-                }
-            });
-        }
-    },
-
-    /**
-     * Executes the specified function once for each item in the collection.
-     * @param {Function} fn The function to execute.
-     * @param {String} fn.key The key of the item
-     * @param {Number} fn.value The value of the item
-     * @param {Number} fn.length The total number of items in the collection
-     * @param {Boolean} fn.return False to cease iteration.
-     * @param {Object} scope The scope to execute in. Defaults to `this`.
-     */
-    each: function(fn, scope){
-        this.all.each(fn, scope || this);
-    },
-
-    /**
-     * Gets the number of items in the collection.
-     * @return {Number} The number of items in the collection.
-     */
-    getCount: function(){
-        return this.all.getCount();
-    }
-});
-
-/**
- * @author Ed Spencer
-
-The ModelManager keeps track of all {@link Ext.data.Model} types defined in your application.
-
-__Creating Model Instances__
-
-Model instances can be created by using the {@link Ext#create Ext.create} method. Ext.create replaces
-the deprecated {@link #create Ext.ModelManager.create} method. It is also possible to create a model instance
-this by using the Model type directly. The following 3 snippets are equivalent:
-
-    Ext.define('User', {
-        extend: 'Ext.data.Model',
-        config: {
-            fields: ['first', 'last']
-        }
-    });
-
-    // method 1, create using Ext.create (recommended)
-    Ext.create('User', {
-        first: 'Ed',
-        last: 'Spencer'
-    });
-
-    // method 2, create through the manager (deprecated)
-    Ext.ModelManager.create({
-        first: 'Ed',
-        last: 'Spencer'
-    }, 'User');
-
-    // method 3, create on the type directly
-    new User({
-        first: 'Ed',
-        last: 'Spencer'
-    });
-
-__Accessing Model Types__
-
-A reference to a Model type can be obtained by using the {@link #getModel} function. Since models types
-are normal classes, you can access the type directly. The following snippets are equivalent:
-
-    Ext.define('User', {
-        extend: 'Ext.data.Model',
-        config: {
-            fields: ['first', 'last']
-        }
-    });
-
-    // method 1, access model type through the manager
-    var UserType = Ext.ModelManager.getModel('User');
-
-    // method 2, reference the type directly
-    var UserType = User;
-
- * @markdown
- */
-Ext.define('Ext.data.ModelManager', {
-    extend: 'Ext.AbstractManager',
-    alternateClassName: ['Ext.ModelMgr', 'Ext.ModelManager'],
-
-    singleton: true,
-
-    /**
-     * @property defaultProxyType
-     * The string type of the default Model Proxy.
-     * @removed 2.0.0
-     */
-
-    /**
-     * @property associationStack
-     * Private stack of associations that must be created once their associated model has been defined.
-     * @removed 2.0.0
-     */
-
-    modelNamespace: null,
-
-    /**
-     * Registers a model definition. All model plugins marked with isDefault: true are bootstrapped
-     * immediately, as are any addition plugins defined in the model config.
-     */
-    registerType: function(name, config) {
-        var proto = config.prototype,
-            model;
-
-        if (proto && proto.isModel) {
-            // registering an already defined model
-            model = config;
-        } else {
-            config = {
-                extend: config.extend || 'Ext.data.Model',
-                config: config
-            };
-            model = Ext.define(name, config);
-        }
-        this.types[name] = model;
-        return model;
-    },
-
-    onModelDefined: Ext.emptyFn,
-
-    // /**
-    //  * @private
-    //  * Private callback called whenever a model has just been defined. This sets up any associations
-    //  * that were waiting for the given model to be defined
-    //  * @param {Function} model The model that was just created
-    //  */
-    // onModelDefined: function(model) {
-    //     var stack  = this.associationStack,
-    //         length = stack.length,
-    //         create = [],
-    //         association, i, created;
-    //
-    //     for (i = 0; i < length; i++) {
-    //         association = stack[i];
-    //
-    //         if (association.associatedModel == model.modelName) {
-    //             create.push(association);
-    //         }
-    //     }
-    //
-    //     for (i = 0, length = create.length; i < length; i++) {
-    //         created = create[i];
-    //         this.types[created.ownerModel].prototype.associations.add(Ext.data.association.Association.create(created));
-    //         Ext.Array.remove(stack, created);
-    //     }
-    // },
-    //
-    // /**
-    //  * Registers an association where one of the models defined doesn't exist yet.
-    //  * The ModelManager will check when new models are registered if it can link them
-    //  * together
-    //  * @private
-    //  * @param {Ext.data.association.Association} association The association
-    //  */
-    // registerDeferredAssociation: function(association){
-    //     this.associationStack.push(association);
-    // },
-
-    /**
-     * Returns the {@link Ext.data.Model} for a given model name
-     * @param {String/Object} id The id of the model or the model instance.
-     * @return {Ext.data.Model} a model class.
-     */
-    getModel: function(id) {
-        var model = id;
-        if (typeof model == 'string') {
-            model = this.types[model];
-            if (!model && this.modelNamespace) {
-                model = this.types[this.modelNamespace + '.' + model];
-            }
-        }
-        return model;
-    },
-
-    /**
-     * Creates a new instance of a Model using the given data.
-     *
-     * This method is deprecated.  Use {@link Ext#create Ext.create} instead.  For example:
-     *
-     *     Ext.create('User', {
-     *         first: 'Ed',
-     *         last: 'Spencer'
-     *     });
-     *
-     * @param {Object} data Data to initialize the Model's fields with
-     * @param {String} name The name of the model to create
-     * @param {Number} id (Optional) unique id of the Model instance (see {@link Ext.data.Model})
-     */
-    create: function(config, name, id) {
-        var con = typeof name == 'function' ? name : this.types[name || config.name];
-        return new con(config, id);
-    }
-}, function() {
-
-    /**
-     * Old way for creating Model classes.  Instead use:
-     *
-     *     Ext.define("MyModel", {
-     *         extend: "Ext.data.Model",
-     *         fields: []
-     *     });
-     *
-     * @param {String} name Name of the Model class.
-     * @param {Object} config A configuration object for the Model you wish to create.
-     * @return {Ext.data.Model} The newly registered Model
-     * @member Ext
-     * @deprecated 2.0.0 Please use {@link Ext#define} instead.
-     */
-    Ext.regModel = function() {
-        Ext.Logger.deprecate('Ext.regModel has been deprecated. Models can now be created by ' +
-            'extending Ext.data.Model: Ext.define("MyModel", {extend: "Ext.data.Model", fields: []});.');
-        return this.ModelManager.registerType.apply(this.ModelManager, arguments);
-    };
-});
-
-/**
  * @author Ed Spencer
  * @aside guide models
  *
@@ -39892,381 +39971,6 @@ Ext.define('Ext.data.association.HasMany', {
 });
 
 /**
- * @author Ed Spencer
- * @aside guide models
- *
- * Represents a many to one association with another model. The owner model is expected to have
- * a foreign key which references the primary key of the associated model:
- *
- *     Ext.define('Category', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 { name: 'id',   type: 'int' },
- *                 { name: 'name', type: 'string' }
- *             ]
- *         }
- *     });
- *
- *     Ext.define('Product', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 { name: 'id',          type: 'int' },
- *                 { name: 'category_id', type: 'int' },
- *                 { name: 'name',        type: 'string' }
- *             ],
- *             // we can use the belongsTo shortcut on the model to create a belongsTo association
- *             associations: { type: 'belongsTo', model: 'Category' }
- *         }
- *     });
- *
- * In the example above we have created models for Products and Categories, and linked them together
- * by saying that each Product belongs to a Category. This automatically links each Product to a Category
- * based on the Product's category_id, and provides new functions on the Product model:
- *
- * ## Generated getter function
- *
- * The first function that is added to the owner model is a getter function:
- *
- *     var product = new Product({
- *         id: 100,
- *         category_id: 20,
- *         name: 'Sneakers'
- *     });
- *
- *     product.getCategory(function(category, operation) {
- *         // do something with the category object
- *         alert(category.get('id')); // alerts 20
- *     }, this);
- *
- * The getCategory function was created on the Product model when we defined the association. This uses the
- * Category's configured {@link Ext.data.proxy.Proxy proxy} to load the Category asynchronously, calling the provided
- * callback when it has loaded.
- *
- * The new getCategory function will also accept an object containing success, failure and callback properties
- * - callback will always be called, success will only be called if the associated model was loaded successfully
- * and failure will only be called if the associatied model could not be loaded:
- *
- *     product.getCategory({
- *         reload: true, // force a reload if the owner model is already cached
- *         callback: function(category, operation) {}, // a function that will always be called
- *         success : function(category, operation) {}, // a function that will only be called if the load succeeded
- *         failure : function(category, operation) {}, // a function that will only be called if the load did not succeed
- *         scope   : this // optionally pass in a scope object to execute the callbacks in
- *     });
- *
- * In each case above the callbacks are called with two arguments - the associated model instance and the
- * {@link Ext.data.Operation operation} object that was executed to load that instance. The Operation object is
- * useful when the instance could not be loaded.
- *
- * Once the getter has been called on the model, it will be cached if the getter is called a second time. To
- * force the model to reload, specify reload: true in the options object.
- *
- * ## Generated setter function
- *
- * The second generated function sets the associated model instance - if only a single argument is passed to
- * the setter then the following two calls are identical:
- *
- *     // this call...
- *     product.setCategory(10);
- *
- *     // is equivalent to this call:
- *     product.set('category_id', 10);
- *
- * An instance of the owner model can also be passed as a parameter.
- *
- * If we pass in a second argument, the model will be automatically saved and the second argument passed to
- * the owner model's {@link Ext.data.Model#save save} method:
- *
- *     product.setCategory(10, function(product, operation) {
- *         // the product has been saved
- *         alert(product.get('category_id')); //now alerts 10
- *     });
- *
- *     //alternative syntax:
- *     product.setCategory(10, {
- *         callback: function(product, operation), // a function that will always be called
- *         success : function(product, operation), // a function that will only be called if the load succeeded
- *         failure : function(product, operation), // a function that will only be called if the load did not succeed
- *         scope   : this //optionally pass in a scope object to execute the callbacks in
- *     })
- *
- * ## Customisation
- *
- * Associations reflect on the models they are linking to automatically set up properties such as the
- * {@link #primaryKey} and {@link #foreignKey}. These can alternatively be specified:
- *
- *     Ext.define('Product', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [ // ...
- *             ],
- *
- *             associations: [
- *                 { type: 'belongsTo', model: 'Category', primaryKey: 'unique_id', foreignKey: 'cat_id' }
- *             ]
- *         }
- *     });
- *
- * Here we replaced the default primary key (defaults to 'id') and foreign key (calculated as 'category_id')
- * with our own settings. Usually this will not be needed.
- */
-Ext.define('Ext.data.association.BelongsTo', {
-    extend: 'Ext.data.association.Association',
-    alternateClassName: 'Ext.data.BelongsToAssociation',
-    alias: 'association.belongsto',
-
-    config: {
-        /**
-         * @cfg {String} foreignKey The name of the foreign key on the owner model that links it to the associated
-         * model. Defaults to the lowercased name of the associated model plus "_id", e.g. an association with a
-         * model called Product would set up a product_id foreign key.
-         *
-         *     Ext.define('Order', {
-         *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'date'],
-         *         hasMany: 'Product'
-         *     });
-         *
-         *     Ext.define('Product', {
-         *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'name', 'order_id'], // refers to the id of the order that this product belongs to
-         *         belongsTo: 'Group'
-         *     });
-         *     var product = new Product({
-         *         id: 1,
-         *         name: 'Product 1',
-         *         order_id: 22
-         *     }, 1);
-         *     product.getOrder(); // Will make a call to the server asking for order_id 22
-         *
-         */
-        foreignKey: undefined,
-
-        /**
-         * @cfg {String} getterName The name of the getter function that will be added to the local model's prototype.
-         * Defaults to 'get' + the name of the foreign model, e.g. getCategory
-         */
-        getterName: undefined,
-
-        /**
-         * @cfg {String} setterName The name of the setter function that will be added to the local model's prototype.
-         * Defaults to 'set' + the name of the foreign model, e.g. setCategory
-         */
-        setterName: undefined,
-
-        instanceName: undefined
-    },
-
-    applyForeignKey: function(foreignKey) {
-        if (!foreignKey) {
-            foreignKey = this.getAssociatedName().toLowerCase() + '_id';
-        }
-        return foreignKey;
-    },
-
-    updateForeignKey: function(foreignKey, oldForeignKey) {
-        var fields = this.getOwnerModel().getFields(),
-            field = fields.get(foreignKey);
-
-        if (!field) {
-            field = new Ext.data.Field({
-                name: foreignKey
-            });
-            fields.add(field);
-            fields.isDirty = true;
-        }
-
-        if (oldForeignKey) {
-            field = fields.get(oldForeignKey);
-            if (field) {
-                fields.isDirty = true;
-                fields.remove(field);
-            }
-        }
-    },
-
-    applyInstanceName: function(instanceName) {
-        if (!instanceName) {
-            instanceName = this.getAssociatedName() + 'BelongsToInstance';
-        }
-        return instanceName;
-    },
-
-    applyAssociationKey: function(associationKey) {
-        if (!associationKey) {
-            var associatedName = this.getAssociatedName();
-            associationKey = associatedName[0].toLowerCase() + associatedName.slice(1);
-        }
-        return associationKey;
-    },
-
-    applyGetterName: function(getterName) {
-        if (!getterName) {
-            var associatedName = this.getAssociatedName();
-            getterName = 'get' + associatedName[0].toUpperCase() + associatedName.slice(1);
-        }
-        return getterName;
-    },
-
-    applySetterName: function(setterName) {
-        if (!setterName) {
-            var associatedName = this.getAssociatedName();
-            setterName = 'set' + associatedName[0].toUpperCase() + associatedName.slice(1);
-        }
-        return setterName;
-    },
-
-    updateGetterName: function(getterName, oldGetterName) {
-        var ownerProto = this.getOwnerModel().prototype;
-        if (oldGetterName) {
-            delete ownerProto[oldGetterName];
-        }
-        if (getterName) {
-            ownerProto[getterName] = this.createGetter();
-        }
-    },
-
-    updateSetterName: function(setterName, oldSetterName) {
-        var ownerProto = this.getOwnerModel().prototype;
-        if (oldSetterName) {
-            delete ownerProto[oldSetterName];
-        }
-        if (setterName) {
-            ownerProto[setterName] = this.createSetter();
-        }
-    },
-
-    /**
-     * @private
-     * Returns a setter function to be placed on the owner model's prototype
-     * @return {Function} The setter function
-     */
-    createSetter: function() {
-        var me = this,
-            foreignKey = me.getForeignKey();
-
-        //'this' refers to the Model instance inside this function
-        return function(value, options, scope) {
-            var inverse = me.getInverseAssociation();
-
-            // If we pass in an instance, pull the id out
-            if (value && value.isModel) {
-                value = value.getId();
-            }
-            this.set(foreignKey, value);
-
-            if (Ext.isFunction(options)) {
-                options = {
-                    callback: options,
-                    scope: scope || this
-                };
-            }
-
-            if (inverse) {
-                value = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(inverse.getOwnerModel().modelName, value));
-                if (value) {
-                    if (inverse.getType().toLowerCase() === 'hasmany') {
-                        var store = value[inverse.getName()]();
-                        store.add(this);
-                    } else {
-                        value[inverse.getInstanceName()] = this;
-                    }
-                }
-            }
-
-            if (Ext.isObject(options)) {
-                return this.save(options);
-            }
-        };
-    },
-
-    /**
-     * @private
-     * Returns a getter function to be placed on the owner model's prototype. We cache the loaded instance
-     * the first time it is loaded so that subsequent calls to the getter always receive the same reference.
-     * @return {Function} The getter function
-     */
-    createGetter: function() {
-        var me              = this,
-            associatedModel = me.getAssociatedModel(),
-            foreignKey      = me.getForeignKey(),
-            instanceName    = me.getInstanceName();
-
-        //'this' refers to the Model instance inside this function
-        return function(options, scope) {
-            options = options || {};
-
-            var model = this,
-                foreignKeyId = model.get(foreignKey),
-                success,
-                instance,
-                args;
-
-            instance = model[instanceName];
-            if (!instance) {
-                instance = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(associatedModel.modelName, foreignKeyId));
-                if (instance) {
-                    model[instanceName] = instance;
-                }
-            }
-
-            if (options.reload === true || instance === undefined) {
-                if (typeof options == 'function') {
-                    options = {
-                        callback: options,
-                        scope: scope || model
-                    };
-                }
-
-                // Overwrite the success handler so we can assign the current instance
-                success = options.success;
-                options.success = function(rec) {
-                    model[instanceName] = rec;
-                    if (success) {
-                        success.call(this, arguments);
-                    }
-                };
-
-                associatedModel.load(foreignKeyId, options);
-            } else {
-                args = [instance];
-                scope = scope || model;
-
-                Ext.callback(options, scope, args);
-                Ext.callback(options.success, scope, args);
-                Ext.callback(options.failure, scope, args);
-                Ext.callback(options.callback, scope, args);
-
-                return instance;
-            }
-        };
-    },
-
-    /**
-     * Read associated data
-     * @private
-     * @param {Ext.data.Model} record The record we're writing to
-     * @param {Ext.data.reader.Reader} reader The reader for the associated model
-     * @param {Object} associationData The raw associated data
-     */
-    read: function(record, reader, associationData){
-        record[this.getInstanceName()] = reader.read([associationData]).getRecords()[0];
-    },
-
-    getInverseAssociation: function() {
-        var ownerName = this.getOwnerModel().modelName,
-            foreignKey = this.getForeignKey();
-
-        return this.getAssociatedModel().associations.findBy(function(assoc) {
-            var type = assoc.getType().toLowerCase();
-            return (type === 'hasmany' || type === 'hasone') && assoc.getAssociatedModel().modelName === ownerName && assoc.getForeignKey() === foreignKey;
-        });
-    }
-});
-
-/**
  * @aside guide models
  *
  * Represents a one to one association with another model. The owner model is expected to have
@@ -40640,6 +40344,381 @@ Ext.define('Ext.data.association.HasOne', {
 
         return this.getAssociatedModel().associations.findBy(function(assoc) {
             return assoc.getType().toLowerCase() === 'belongsto' && assoc.getAssociatedModel().modelName === ownerName;
+        });
+    }
+});
+
+/**
+ * @author Ed Spencer
+ * @aside guide models
+ *
+ * Represents a many to one association with another model. The owner model is expected to have
+ * a foreign key which references the primary key of the associated model:
+ *
+ *     Ext.define('Category', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 { name: 'id',   type: 'int' },
+ *                 { name: 'name', type: 'string' }
+ *             ]
+ *         }
+ *     });
+ *
+ *     Ext.define('Product', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 { name: 'id',          type: 'int' },
+ *                 { name: 'category_id', type: 'int' },
+ *                 { name: 'name',        type: 'string' }
+ *             ],
+ *             // we can use the belongsTo shortcut on the model to create a belongsTo association
+ *             associations: { type: 'belongsTo', model: 'Category' }
+ *         }
+ *     });
+ *
+ * In the example above we have created models for Products and Categories, and linked them together
+ * by saying that each Product belongs to a Category. This automatically links each Product to a Category
+ * based on the Product's category_id, and provides new functions on the Product model:
+ *
+ * ## Generated getter function
+ *
+ * The first function that is added to the owner model is a getter function:
+ *
+ *     var product = new Product({
+ *         id: 100,
+ *         category_id: 20,
+ *         name: 'Sneakers'
+ *     });
+ *
+ *     product.getCategory(function(category, operation) {
+ *         // do something with the category object
+ *         alert(category.get('id')); // alerts 20
+ *     }, this);
+ *
+ * The getCategory function was created on the Product model when we defined the association. This uses the
+ * Category's configured {@link Ext.data.proxy.Proxy proxy} to load the Category asynchronously, calling the provided
+ * callback when it has loaded.
+ *
+ * The new getCategory function will also accept an object containing success, failure and callback properties
+ * - callback will always be called, success will only be called if the associated model was loaded successfully
+ * and failure will only be called if the associatied model could not be loaded:
+ *
+ *     product.getCategory({
+ *         reload: true, // force a reload if the owner model is already cached
+ *         callback: function(category, operation) {}, // a function that will always be called
+ *         success : function(category, operation) {}, // a function that will only be called if the load succeeded
+ *         failure : function(category, operation) {}, // a function that will only be called if the load did not succeed
+ *         scope   : this // optionally pass in a scope object to execute the callbacks in
+ *     });
+ *
+ * In each case above the callbacks are called with two arguments - the associated model instance and the
+ * {@link Ext.data.Operation operation} object that was executed to load that instance. The Operation object is
+ * useful when the instance could not be loaded.
+ *
+ * Once the getter has been called on the model, it will be cached if the getter is called a second time. To
+ * force the model to reload, specify reload: true in the options object.
+ *
+ * ## Generated setter function
+ *
+ * The second generated function sets the associated model instance - if only a single argument is passed to
+ * the setter then the following two calls are identical:
+ *
+ *     // this call...
+ *     product.setCategory(10);
+ *
+ *     // is equivalent to this call:
+ *     product.set('category_id', 10);
+ *
+ * An instance of the owner model can also be passed as a parameter.
+ *
+ * If we pass in a second argument, the model will be automatically saved and the second argument passed to
+ * the owner model's {@link Ext.data.Model#save save} method:
+ *
+ *     product.setCategory(10, function(product, operation) {
+ *         // the product has been saved
+ *         alert(product.get('category_id')); //now alerts 10
+ *     });
+ *
+ *     //alternative syntax:
+ *     product.setCategory(10, {
+ *         callback: function(product, operation), // a function that will always be called
+ *         success : function(product, operation), // a function that will only be called if the load succeeded
+ *         failure : function(product, operation), // a function that will only be called if the load did not succeed
+ *         scope   : this //optionally pass in a scope object to execute the callbacks in
+ *     })
+ *
+ * ## Customisation
+ *
+ * Associations reflect on the models they are linking to automatically set up properties such as the
+ * {@link #primaryKey} and {@link #foreignKey}. These can alternatively be specified:
+ *
+ *     Ext.define('Product', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [ // ...
+ *             ],
+ *
+ *             associations: [
+ *                 { type: 'belongsTo', model: 'Category', primaryKey: 'unique_id', foreignKey: 'cat_id' }
+ *             ]
+ *         }
+ *     });
+ *
+ * Here we replaced the default primary key (defaults to 'id') and foreign key (calculated as 'category_id')
+ * with our own settings. Usually this will not be needed.
+ */
+Ext.define('Ext.data.association.BelongsTo', {
+    extend: 'Ext.data.association.Association',
+    alternateClassName: 'Ext.data.BelongsToAssociation',
+    alias: 'association.belongsto',
+
+    config: {
+        /**
+         * @cfg {String} foreignKey The name of the foreign key on the owner model that links it to the associated
+         * model. Defaults to the lowercased name of the associated model plus "_id", e.g. an association with a
+         * model called Product would set up a product_id foreign key.
+         *
+         *     Ext.define('Order', {
+         *         extend: 'Ext.data.Model',
+         *         fields: ['id', 'date'],
+         *         hasMany: 'Product'
+         *     });
+         *
+         *     Ext.define('Product', {
+         *         extend: 'Ext.data.Model',
+         *         fields: ['id', 'name', 'order_id'], // refers to the id of the order that this product belongs to
+         *         belongsTo: 'Group'
+         *     });
+         *     var product = new Product({
+         *         id: 1,
+         *         name: 'Product 1',
+         *         order_id: 22
+         *     }, 1);
+         *     product.getOrder(); // Will make a call to the server asking for order_id 22
+         *
+         */
+        foreignKey: undefined,
+
+        /**
+         * @cfg {String} getterName The name of the getter function that will be added to the local model's prototype.
+         * Defaults to 'get' + the name of the foreign model, e.g. getCategory
+         */
+        getterName: undefined,
+
+        /**
+         * @cfg {String} setterName The name of the setter function that will be added to the local model's prototype.
+         * Defaults to 'set' + the name of the foreign model, e.g. setCategory
+         */
+        setterName: undefined,
+
+        instanceName: undefined
+    },
+
+    applyForeignKey: function(foreignKey) {
+        if (!foreignKey) {
+            foreignKey = this.getAssociatedName().toLowerCase() + '_id';
+        }
+        return foreignKey;
+    },
+
+    updateForeignKey: function(foreignKey, oldForeignKey) {
+        var fields = this.getOwnerModel().getFields(),
+            field = fields.get(foreignKey);
+
+        if (!field) {
+            field = new Ext.data.Field({
+                name: foreignKey
+            });
+            fields.add(field);
+            fields.isDirty = true;
+        }
+
+        if (oldForeignKey) {
+            field = fields.get(oldForeignKey);
+            if (field) {
+                fields.isDirty = true;
+                fields.remove(field);
+            }
+        }
+    },
+
+    applyInstanceName: function(instanceName) {
+        if (!instanceName) {
+            instanceName = this.getAssociatedName() + 'BelongsToInstance';
+        }
+        return instanceName;
+    },
+
+    applyAssociationKey: function(associationKey) {
+        if (!associationKey) {
+            var associatedName = this.getAssociatedName();
+            associationKey = associatedName[0].toLowerCase() + associatedName.slice(1);
+        }
+        return associationKey;
+    },
+
+    applyGetterName: function(getterName) {
+        if (!getterName) {
+            var associatedName = this.getAssociatedName();
+            getterName = 'get' + associatedName[0].toUpperCase() + associatedName.slice(1);
+        }
+        return getterName;
+    },
+
+    applySetterName: function(setterName) {
+        if (!setterName) {
+            var associatedName = this.getAssociatedName();
+            setterName = 'set' + associatedName[0].toUpperCase() + associatedName.slice(1);
+        }
+        return setterName;
+    },
+
+    updateGetterName: function(getterName, oldGetterName) {
+        var ownerProto = this.getOwnerModel().prototype;
+        if (oldGetterName) {
+            delete ownerProto[oldGetterName];
+        }
+        if (getterName) {
+            ownerProto[getterName] = this.createGetter();
+        }
+    },
+
+    updateSetterName: function(setterName, oldSetterName) {
+        var ownerProto = this.getOwnerModel().prototype;
+        if (oldSetterName) {
+            delete ownerProto[oldSetterName];
+        }
+        if (setterName) {
+            ownerProto[setterName] = this.createSetter();
+        }
+    },
+
+    /**
+     * @private
+     * Returns a setter function to be placed on the owner model's prototype
+     * @return {Function} The setter function
+     */
+    createSetter: function() {
+        var me = this,
+            foreignKey = me.getForeignKey();
+
+        //'this' refers to the Model instance inside this function
+        return function(value, options, scope) {
+            var inverse = me.getInverseAssociation();
+
+            // If we pass in an instance, pull the id out
+            if (value && value.isModel) {
+                value = value.getId();
+            }
+            this.set(foreignKey, value);
+
+            if (Ext.isFunction(options)) {
+                options = {
+                    callback: options,
+                    scope: scope || this
+                };
+            }
+
+            if (inverse) {
+                value = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(inverse.getOwnerModel().modelName, value));
+                if (value) {
+                    if (inverse.getType().toLowerCase() === 'hasmany') {
+                        var store = value[inverse.getName()]();
+                        store.add(this);
+                    } else {
+                        value[inverse.getInstanceName()] = this;
+                    }
+                }
+            }
+
+            if (Ext.isObject(options)) {
+                return this.save(options);
+            }
+        };
+    },
+
+    /**
+     * @private
+     * Returns a getter function to be placed on the owner model's prototype. We cache the loaded instance
+     * the first time it is loaded so that subsequent calls to the getter always receive the same reference.
+     * @return {Function} The getter function
+     */
+    createGetter: function() {
+        var me              = this,
+            associatedModel = me.getAssociatedModel(),
+            foreignKey      = me.getForeignKey(),
+            instanceName    = me.getInstanceName();
+
+        //'this' refers to the Model instance inside this function
+        return function(options, scope) {
+            options = options || {};
+
+            var model = this,
+                foreignKeyId = model.get(foreignKey),
+                success,
+                instance,
+                args;
+
+            instance = model[instanceName];
+            if (!instance) {
+                instance = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(associatedModel.modelName, foreignKeyId));
+                if (instance) {
+                    model[instanceName] = instance;
+                }
+            }
+
+            if (options.reload === true || instance === undefined) {
+                if (typeof options == 'function') {
+                    options = {
+                        callback: options,
+                        scope: scope || model
+                    };
+                }
+
+                // Overwrite the success handler so we can assign the current instance
+                success = options.success;
+                options.success = function(rec) {
+                    model[instanceName] = rec;
+                    if (success) {
+                        success.call(this, arguments);
+                    }
+                };
+
+                associatedModel.load(foreignKeyId, options);
+            } else {
+                args = [instance];
+                scope = scope || model;
+
+                Ext.callback(options, scope, args);
+                Ext.callback(options.success, scope, args);
+                Ext.callback(options.failure, scope, args);
+                Ext.callback(options.callback, scope, args);
+
+                return instance;
+            }
+        };
+    },
+
+    /**
+     * Read associated data
+     * @private
+     * @param {Ext.data.Model} record The record we're writing to
+     * @param {Ext.data.reader.Reader} reader The reader for the associated model
+     * @param {Object} associationData The raw associated data
+     */
+    read: function(record, reader, associationData){
+        record[this.getInstanceName()] = reader.read([associationData]).getRecords()[0];
+    },
+
+    getInverseAssociation: function() {
+        var ownerName = this.getOwnerModel().modelName,
+            foreignKey = this.getForeignKey();
+
+        return this.getAssociatedModel().associations.findBy(function(assoc) {
+            var type = assoc.getType().toLowerCase();
+            return (type === 'hasmany' || type === 'hasone') && assoc.getAssociatedModel().modelName === ownerName && assoc.getForeignKey() === foreignKey;
         });
     }
 });
@@ -46833,6 +46912,509 @@ Ext.define('Ext.data.proxy.Client', {
 
 /**
  * @author Ed Spencer
+ *
+ * WebStorageProxy is simply a superclass for the {@link Ext.data.proxy.LocalStorage LocalStorage} proxy. It uses the
+ * new HTML5 key/value client-side storage objects to save {@link Ext.data.Model model instances} for offline use.
+ * @private
+ */
+Ext.define('Ext.data.proxy.WebStorage', {
+    extend: 'Ext.data.proxy.Client',
+    alternateClassName: 'Ext.data.WebStorageProxy',
+
+    requires: 'Ext.Date',
+
+    config: {
+        /**
+         * @cfg {String} id
+         * The unique ID used as the key in which all record data are stored in the local storage object.
+         */
+        id: undefined,
+
+        // WebStorage proxies dont use readers and writers
+        reader: null,
+        writer: null
+    },
+
+    /**
+     * Creates the proxy, throws an error if local storage is not supported in the current browser.
+     * @param {Object} config (optional) Config object.
+     */
+    constructor: function(config) {
+        this.callParent(arguments);
+
+        /**
+         * @property {Object} cache
+         * Cached map of records already retrieved by this Proxy. Ensures that the same instance is always retrieved.
+         */
+        this.cache = {};
+
+        if (this.getStorageObject() === undefined) {
+            Ext.Logger.error("Local Storage is not supported in this browser, please use another type of data proxy");
+        }
+    },
+
+    updateModel: function(model) {
+        if (!this.getId()) {
+            this.setId(model.modelName);
+        }
+    },
+
+    //inherit docs
+    create: function(operation, callback, scope) {
+        var records = operation.getRecords(),
+            length  = records.length,
+            ids     = this.getIds(),
+            id, record, i;
+
+        operation.setStarted();
+
+        for (i = 0; i < length; i++) {
+            record = records[i];
+
+            if (record.phantom) {
+                record.phantom = false;
+                id = this.getNextId();
+            } else {
+                id = record.getId();
+            }
+
+            this.setRecord(record, id);
+            ids.push(id);
+        }
+
+        this.setIds(ids);
+
+        operation.setCompleted();
+        operation.setSuccessful();
+
+        if (typeof callback == 'function') {
+            callback.call(scope || this, operation);
+        }
+    },
+
+    //inherit docs
+    read: function(operation, callback, scope) {
+        var records    = [],
+            ids        = this.getIds(),
+            model      = this.getModel(),
+            idProperty = model.getIdProperty(),
+            params     = operation.getParams() || {},
+            length     = ids.length,
+            i, record;
+
+        //read a single record
+        if (params[idProperty] !== undefined) {
+            record = this.getRecord(params[idProperty]);
+            if (record) {
+                records.push(record);
+                operation.setSuccessful();
+            }
+        } else {
+            for (i = 0; i < length; i++) {
+                records.push(this.getRecord(ids[i]));
+            }
+            operation.setSuccessful();
+        }
+
+        operation.setCompleted();
+
+        operation.setResultSet(Ext.create('Ext.data.ResultSet', {
+            records: records,
+            total  : records.length,
+            loaded : true
+        }));
+        operation.setRecords(records);
+
+        if (typeof callback == 'function') {
+            callback.call(scope || this, operation);
+        }
+    },
+
+    //inherit docs
+    update: function(operation, callback, scope) {
+        var records = operation.getRecords(),
+            length  = records.length,
+            ids     = this.getIds(),
+            record, id, i;
+
+        operation.setStarted();
+
+        for (i = 0; i < length; i++) {
+            record = records[i];
+            this.setRecord(record);
+
+            //we need to update the set of ids here because it's possible that a non-phantom record was added
+            //to this proxy - in which case the record's id would never have been added via the normal 'create' call
+            id = record.getId();
+            if (id !== undefined && Ext.Array.indexOf(ids, id) == -1) {
+                ids.push(id);
+            }
+        }
+        this.setIds(ids);
+
+        operation.setCompleted();
+        operation.setSuccessful();
+
+        if (typeof callback == 'function') {
+            callback.call(scope || this, operation);
+        }
+    },
+
+    //inherit
+    destroy: function(operation, callback, scope) {
+        var records = operation.getRecords(),
+            length  = records.length,
+            ids     = this.getIds(),
+
+            //newIds is a copy of ids, from which we remove the destroyed records
+            newIds  = [].concat(ids),
+            i;
+
+        for (i = 0; i < length; i++) {
+            Ext.Array.remove(newIds, records[i].getId());
+            this.removeRecord(records[i], false);
+        }
+
+        this.setIds(newIds);
+
+        operation.setCompleted();
+        operation.setSuccessful();
+
+        if (typeof callback == 'function') {
+            callback.call(scope || this, operation);
+        }
+    },
+
+    /**
+     * @private
+     * Fetches a model instance from the Proxy by ID. Runs each field's decode function (if present) to decode the data.
+     * @param {String} id The record's unique ID
+     * @return {Ext.data.Model} The model instance or undefined if the record did not exist in the storage.
+     */
+    getRecord: function(id) {
+        if (this.cache[id] === undefined) {
+            var recordKey = this.getRecordKey(id),
+                item = this.getStorageObject().getItem(recordKey),
+                data    = {},
+                Model   = this.getModel(),
+                fields  = Model.getFields().items,
+                length  = fields.length,
+                i, field, name, record, rawData, dateFormat;
+
+            if (!item) {
+                return;
+            }
+
+            rawData = Ext.decode(item);
+
+            for (i = 0; i < length; i++) {
+                field = fields[i];
+                name  = field.getName();
+
+                if (typeof field.getDecode() == 'function') {
+                    data[name] = field.getDecode()(rawData[name]);
+                } else {
+                    if (field.getType().type == 'date') {
+                        dateFormat = field.getDateFormat();
+                        if (dateFormat) {
+                            data[name] = Ext.Date.parse(rawData[name], dateFormat);
+                        } else {
+                            data[name] = new Date(rawData[name]);
+                        }
+                    } else {
+                        data[name] = rawData[name];
+                    }
+                }
+            }
+
+            record = new Model(data, id);
+            this.cache[id] = record;
+        }
+
+        return this.cache[id];
+    },
+
+    /**
+     * Saves the given record in the Proxy. Runs each field's encode function (if present) to encode the data.
+     * @param {Ext.data.Model} record The model instance
+     * @param {String} [id] The id to save the record under (defaults to the value of the record's getId() function)
+     */
+    setRecord: function(record, id) {
+        if (id) {
+            record.setId(id);
+        } else {
+            id = record.getId();
+        }
+
+        var me = this,
+            rawData = record.getData(),
+            data    = {},
+            Model   = me.getModel(),
+            fields  = Model.getFields().items,
+            length  = fields.length,
+            i = 0,
+            field, name, obj, key, dateFormat;
+
+        for (; i < length; i++) {
+            field = fields[i];
+            name  = field.getName();
+
+            if (typeof field.getEncode() == 'function') {
+                data[name] = field.getEncode()(rawData[name], record);
+            } else {
+                if (field.getType().type == 'date' && Ext.isDate(rawData[name])) {
+                    dateFormat = field.getDateFormat();
+                    if (dateFormat) {
+                        data[name] = Ext.Date.format(rawData[name], dateFormat);
+                    } else {
+                        data[name] = rawData[name].getTime();
+                    }
+                } else {
+                    data[name] = rawData[name];
+                }
+            }
+        }
+
+        obj = me.getStorageObject();
+        key = me.getRecordKey(id);
+
+        //keep the cache up to date
+        me.cache[id] = record;
+
+        //iPad bug requires that we remove the item before setting it
+        obj.removeItem(key);
+        obj.setItem(key, Ext.encode(data));
+    },
+
+    /**
+     * @private
+     * Physically removes a given record from the local storage. Used internally by {@link #destroy}, which you should
+     * use instead because it updates the list of currently-stored record ids
+     * @param {String/Number/Ext.data.Model} id The id of the record to remove, or an Ext.data.Model instance
+     */
+    removeRecord: function(id, updateIds) {
+        var me = this,
+            ids;
+
+        if (id.isModel) {
+            id = id.getId();
+        }
+
+        if (updateIds !== false) {
+            ids = me.getIds();
+            Ext.Array.remove(ids, id);
+            me.setIds(ids);
+        }
+
+        me.getStorageObject().removeItem(me.getRecordKey(id));
+    },
+
+    /**
+     * @private
+     * Given the id of a record, returns a unique string based on that id and the id of this proxy. This is used when
+     * storing data in the local storage object and should prevent naming collisions.
+     * @param {String/Number/Ext.data.Model} id The record id, or a Model instance
+     * @return {String} The unique key for this record
+     */
+    getRecordKey: function(id) {
+        if (id.isModel) {
+            id = id.getId();
+        }
+
+        return Ext.String.format("{0}-{1}", this.getId(), id);
+    },
+
+    /**
+     * @private
+     * Returns the unique key used to store the current record counter for this proxy. This is used internally when
+     * realizing models (creating them when they used to be phantoms), in order to give each model instance a unique id.
+     * @return {String} The counter key
+     */
+    getRecordCounterKey: function() {
+        return Ext.String.format("{0}-counter", this.getId());
+    },
+
+    /**
+     * @private
+     * Returns the array of record IDs stored in this Proxy
+     * @return {Number[]} The record IDs. Each is cast as a Number
+     */
+    getIds: function() {
+        var ids    = (this.getStorageObject().getItem(this.getId()) || "").split(","),
+            length = ids.length,
+            i;
+
+        if (length == 1 && ids[0] === "") {
+            ids = [];
+        } else {
+            for (i = 0; i < length; i++) {
+                ids[i] = parseInt(ids[i], 10);
+            }
+        }
+
+        return ids;
+    },
+
+    /**
+     * @private
+     * Saves the array of ids representing the set of all records in the Proxy
+     * @param {Number[]} ids The ids to set
+     */
+    setIds: function(ids) {
+        var obj = this.getStorageObject(),
+            str = ids.join(","),
+            id  = this.getId(),
+            key = this.getRecordCounterKey();
+
+        obj.removeItem(id);
+
+        if (Ext.isEmpty(str)) {
+            obj.removeItem(key);
+        } else {
+            obj.setItem(id, str);
+        }
+    },
+
+    /**
+     * @private
+     * Returns the next numerical ID that can be used when realizing a model instance (see getRecordCounterKey).
+     * Increments the counter.
+     * @return {Number} The id
+     */
+    getNextId: function() {
+        var obj  = this.getStorageObject(),
+            key  = this.getRecordCounterKey(),
+            last = obj.getItem(key),
+            ids, id;
+
+        if (last === null) {
+            ids = this.getIds();
+            last = ids[ids.length - 1] || 0;
+        }
+
+        id = parseInt(last, 10) + 1;
+        obj.setItem(key, id);
+
+        return id;
+    },
+
+    /**
+     * @private
+     * Sets up the Proxy by claiming the key in the storage object that corresponds to the unique id of this Proxy. Called
+     * automatically by the constructor, this should not need to be called again unless {@link #clear} has been called.
+     */
+    initialize: function() {
+        this.callParent(arguments);
+        var storageObject = this.getStorageObject();
+        storageObject.setItem(this.getId(), storageObject.getItem(this.getId()) || "");
+    },
+
+    /**
+     * Destroys all records stored in the proxy and removes all keys and values used to support the proxy from the
+     * storage object.
+     */
+    clear: function() {
+        var obj = this.getStorageObject(),
+            ids = this.getIds(),
+            len = ids.length,
+            i;
+
+        //remove all the records
+        for (i = 0; i < len; i++) {
+            this.removeRecord(ids[i]);
+        }
+
+        //remove the supporting objects
+        obj.removeItem(this.getRecordCounterKey());
+        obj.removeItem(this.getId());
+    },
+
+    /**
+     * @private
+     * Abstract function which should return the storage object that data will be saved to. This must be implemented
+     * in each subclass.
+     * @return {Object} The storage object
+     */
+    getStorageObject: function() {
+        Ext.Logger.error("The getStorageObject function has not been defined in your Ext.data.proxy.WebStorage subclass");
+    }
+});
+
+/**
+ * @author Ed Spencer
+ * @aside guide proxies
+ *
+ * The LocalStorageProxy uses the new HTML5 localStorage API to save {@link Ext.data.Model Model} data locally on the
+ * client browser. HTML5 localStorage is a key-value store (e.g. cannot save complex objects like JSON), so
+ * LocalStorageProxy automatically serializes and deserializes data when saving and retrieving it.
+ *
+ * localStorage is extremely useful for saving user-specific information without needing to build server-side
+ * infrastructure to support it. Let's imagine we're writing a Twitter search application and want to save the user's
+ * searches locally so they can easily perform a saved search again later. We'd start by creating a Search model:
+ *
+ *     Ext.define('Search', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: ['id', 'query'],
+ *             proxy: {
+ *                 type: 'localstorage',
+ *                 id  : 'twitter-Searches'
+ *             }
+ *         }
+ *     });
+ *
+ * Our Search model contains just two fields - id and query - plus a Proxy definition. The only configuration we need to
+ * pass to the LocalStorage proxy is an {@link #id}. This is important as it separates the Model data in this Proxy from
+ * all others. The localStorage API puts all data into a single shared namespace, so by setting an id we enable
+ * LocalStorageProxy to manage the saved Search data.
+ *
+ * Saving our data into localStorage is easy and would usually be done with a {@link Ext.data.Store Store}:
+ *
+ *     //our Store automatically picks up the LocalStorageProxy defined on the Search model
+ *     var store = Ext.create('Ext.data.Store', {
+ *         model: "Search"
+ *     });
+ *
+ *     //loads any existing Search data from localStorage
+ *     store.load();
+ *
+ *     //now add some Searches
+ *     store.add({query: 'Sencha Touch'});
+ *     store.add({query: 'Ext JS'});
+ *
+ *     //finally, save our Search data to localStorage
+ *     store.sync();
+ *
+ * The LocalStorageProxy automatically gives our new Searches an id when we call store.sync(). It encodes the Model data
+ * and places it into localStorage. We can also save directly to localStorage, bypassing the Store altogether:
+ *
+ *     var search = Ext.create('Search', {query: 'Sencha Animator'});
+ *
+ *     //uses the configured LocalStorageProxy to save the new Search to localStorage
+ *     search.save();
+ *
+ * # Limitations
+ *
+ * If this proxy is used in a browser where local storage is not supported, the constructor will throw an error. A local
+ * storage proxy requires a unique ID which is used as a key in which all record data are stored in the local storage
+ * object.
+ *
+ * It's important to supply this unique ID as it cannot be reliably determined otherwise. If no id is provided but the
+ * attached store has a storeId, the storeId will be used. If neither option is presented the proxy will throw an error.
+ */
+Ext.define('Ext.data.proxy.LocalStorage', {
+    extend: 'Ext.data.proxy.WebStorage',
+    alias: 'proxy.localstorage',
+    alternateClassName: 'Ext.data.LocalStorageProxy',
+
+    //inherit docs
+    getStorageObject: function() {
+        return window.localStorage;
+    }
+});
+
+/**
+ * @author Ed Spencer
  * @aside guide proxies
  *
  * In-memory proxy. This proxy simply uses a local variable for data storage/retrieval, so its contents are lost on
@@ -49137,7 +49719,8 @@ Ext.define("App.view.SessionList", {
         iconCls: "button",
         itemTpl:
                 '</pre>'+
-                '<div class="list-item-title">{startTime} - {endTime}: {name}</div>'+
+                '<div class="list-item-title"><input id="img{id}" type="image" src="resources/icons/star_gray_small.png" onClick="saveSessionDetail(\'{id}\');" onLoad="setImageSource({id});" />{startTime} - {endTime}: {name}</div>'+
+                '<image id="img2{id}" src="resources/icons/star_gray_small.png" onLoad="setImageSource({id});" style="display:none;" />'+
                 '<div class="list-item-title">{speaker}</div>'+
                 '<div class="list-item-description">{ingress}</div>'+
                 '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPopupMap(\'{place}\', \'{place}\');" value="{place}" /></div>'+
@@ -49146,7 +49729,6 @@ Ext.define("App.view.SessionList", {
 });
 
 function showPopupMap(image, imageTitle){
-    //showPopup(image, imageTitle);
     
     var popup = new Ext.Panel({
         floating: true,
@@ -49170,7 +49752,6 @@ function showPopupMap(image, imageTitle){
     });
     
     popup.show();
-    
 }
 
 
@@ -49189,509 +49770,6 @@ Ext.define("App.view.SessionListContainer", {
         items: [{
                 xtype: 'sessionlist'
         }]
-    }
-});
-
-/**
- * @author Ed Spencer
- *
- * WebStorageProxy is simply a superclass for the {@link Ext.data.proxy.LocalStorage LocalStorage} proxy. It uses the
- * new HTML5 key/value client-side storage objects to save {@link Ext.data.Model model instances} for offline use.
- * @private
- */
-Ext.define('Ext.data.proxy.WebStorage', {
-    extend: 'Ext.data.proxy.Client',
-    alternateClassName: 'Ext.data.WebStorageProxy',
-
-    requires: 'Ext.Date',
-
-    config: {
-        /**
-         * @cfg {String} id
-         * The unique ID used as the key in which all record data are stored in the local storage object.
-         */
-        id: undefined,
-
-        // WebStorage proxies dont use readers and writers
-        reader: null,
-        writer: null
-    },
-
-    /**
-     * Creates the proxy, throws an error if local storage is not supported in the current browser.
-     * @param {Object} config (optional) Config object.
-     */
-    constructor: function(config) {
-        this.callParent(arguments);
-
-        /**
-         * @property {Object} cache
-         * Cached map of records already retrieved by this Proxy. Ensures that the same instance is always retrieved.
-         */
-        this.cache = {};
-
-        if (this.getStorageObject() === undefined) {
-            Ext.Logger.error("Local Storage is not supported in this browser, please use another type of data proxy");
-        }
-    },
-
-    updateModel: function(model) {
-        if (!this.getId()) {
-            this.setId(model.modelName);
-        }
-    },
-
-    //inherit docs
-    create: function(operation, callback, scope) {
-        var records = operation.getRecords(),
-            length  = records.length,
-            ids     = this.getIds(),
-            id, record, i;
-
-        operation.setStarted();
-
-        for (i = 0; i < length; i++) {
-            record = records[i];
-
-            if (record.phantom) {
-                record.phantom = false;
-                id = this.getNextId();
-            } else {
-                id = record.getId();
-            }
-
-            this.setRecord(record, id);
-            ids.push(id);
-        }
-
-        this.setIds(ids);
-
-        operation.setCompleted();
-        operation.setSuccessful();
-
-        if (typeof callback == 'function') {
-            callback.call(scope || this, operation);
-        }
-    },
-
-    //inherit docs
-    read: function(operation, callback, scope) {
-        var records    = [],
-            ids        = this.getIds(),
-            model      = this.getModel(),
-            idProperty = model.getIdProperty(),
-            params     = operation.getParams() || {},
-            length     = ids.length,
-            i, record;
-
-        //read a single record
-        if (params[idProperty] !== undefined) {
-            record = this.getRecord(params[idProperty]);
-            if (record) {
-                records.push(record);
-                operation.setSuccessful();
-            }
-        } else {
-            for (i = 0; i < length; i++) {
-                records.push(this.getRecord(ids[i]));
-            }
-            operation.setSuccessful();
-        }
-
-        operation.setCompleted();
-
-        operation.setResultSet(Ext.create('Ext.data.ResultSet', {
-            records: records,
-            total  : records.length,
-            loaded : true
-        }));
-        operation.setRecords(records);
-
-        if (typeof callback == 'function') {
-            callback.call(scope || this, operation);
-        }
-    },
-
-    //inherit docs
-    update: function(operation, callback, scope) {
-        var records = operation.getRecords(),
-            length  = records.length,
-            ids     = this.getIds(),
-            record, id, i;
-
-        operation.setStarted();
-
-        for (i = 0; i < length; i++) {
-            record = records[i];
-            this.setRecord(record);
-
-            //we need to update the set of ids here because it's possible that a non-phantom record was added
-            //to this proxy - in which case the record's id would never have been added via the normal 'create' call
-            id = record.getId();
-            if (id !== undefined && Ext.Array.indexOf(ids, id) == -1) {
-                ids.push(id);
-            }
-        }
-        this.setIds(ids);
-
-        operation.setCompleted();
-        operation.setSuccessful();
-
-        if (typeof callback == 'function') {
-            callback.call(scope || this, operation);
-        }
-    },
-
-    //inherit
-    destroy: function(operation, callback, scope) {
-        var records = operation.getRecords(),
-            length  = records.length,
-            ids     = this.getIds(),
-
-            //newIds is a copy of ids, from which we remove the destroyed records
-            newIds  = [].concat(ids),
-            i;
-
-        for (i = 0; i < length; i++) {
-            Ext.Array.remove(newIds, records[i].getId());
-            this.removeRecord(records[i], false);
-        }
-
-        this.setIds(newIds);
-
-        operation.setCompleted();
-        operation.setSuccessful();
-
-        if (typeof callback == 'function') {
-            callback.call(scope || this, operation);
-        }
-    },
-
-    /**
-     * @private
-     * Fetches a model instance from the Proxy by ID. Runs each field's decode function (if present) to decode the data.
-     * @param {String} id The record's unique ID
-     * @return {Ext.data.Model} The model instance or undefined if the record did not exist in the storage.
-     */
-    getRecord: function(id) {
-        if (this.cache[id] === undefined) {
-            var recordKey = this.getRecordKey(id),
-                item = this.getStorageObject().getItem(recordKey),
-                data    = {},
-                Model   = this.getModel(),
-                fields  = Model.getFields().items,
-                length  = fields.length,
-                i, field, name, record, rawData, dateFormat;
-
-            if (!item) {
-                return;
-            }
-
-            rawData = Ext.decode(item);
-
-            for (i = 0; i < length; i++) {
-                field = fields[i];
-                name  = field.getName();
-
-                if (typeof field.getDecode() == 'function') {
-                    data[name] = field.getDecode()(rawData[name]);
-                } else {
-                    if (field.getType().type == 'date') {
-                        dateFormat = field.getDateFormat();
-                        if (dateFormat) {
-                            data[name] = Ext.Date.parse(rawData[name], dateFormat);
-                        } else {
-                            data[name] = new Date(rawData[name]);
-                        }
-                    } else {
-                        data[name] = rawData[name];
-                    }
-                }
-            }
-
-            record = new Model(data, id);
-            this.cache[id] = record;
-        }
-
-        return this.cache[id];
-    },
-
-    /**
-     * Saves the given record in the Proxy. Runs each field's encode function (if present) to encode the data.
-     * @param {Ext.data.Model} record The model instance
-     * @param {String} [id] The id to save the record under (defaults to the value of the record's getId() function)
-     */
-    setRecord: function(record, id) {
-        if (id) {
-            record.setId(id);
-        } else {
-            id = record.getId();
-        }
-
-        var me = this,
-            rawData = record.getData(),
-            data    = {},
-            Model   = me.getModel(),
-            fields  = Model.getFields().items,
-            length  = fields.length,
-            i = 0,
-            field, name, obj, key, dateFormat;
-
-        for (; i < length; i++) {
-            field = fields[i];
-            name  = field.getName();
-
-            if (typeof field.getEncode() == 'function') {
-                data[name] = field.getEncode()(rawData[name], record);
-            } else {
-                if (field.getType().type == 'date' && Ext.isDate(rawData[name])) {
-                    dateFormat = field.getDateFormat();
-                    if (dateFormat) {
-                        data[name] = Ext.Date.format(rawData[name], dateFormat);
-                    } else {
-                        data[name] = rawData[name].getTime();
-                    }
-                } else {
-                    data[name] = rawData[name];
-                }
-            }
-        }
-
-        obj = me.getStorageObject();
-        key = me.getRecordKey(id);
-
-        //keep the cache up to date
-        me.cache[id] = record;
-
-        //iPad bug requires that we remove the item before setting it
-        obj.removeItem(key);
-        obj.setItem(key, Ext.encode(data));
-    },
-
-    /**
-     * @private
-     * Physically removes a given record from the local storage. Used internally by {@link #destroy}, which you should
-     * use instead because it updates the list of currently-stored record ids
-     * @param {String/Number/Ext.data.Model} id The id of the record to remove, or an Ext.data.Model instance
-     */
-    removeRecord: function(id, updateIds) {
-        var me = this,
-            ids;
-
-        if (id.isModel) {
-            id = id.getId();
-        }
-
-        if (updateIds !== false) {
-            ids = me.getIds();
-            Ext.Array.remove(ids, id);
-            me.setIds(ids);
-        }
-
-        me.getStorageObject().removeItem(me.getRecordKey(id));
-    },
-
-    /**
-     * @private
-     * Given the id of a record, returns a unique string based on that id and the id of this proxy. This is used when
-     * storing data in the local storage object and should prevent naming collisions.
-     * @param {String/Number/Ext.data.Model} id The record id, or a Model instance
-     * @return {String} The unique key for this record
-     */
-    getRecordKey: function(id) {
-        if (id.isModel) {
-            id = id.getId();
-        }
-
-        return Ext.String.format("{0}-{1}", this.getId(), id);
-    },
-
-    /**
-     * @private
-     * Returns the unique key used to store the current record counter for this proxy. This is used internally when
-     * realizing models (creating them when they used to be phantoms), in order to give each model instance a unique id.
-     * @return {String} The counter key
-     */
-    getRecordCounterKey: function() {
-        return Ext.String.format("{0}-counter", this.getId());
-    },
-
-    /**
-     * @private
-     * Returns the array of record IDs stored in this Proxy
-     * @return {Number[]} The record IDs. Each is cast as a Number
-     */
-    getIds: function() {
-        var ids    = (this.getStorageObject().getItem(this.getId()) || "").split(","),
-            length = ids.length,
-            i;
-
-        if (length == 1 && ids[0] === "") {
-            ids = [];
-        } else {
-            for (i = 0; i < length; i++) {
-                ids[i] = parseInt(ids[i], 10);
-            }
-        }
-
-        return ids;
-    },
-
-    /**
-     * @private
-     * Saves the array of ids representing the set of all records in the Proxy
-     * @param {Number[]} ids The ids to set
-     */
-    setIds: function(ids) {
-        var obj = this.getStorageObject(),
-            str = ids.join(","),
-            id  = this.getId(),
-            key = this.getRecordCounterKey();
-
-        obj.removeItem(id);
-
-        if (Ext.isEmpty(str)) {
-            obj.removeItem(key);
-        } else {
-            obj.setItem(id, str);
-        }
-    },
-
-    /**
-     * @private
-     * Returns the next numerical ID that can be used when realizing a model instance (see getRecordCounterKey).
-     * Increments the counter.
-     * @return {Number} The id
-     */
-    getNextId: function() {
-        var obj  = this.getStorageObject(),
-            key  = this.getRecordCounterKey(),
-            last = obj.getItem(key),
-            ids, id;
-
-        if (last === null) {
-            ids = this.getIds();
-            last = ids[ids.length - 1] || 0;
-        }
-
-        id = parseInt(last, 10) + 1;
-        obj.setItem(key, id);
-
-        return id;
-    },
-
-    /**
-     * @private
-     * Sets up the Proxy by claiming the key in the storage object that corresponds to the unique id of this Proxy. Called
-     * automatically by the constructor, this should not need to be called again unless {@link #clear} has been called.
-     */
-    initialize: function() {
-        this.callParent(arguments);
-        var storageObject = this.getStorageObject();
-        storageObject.setItem(this.getId(), storageObject.getItem(this.getId()) || "");
-    },
-
-    /**
-     * Destroys all records stored in the proxy and removes all keys and values used to support the proxy from the
-     * storage object.
-     */
-    clear: function() {
-        var obj = this.getStorageObject(),
-            ids = this.getIds(),
-            len = ids.length,
-            i;
-
-        //remove all the records
-        for (i = 0; i < len; i++) {
-            this.removeRecord(ids[i]);
-        }
-
-        //remove the supporting objects
-        obj.removeItem(this.getRecordCounterKey());
-        obj.removeItem(this.getId());
-    },
-
-    /**
-     * @private
-     * Abstract function which should return the storage object that data will be saved to. This must be implemented
-     * in each subclass.
-     * @return {Object} The storage object
-     */
-    getStorageObject: function() {
-        Ext.Logger.error("The getStorageObject function has not been defined in your Ext.data.proxy.WebStorage subclass");
-    }
-});
-
-/**
- * @author Ed Spencer
- * @aside guide proxies
- *
- * The LocalStorageProxy uses the new HTML5 localStorage API to save {@link Ext.data.Model Model} data locally on the
- * client browser. HTML5 localStorage is a key-value store (e.g. cannot save complex objects like JSON), so
- * LocalStorageProxy automatically serializes and deserializes data when saving and retrieving it.
- *
- * localStorage is extremely useful for saving user-specific information without needing to build server-side
- * infrastructure to support it. Let's imagine we're writing a Twitter search application and want to save the user's
- * searches locally so they can easily perform a saved search again later. We'd start by creating a Search model:
- *
- *     Ext.define('Search', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: ['id', 'query'],
- *             proxy: {
- *                 type: 'localstorage',
- *                 id  : 'twitter-Searches'
- *             }
- *         }
- *     });
- *
- * Our Search model contains just two fields - id and query - plus a Proxy definition. The only configuration we need to
- * pass to the LocalStorage proxy is an {@link #id}. This is important as it separates the Model data in this Proxy from
- * all others. The localStorage API puts all data into a single shared namespace, so by setting an id we enable
- * LocalStorageProxy to manage the saved Search data.
- *
- * Saving our data into localStorage is easy and would usually be done with a {@link Ext.data.Store Store}:
- *
- *     //our Store automatically picks up the LocalStorageProxy defined on the Search model
- *     var store = Ext.create('Ext.data.Store', {
- *         model: "Search"
- *     });
- *
- *     //loads any existing Search data from localStorage
- *     store.load();
- *
- *     //now add some Searches
- *     store.add({query: 'Sencha Touch'});
- *     store.add({query: 'Ext JS'});
- *
- *     //finally, save our Search data to localStorage
- *     store.sync();
- *
- * The LocalStorageProxy automatically gives our new Searches an id when we call store.sync(). It encodes the Model data
- * and places it into localStorage. We can also save directly to localStorage, bypassing the Store altogether:
- *
- *     var search = Ext.create('Search', {query: 'Sencha Animator'});
- *
- *     //uses the configured LocalStorageProxy to save the new Search to localStorage
- *     search.save();
- *
- * # Limitations
- *
- * If this proxy is used in a browser where local storage is not supported, the constructor will throw an error. A local
- * storage proxy requires a unique ID which is used as a key in which all record data are stored in the local storage
- * object.
- *
- * It's important to supply this unique ID as it cannot be reliably determined otherwise. If no id is provided but the
- * attached store has a storeId, the storeId will be used. If neither option is presented the proxy will throw an error.
- */
-Ext.define('Ext.data.proxy.LocalStorage', {
-    extend: 'Ext.data.proxy.WebStorage',
-    alias: 'proxy.localstorage',
-    alternateClassName: 'Ext.data.LocalStorageProxy',
-
-    //inherit docs
-    getStorageObject: function() {
-        return window.localStorage;
     }
 });
 
@@ -49949,11 +50027,12 @@ Ext.define("App.view.EventList", {
         itemTpl:
                 '</pre>'+
                 '<div class="list-item-title">'+
-                '<input class="buttonLeft" type="button" onClick="removeEvent({externalId});" value="Fjern" />' + 
+                //'<image id="img{id}" type="image" src="resources/icons/star_color_small.png" onclick="removeEvent({externalId});" />' +
+                '<input type="image" src="resources/icons/star_color_small.png" onClick="removeEvent({externalId});" value="Fjern" />' + 
                 '{name}</div>'+
                 '<div class="list-item-title"></div>'+
                 '<div class="list-item-description">{ingress}</div>'+
-                '<div class="list-item-title"><a href="">{place}</a></div>'+
+                '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPopupMap(\'{place}\', \'{place}\');" value="{place}" /></div>'+
                 '<pre>'
     }
 });
@@ -49962,6 +50041,31 @@ function removeEvent(id) {
     removeItem(id);
 }
 
+function showPopupMap(image, imageTitle){
+    
+    var popup = new Ext.Panel({
+        floating: true,
+        modal: true,
+        width: 320,
+        height: 420,
+        html: '<body style="margin: 0px 0px 0px 0px; padding: 0px 0px 0px 0px;"><img src="resources/images/maps/'+image+'" style="height:100%; width:100%"></body>',
+        items: [{
+            xtype: 'toolbar',
+            title: imageTitle,
+            docked: 'top',
+            items: [{
+                xtype: 'spacer'
+            },{
+                text: 'Lukk',
+                handler: function(){
+                    popup.hide();
+                }
+            }]
+        }]
+    });
+    
+    popup.show();
+}
 
 
 Ext.define("App.view.EventListContainer", {

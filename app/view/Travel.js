@@ -17,7 +17,7 @@ Ext.define("App.view.Travel", {
                     '<div class="textBlock">',
                     '<div class="header">{item1}</div>',
                     '<div class="contentText">{item2}</div></div>',
-                    '<input type="button" class="buttonWide" onClick="showPopupMap(\'{item4}\', \'{item3}\');" value="{item3}" />',
+                    '<input type="button" class="buttonWide" onClick="showPopupMap(\'{item4}.jpg\', \'{item3}\');" value="{item3}" />',
                     '</div>'
                 ],
 

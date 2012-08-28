@@ -2,7 +2,7 @@ Ext.application({
     name: 'App',
 
     requires: [
-        'Ext.MessageBox'
+        // 'Ext.MessageBox'
     ],
 
     views: [
