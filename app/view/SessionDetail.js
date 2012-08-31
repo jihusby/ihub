@@ -31,15 +31,12 @@ function setListButtonText(removeFromList){
 }
 
 function setImageSource(id){
-    console.log("setImageSource invoked");
     var saved = isEventSaved(id) ? "color" : "gray";
-    console.log("setImageSource: saved is " + saved);
     setSource(id, saved);
 }
 
 function setSource(id, color){
     if(document.getElementById("img"+id)){
-        console.log("setting source: color is " + color);
         document.getElementById("img"+id).src = "resources/icons/star_"+ color +"_small.png";
     }
 }

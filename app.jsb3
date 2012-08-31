@@ -1,5 +1,5 @@
 {
-    "projectName": "XP 2010",
+    "projectName": "XP2010",
     "licenseText": "Copyright(c) 2012 Itema as",
     "builds": [
         {
@@ -10,13 +10,13 @@
             },
             "files": [
                 {
-                    "clsName": "Ext.event.Controller",
-                    "name": "Controller.js",
+                    "clsName": "Ext.event.ListenerStack",
+                    "name": "ListenerStack.js",
                     "path": "sdk/src/event/"
                 },
                 {
-                    "clsName": "Ext.event.ListenerStack",
-                    "name": "ListenerStack.js",
+                    "clsName": "Ext.event.Controller",
+                    "name": "Controller.js",
                     "path": "sdk/src/event/"
                 },
                 {
@@ -135,11 +135,6 @@
                     "path": "sdk/src/fx/animation/"
                 },
                 {
-                    "clsName": "Ext.fx.animation.Fade",
-                    "name": "Fade.js",
-                    "path": "sdk/src/fx/animation/"
-                },
-                {
                     "clsName": "Ext.fx.animation.Slide",
                     "name": "Slide.js",
                     "path": "sdk/src/fx/animation/"
@@ -147,6 +142,11 @@
                 {
                     "clsName": "Ext.fx.animation.SlideOut",
                     "name": "SlideOut.js",
+                    "path": "sdk/src/fx/animation/"
+                },
+                {
+                    "clsName": "Ext.fx.animation.Fade",
+                    "name": "Fade.js",
                     "path": "sdk/src/fx/animation/"
                 },
                 {
@@ -180,21 +180,6 @@
                     "path": "sdk/src/"
                 },
                 {
-                    "clsName": "Ext.util.AbstractMixedCollection",
-                    "name": "AbstractMixedCollection.js",
-                    "path": "sdk/src/util/"
-                },
-                {
-                    "clsName": "Ext.util.MixedCollection",
-                    "name": "MixedCollection.js",
-                    "path": "sdk/src/util/"
-                },
-                {
-                    "clsName": "Ext.ItemCollection",
-                    "name": "ItemCollection.js",
-                    "path": "sdk/src/"
-                },
-                {
                     "clsName": "Ext.layout.Default",
                     "name": "Default.js",
                     "path": "sdk/src/layout/"
@@ -210,14 +195,29 @@
                     "path": "sdk/src/layout/"
                 },
                 {
+                    "clsName": "Ext.layout.HBox",
+                    "name": "HBox.js",
+                    "path": "sdk/src/layout/"
+                },
+                {
                     "clsName": "Ext.layout.VBox",
                     "name": "VBox.js",
                     "path": "sdk/src/layout/"
                 },
                 {
-                    "clsName": "Ext.layout.HBox",
-                    "name": "HBox.js",
-                    "path": "sdk/src/layout/"
+                    "clsName": "Ext.util.AbstractMixedCollection",
+                    "name": "AbstractMixedCollection.js",
+                    "path": "sdk/src/util/"
+                },
+                {
+                    "clsName": "Ext.util.MixedCollection",
+                    "name": "MixedCollection.js",
+                    "path": "sdk/src/util/"
+                },
+                {
+                    "clsName": "Ext.ItemCollection",
+                    "name": "ItemCollection.js",
+                    "path": "sdk/src/"
                 },
                 {
                     "clsName": "Ext.DateExtras",
@@ -250,9 +250,69 @@
                     "path": "sdk/src/fx/easing/"
                 },
                 {
+                    "clsName": "Ext.fx.layout.card.Abstract",
+                    "name": "Abstract.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
+                    "clsName": "Ext.fx.layout.card.Style",
+                    "name": "Style.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
+                    "clsName": "Ext.fx.layout.card.Slide",
+                    "name": "Slide.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
+                    "clsName": "Ext.fx.layout.card.Cover",
+                    "name": "Cover.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
+                    "clsName": "Ext.fx.layout.card.Reveal",
+                    "name": "Reveal.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
+                    "clsName": "Ext.fx.layout.card.Fade",
+                    "name": "Fade.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
+                    "clsName": "Ext.fx.layout.card.Flip",
+                    "name": "Flip.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
+                    "clsName": "Ext.fx.layout.card.Pop",
+                    "name": "Pop.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
                     "clsName": "Ext.fx.easing.Linear",
                     "name": "Linear.js",
                     "path": "sdk/src/fx/easing/"
+                },
+                {
+                    "clsName": "Ext.fx.layout.card.Scroll",
+                    "name": "Scroll.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
+                    "clsName": "Ext.fx.layout.Card",
+                    "name": "Card.js",
+                    "path": "sdk/src/fx/layout/"
+                },
+                {
+                    "clsName": "Ext.layout.Card",
+                    "name": "Card.js",
+                    "path": "sdk/src/layout/"
+                },
+                {
+                    "clsName": "Ext.layout.Layout",
+                    "name": "Layout.js",
+                    "path": "sdk/src/layout/"
                 },
                 {
                     "clsName": "Ext.fx.easing.EaseOut",
@@ -320,19 +380,14 @@
                     "path": "sdk/src/"
                 },
                 {
-                    "clsName": "Ext.field.Input",
-                    "name": "Input.js",
-                    "path": "sdk/src/field/"
-                },
-                {
-                    "clsName": "Ext.field.TextAreaInput",
-                    "name": "TextAreaInput.js",
-                    "path": "sdk/src/field/"
-                },
-                {
                     "clsName": "Ext.Decorator",
                     "name": "Decorator.js",
                     "path": "sdk/src/"
+                },
+                {
+                    "clsName": "Ext.field.Input",
+                    "name": "Input.js",
+                    "path": "sdk/src/field/"
                 },
                 {
                     "clsName": "Ext.field.Field",
@@ -345,6 +400,11 @@
                     "path": "sdk/src/field/"
                 },
                 {
+                    "clsName": "Ext.field.TextAreaInput",
+                    "name": "TextAreaInput.js",
+                    "path": "sdk/src/field/"
+                },
+                {
                     "clsName": "Ext.field.TextArea",
                     "name": "TextArea.js",
                     "path": "sdk/src/field/"
@@ -353,66 +413,6 @@
                     "clsName": "Ext.scroll.Scroller",
                     "name": "Scroller.js",
                     "path": "sdk/src/scroll/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Abstract",
-                    "name": "Abstract.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Scroll",
-                    "name": "Scroll.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Style",
-                    "name": "Style.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Slide",
-                    "name": "Slide.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Cover",
-                    "name": "Cover.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Reveal",
-                    "name": "Reveal.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Flip",
-                    "name": "Flip.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Pop",
-                    "name": "Pop.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Fade",
-                    "name": "Fade.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.Card",
-                    "name": "Card.js",
-                    "path": "sdk/src/fx/layout/"
-                },
-                {
-                    "clsName": "Ext.layout.Card",
-                    "name": "Card.js",
-                    "path": "sdk/src/layout/"
-                },
-                {
-                    "clsName": "Ext.layout.Layout",
-                    "name": "Layout.js",
-                    "path": "sdk/src/layout/"
                 },
                 {
                     "clsName": "Ext.scroll.indicator.Abstract",
@@ -635,6 +635,11 @@
                     "path": "sdk/src/viewport/"
                 },
                 {
+                    "clsName": "Ext.app.Controller",
+                    "name": "Controller.js",
+                    "path": "sdk/src/app/"
+                },
+                {
                     "clsName": "Ext.app.History",
                     "name": "History.js",
                     "path": "sdk/src/app/"
@@ -647,11 +652,6 @@
                 {
                     "clsName": "Ext.app.Action",
                     "name": "Action.js",
-                    "path": "sdk/src/app/"
-                },
-                {
-                    "clsName": "Ext.app.Controller",
-                    "name": "Controller.js",
                     "path": "sdk/src/app/"
                 },
                 {
@@ -695,13 +695,13 @@
                     "path": "sdk/src/navigation/"
                 },
                 {
-                    "clsName": "Ext.dataview.ListItemHeader",
-                    "name": "ListItemHeader.js",
+                    "clsName": "Ext.dataview.IndexBar",
+                    "name": "IndexBar.js",
                     "path": "sdk/src/dataview/"
                 },
                 {
-                    "clsName": "Ext.dataview.IndexBar",
-                    "name": "IndexBar.js",
+                    "clsName": "Ext.dataview.ListItemHeader",
+                    "name": "ListItemHeader.js",
                     "path": "sdk/src/dataview/"
                 },
                 {
@@ -755,9 +755,9 @@
                     "path": "sdk/src/dataview/element/"
                 },
                 {
-                    "clsName": "Ext.data.Connection",
-                    "name": "Connection.js",
-                    "path": "sdk/src/data/"
+                    "clsName": "Ext.util.HashMap",
+                    "name": "HashMap.js",
+                    "path": "sdk/src/util/"
                 },
                 {
                     "clsName": "Ext.data.Request",
@@ -765,9 +765,9 @@
                     "path": "sdk/src/data/"
                 },
                 {
-                    "clsName": "Ext.util.HashMap",
-                    "name": "HashMap.js",
-                    "path": "sdk/src/util/"
+                    "clsName": "Ext.data.Connection",
+                    "name": "Connection.js",
+                    "path": "sdk/src/data/"
                 },
                 {
                     "clsName": "Ext.dataview.component.DataItem",
@@ -795,11 +795,6 @@
                     "path": "sdk/src/navigation/"
                 },
                 {
-                    "clsName": "App.view.Travel",
-                    "name": "Travel.js",
-                    "path": "app/view/"
-                },
-                {
                     "clsName": "App.view.Homepage",
                     "name": "Homepage.js",
                     "path": "app/view/"
@@ -807,6 +802,11 @@
                 {
                     "clsName": "App.view.Info",
                     "name": "Info.js",
+                    "path": "app/view/"
+                },
+                {
+                    "clsName": "App.view.Travel",
+                    "name": "Travel.js",
                     "path": "app/view/"
                 },
                 {
@@ -845,11 +845,6 @@
                     "path": "sdk/src/data/"
                 },
                 {
-                    "clsName": "Ext.Ajax",
-                    "name": "Ajax.js",
-                    "path": "sdk/src/"
-                },
-                {
                     "clsName": "Ext.data.Types",
                     "name": "Types.js",
                     "path": "sdk/src/data/"
@@ -868,6 +863,11 @@
                     "clsName": "Ext.data.ModelManager",
                     "name": "ModelManager.js",
                     "path": "sdk/src/data/"
+                },
+                {
+                    "clsName": "Ext.Ajax",
+                    "name": "Ajax.js",
+                    "path": "sdk/src/"
                 },
                 {
                     "clsName": "Ext.data.association.Association",

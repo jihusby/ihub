@@ -15,7 +15,8 @@ Ext.define("App.model.Event", {
             { name: 'name', type: 'string' },
             { name: 'speaker', type: 'string' },
             { name: 'ingress', type: 'string' },
-            { name: 'description', type: 'string' }
+            { name: 'description', type: 'string' },
+            { name: 'attending', type: 'string' }
         ],
         validations: [
             { type: 'presence', field: 'id' },

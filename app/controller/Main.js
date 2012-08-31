@@ -20,6 +20,7 @@ Ext.define('App.controller.Main', {
             },
             'eventlist': {
                 disclose: 'onEventDetailCommand'
+                //itemtap: 'onEventDetailCommand'
             }
         }
     },
@@ -50,25 +51,19 @@ Ext.define('App.controller.Main', {
     },
 
     onEventDetailCommand: function(list, record) {
+        console.log("onEventDetailCommand invoked");
         this.getEventListContainer().push(getEventDetail(record.data));
     }
 });
 
 function getSessionDetail(record) {
-    var value = isEventSaved(record.id)?"Fjern fra huskeliste":"Legg til i huskeliste";
+    var btnText = isEventSaved(record.id)?"Fjern fra huskeliste":"Legg til i huskeliste";
     this.setMainWindow();
     return {
             xtype: 'sessiondetail',
             title: record.startTime,
             data: record,
-            tpl:
-                '<input value="'+value+'" id="btn" class="buttonWide" type="button" onClick="saveSessionDetail({id});" />' + 
-                '<div class="textBlock">' + 
-                '<div class="contentInfo">{place} kl. {startTime}</div>' + 
-                '<div class="contentTitle">{name}</div>' + 
-                '<div class="contentIngress">{ingress}</div>' + 
-                '<div class="contentText">{description}</div>' + 
-                '</div>'
+            tpl: getSessionDetailTemplate(btnText)
     }
 }
 
@@ -77,14 +72,35 @@ function getEventDetail(record) {
             xtype: 'sessiondetail',
             title: record.startTime,
             data: record,
-            tpl:'<div class="textBlock">' + 
-                '<div class="contentInfo">{place} kl. {startTime}</div>' + 
-                '<div class="contentTitle">{name}</div>' + 
-                '<div class="contentIngress">{ingress}</div>' + 
-                '<div class="contentText">{description}</div>' + 
-                '</div>'
+            tpl: getEventDetailTemplate()
     }
 }
+
+function showPopupMap(image, imageTitle){
+    var popup = new Ext.Panel({
+        floating: true,
+        modal: true,
+        width: 320,
+        height: 420,
+        html: '<body style="margin: 0px 0px 0px 0px; padding: 0px 0px 0px 0px;"><img src="resources/images/maps/'+image+'" style="height:100%; width:100%"></body>',
+        items: [{
+            xtype: 'toolbar',
+            title: imageTitle,
+            docked: 'top',
+            items: [{
+                xtype: 'spacer'
+            },{
+                text: 'Lukk',
+                handler: function(){
+                    popup.hide();
+                }
+            }]
+        }]
+    });
+    
+    popup.show();
+}
+
 
   
   

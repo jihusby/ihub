@@ -92,15 +92,17 @@ $alert-color: red !default;
  * @var {color} $confirm-color
  * Color used for elements like success messages, and "confirm" UIs (eg. on buttons).
  */
-/*$confirm-color: #CACACA;*/
-$confirm-color: darken(saturate(#ffcc99, 10%), 20%);
+$confirm-color: #CACACA;
+/*$confirm-color: darken(saturate($base-color, 80%), 20%);*/
 
 /**
  * @var {color} $active-color
  * Color used for elements like selected rows, "action" UIs (eg. on buttons) and certain overlays like the picker mask.
  * -- Fill color of active bottom icon
  */
-$active-color: darken(saturate(#efefef, 10%), 10%);
+
+ /*$active-color: darken(saturate($base-color, 40%), 0%);*/
+$active-color: darken($base-color, 0%);
 
 /**
  * @var {color} $neutral-color

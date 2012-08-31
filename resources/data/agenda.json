@@ -86,7 +86,7 @@
 "timestamp": "1347141650400",
 "endTime": "14:45",
 "name": "Comparing Asynchronous Web Techniques",
-"speaker": "",
+"speaker": "Kent Beck",
 "ingress": "Pros and cons of comet, servlet 3, and websockets",
 "description": "The world is all about the asynchronous web these days. There are an increasing number of options for Java developers. In this presentation we'll cover 3 such options: comet, servlet 3, and websockets. We'll look at code and discuss pros and cons of each approach.",
 "place": "Møllenberg"
@@ -99,7 +99,7 @@
 "timestamp": "1347228032400",
 "endTime": "09:45",
 "name": "Workshop med Uncle Bob",
-"speaker": "",
+"speaker": "Kent Beck",
 "ingress": "TDD and Extreme programming with Robert C. Martin",
 "description": "Robert C. Martin - Uncle Bob - has been a software professional since 1970. In the last 35 years, he has worked in various capacities on literally hundreds of software projects. He has authored 'landmark' books on Agile Programming, Extreme Programming, UML, Object-Oriented Programming, and C Programming.",
 "place": "Møllenberg"
@@ -125,7 +125,7 @@
 "timestamp": "1347314432400",
 "endTime": "09:45",
 "name": "Avslutning",
-"speaker": "",
+"speaker": "Kent Beck",
 "ingress": "Siste dag på seminaret!",
 "description": "Vi oppsummerer",
 "place": "Møllenberg"}

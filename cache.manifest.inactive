@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# # # # # # # Manifest version 0.016
+# # # # # # # # Manifest version 0.016
 
 # Explicitly cached 'master entries'.
 CACHE:
@@ -18,7 +18,7 @@ app/controller/Main.js
 app/view/EventList.js
 app/view/EventListContainer.js
 app/view/Homepage.js
-# app/view/Info.js
+app/view/Info.js
 app/view/Main.js
 app/view/Offline.js
 app/view/SessionDetail.js
@@ -52,7 +52,5 @@ resources/data/agenda.json
 resources/data/hotel.json
 resources/data/info.json
 resources/data/travel.json
-app/view/Info.js
 
-FALLBACK:
-app/view/Info.js app/view/Offline.js
+# FALLBACK:

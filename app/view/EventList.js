@@ -18,18 +18,15 @@ Ext.define("App.view.EventList", {
                 '<div class="event-list-empty-text">Huskelisten er tom.</div>'+
                 '<pre>',
         onItemDisclosure: true,
+        listeners: {
+            itemtap: function() {
+                console.log("item tapped");
+                
+            }
+        },
         grouped: true,
         iconCls: "button",
-        itemTpl:
-                '</pre>'+
-                '<div class="list-item-title">'+
-                //'<image id="img{id}" type="image" src="resources/icons/star_color_small.png" onclick="removeEvent({externalId});" />' +
-                '<input type="image" src="resources/icons/star_color_small.png" onClick="removeEvent({externalId});" value="Fjern" />' + 
-                '{name}</div>'+
-                '<div class="list-item-title"></div>'+
-                '<div class="list-item-description">{ingress}</div>'+
-                '<div class="list-item-title"><input class="buttonList" type="button" onClick="showPopupMap(\'{place}.jpg\', \'{place}\');" value="{place}" /></div>'+
-                '<pre>'
+        itemTpl: getTemplate() 
     }
 });
 
@@ -62,4 +59,9 @@ function showPopupMap(image, imageTitle){
     
     popup.show();
 }
+
+function getTemplate() {
+    return getEventListTemplate();
+}
+
 
