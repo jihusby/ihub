@@ -19,6 +19,7 @@ function getEventFromSession(session) {
         start: session.data.start,
         timestamp: session.data.timestamp,
         startTime: session.data.startTime,
+        endTime: session.data.endTime,
         name: session.data.name,
         speaker: session.data.speaker,
         ingress: session.data.ingress,
@@ -101,7 +102,7 @@ function showPopup(image, imageTitle) {
         }]
     });
     
-    popup.show();
+    return popup;
 }
 
 function getEventListTemplate() {
@@ -115,7 +116,8 @@ function getEventListTemplate() {
 
 function getEventDetailTemplate() {
     return '<div class="textBlock">' + 
-                '<div class="contentInfo">{place} kl. {startTime}</div>' + 
+                '<div class="contentInfo"><input type="button" onClick="showPopupMap(\'{place}.jpg\', \'{place}\').show();" value="{place}"></a></div>' + 
+                '<input class="x-detail-star" type="image" src="resources/icons/star_color.png" onClick="removeEvent({externalId});" value="Fjern" />'+
                 '<div class="contentTitle">{name}</div>' + 
                 '<div class="contentIngress">{ingress}</div>' + 
                 '<div class="contentText">{description}</div>' + 
@@ -134,7 +136,7 @@ function getSessionListTemplate() {
 
 function getSessionDetailTemplate(btnText) {
     return '<input value="'+btnText+'" id="btn" class="buttonWide" type="button" onClick="saveSessionDetail({id});" />' + 
-                '<input class="buttonWide" type="button" onClick="showPopupMap(\'{place}.jpg\', \'{place}\');" value="{place}" />'+
+                '<input class="buttonWide" type="button" onClick="showPopupMap(\'{place}.jpg\', \'{place}\').show();" value="{place}" />'+
                 '<div class="textBlock">' + 
                 '<div class="contentInfo">{place} kl. {startTime}</div>' + 
                 '<div class="contentTitle">{name}</div>' + 

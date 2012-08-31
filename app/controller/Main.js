@@ -20,7 +20,6 @@ Ext.define('App.controller.Main', {
             },
             'eventlist': {
                 disclose: 'onEventDetailCommand'
-                //itemtap: 'onEventDetailCommand'
             }
         }
     },
@@ -70,7 +69,7 @@ function getSessionDetail(record) {
 function getEventDetail(record) {
     return {
             xtype: 'sessiondetail',
-            title: record.startTime,
+            title: record.startTime + " - " + record.endTime,
             data: record,
             tpl: getEventDetailTemplate()
     }

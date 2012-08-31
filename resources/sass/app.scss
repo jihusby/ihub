@@ -128,11 +128,6 @@ body {
   
 }
 
-/*.x-list .x-list-disclosure {
-  -webkit-mask: 0 0 url('../../resources/icons/star_gray.jpg') no-repeat; 
-  -webkit-mask-box-image: url('../../resources/icons/star_gray.jpg');
-}*/
-
 /* Move up the disclosure button to account for the list item height increase */
 .x-list .x-list-disclosure {
   position: absolute;
@@ -148,6 +143,12 @@ body {
   bottom: 1.65em;
   left: 0.44em;
   bottom: 25%;
+}
+
+.x-detail-star {
+  position: absolute;
+  top: 1.8em;
+  right: 1.8em;
 }
 
 .x-list-content {
@@ -206,6 +207,15 @@ body {
   height: 20;
   margin-top: 5px;
   margin-bottom: 5px;
+}
+
+.buttonContact {
+  width: 95%;
+  height: 20;
+  margin: 5px 5px 5px 5px;
+  border-radius: 16px;
+  background-color:
+    rgba(255,255,255,0.8);
 }
 
 .buttonList {

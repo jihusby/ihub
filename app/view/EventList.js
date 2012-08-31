@@ -21,7 +21,6 @@ Ext.define("App.view.EventList", {
         listeners: {
             itemtap: function() {
                 console.log("item tapped");
-                
             }
         },
         grouped: true,

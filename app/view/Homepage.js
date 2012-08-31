@@ -12,6 +12,19 @@ Ext.define("App.view.Homepage", {
                 title: 'Rica Nidelven',
                 maxWidth: 750,
                 xtype: 'dataview',
+                items: [
+                    {
+                        xtype: 'button',
+                        ui: 'normal',
+                        id: 'contactBtn',
+                        text: 'Kontakt oss',
+                        cls: 'buttonContact',
+                        docked: 'bottom',
+                        handler: function() {
+                            window.location = 'tel:99205294';
+                        }
+                    }],
+
                 itemTpl: [
                     '<div class="textBlock">',
                     '<div class="header">{item1}</div>',
