@@ -33,18 +33,6 @@ class info {
     function get_content(){
         return $this->content;
     }
-    function set_mapHeader($new_mapHeader){
-        $this->mapHeader = $new_mapHeader;
-    }
-    function get_mapHeader(){
-        return $this->mapHeader;
-    }
-    function set_map($new_map){
-        $this->map = $new_map;
-    }
-    function get_map(){
-        return $this->map;
-    }
 }
 
 ?>

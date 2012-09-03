@@ -8,10 +8,10 @@
     function getActiveMenu(){
         var menu = 
             '<h3>Forhåndsvisning</h3>' + 
-            '<IFRAME id="iFrame" name="iFrame" SRC="../../index.html" WIDTH=320 HEIGHT=480 style="border-radius: 5px;">' +
+            '<IFRAME id="iFrame" name="iFrame" SRC="../../index-debug.html" WIDTH=320 HEIGHT=480 style="border-radius: 5px;">' +
                 'If you can see this, your browser does not understand IFRAME.  However, we will still <A HREF="../../index-debug.html">link</A> you to the file.' +
             '</IFRAME> ' +
-            '<p><p><input type="button" class="btn" value="Oppdater" onClick="javascript:updateFrame(\'../../index.html\');" style="float:">';
+            '<p><p><input type="button" class="btn" value="Oppdater" onClick="javascript:updateFrame(\'../../index-debug.html\');" style="float:">';
         return menu;
     }
     

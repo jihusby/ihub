@@ -47,10 +47,6 @@ class infoHandler implements genericContentHandler {
                 $info->set_ingress($value);
             }else if($key === "item3"){
                 $info->set_content($value);
-            }else if($key === "item4"){
-                $info->set_mapHeader($value);
-            }else if($key === "item5"){
-                $info->set_map($value);
             }
         }
         return $info;
@@ -62,8 +58,6 @@ class infoHandler implements genericContentHandler {
         $result = $result . formElementUtils::getTextFieldSection("Overskrift", "info1", "stdField", $info->get_header()) . "</td></tr>";
         $result = $result . formElementUtils::getTextAreaSection("Ingress", "info2", "stdBigArea", stringUtils::htmlToText($info->get_ingress())) . "</td></tr>";        
         $result = $result . formElementUtils::getTextAreaSection("Hovedtekst", "info3", "stdHugeArea", stringUtils::htmlToText($info->get_content())) . "</td></tr>";
-        $result = $result . formElementUtils::getTextFieldSection("Områdekart", "info4", "stdMediumField", $info->get_mapHeader());
-        $result = $result . formElementUtils::getTextField("info5", "stdSmallField", $info->get_map()) . "&nbsp;<a name='infomap' id='infomap' target='_new' href='../../resources/images/maps/".$info->get_map()."'>Vis bilde</a></td></tr>";
         $result = $result . "</table>";
         return $result;
     }

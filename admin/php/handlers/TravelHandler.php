@@ -45,10 +45,6 @@ class travelHandler implements genericContentHandler {
                 $travel->set_header($value);
             }else if($key === "item2"){
                 $travel->set_content($value);
-            }else if($key === "item3"){
-                $travel->set_mapHeader($value);
-            }else if($key === "item4"){
-                $travel->set_map($value);
             }
         }
         return $travel;
@@ -59,8 +55,6 @@ class travelHandler implements genericContentHandler {
         $result = $result . "<table>";
         $result = $result . formElementUtils::getTextFieldSection("Overskrift", "travel1", "stdField", $travel->get_header()) . "</td></tr>";
         $result = $result . formElementUtils::getTextAreaSection("Reisebeskrivelse", "travel2", "stdHugeArea", stringUtils::htmlToText($travel->get_content())) . "</td></tr>";
-        $result = $result . formElementUtils::getTextFieldSection("Kart", "travel3", "stdMediumField", $travel->get_mapHeader());
-        $result = $result . formElementUtils::getTextField("travel4", "stdSmallField", $travel->get_map()) . "&nbsp;<a name='travelmap' id='travelmap' target='_new' href='../../resources/images/maps/".$travel->get_map()."'>Vis bilde</a></td></tr>";
         $result = $result . "</table>";
         return $result;
     }
