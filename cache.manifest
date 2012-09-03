@@ -26,7 +26,6 @@ app/view/SessionList.js
 app/view/SessionListContainer.js
 app/view/Travel.js
 app/store/Infos.js
-app/store/ExternalInfos.js
 app/store/Events.js
 app/store/Sessions.js
 app/model/Info.js
@@ -47,6 +46,7 @@ resources/images/maps/Torget.jpg
 
 # Resources that require the user to be online.
 NETWORK:
+app/store/ExternalInfos.js
 resources/data/agenda.json
 resources/data/hotel.json
 resources/data/info.json
