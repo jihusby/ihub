@@ -32,18 +32,22 @@ Ext.define("App.view.Info", {
                     '<div class="contentText">{item3}</div></div>'
                 ],
 
-                store: {
-                    autoLoad: true,
-                    fields: ['item0', 'item1', 'item2', 'item3'],
-                    proxy: {
-                        type: 'ajax',
-                        url: 'resources/data/info.json',
-                        reader: {
-                            type: 'json',
-                            rootProperty: 'responseData.feed.entries'
-                    }
-                }
-            }
+                store: "Infos",
+                autoLoad: true,
+                fields: ['id', 'item0', 'item1', 'item2', 'item3']                
+
+//                {
+//                    autoLoad: true,
+//                    fields: ['item0', 'item1', 'item2', 'item3'],
+//                    proxy: {
+//                        type: 'ajax',
+//                        url: 'resources/data/info.json',
+//                        reader: {
+//                            type: 'json',
+//                            rootProperty: 'responseData.feed.entries'
+//                    }
+//                }
+//            }
         }]
     }
     

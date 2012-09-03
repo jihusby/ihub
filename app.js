@@ -1,10 +1,6 @@
 Ext.application({
     name: 'App',
 
-    requires: [
-        // 'Ext.MessageBox'
-    ],
-
     views: [
         'Main',
         'Homepage',
@@ -18,11 +14,14 @@ Ext.application({
     ],
     
     models: [
+        'Info',
         'Session',
         'Event'
     ],
     
     stores: [
+        'ExternalInfos',
+        'Infos',
         'Sessions',
         'Events'
     ],
@@ -47,8 +46,6 @@ Ext.application({
 
         // Initialize the main view
         Ext.Viewport.add(Ext.create('App.view.Main'));
-
-        
     },
 
     onUpdated: function() {

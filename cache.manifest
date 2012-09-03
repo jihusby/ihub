@@ -25,8 +25,11 @@ app/view/SessionDetail.js
 app/view/SessionList.js
 app/view/SessionListContainer.js
 app/view/Travel.js
+app/store/Infos.js
+app/store/ExternalInfos.js
 app/store/Events.js
 app/store/Sessions.js
+app/model/Info.js
 app/model/Event.js
 app/model/Session.js
 resources/css/app.css
@@ -41,10 +44,6 @@ resources/images/maps/Gråkallen.jpg
 resources/images/maps/Møllenberg.jpg
 resources/images/maps/Ringve.jpg
 resources/images/maps/Torget.jpg
-# resources/data/agenda.json
-# resources/data/hotel.json
-# resources/data/info.json
-# resources/data/travel.json
 
 # Resources that require the user to be online.
 NETWORK:

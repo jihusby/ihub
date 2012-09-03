@@ -47,7 +47,20 @@ function addItem(currentSessionId) {
         eventStore.sort([
             {property: 'timestamp', direction: 'ASC'}
         ]);
+        saveContentFromExternal("Infos", "ExternalInfos");
     }
+}
+
+function saveContentFromExternal(localStoreName, externalStoreName) {
+    console.log("1 saveContentFromExternal("+localStoreName+", "+externalStoreName+")");
+    var content = Ext.getStore(externalStoreName).findRecord('id', 1);
+    if(content!==null){
+        console.log("2 saveContentFromExternal:content not null");
+        var localStore = Ext.getStore(localStoreName);
+        localStore.add(content);
+        localStore.sync();
+    }
+    console.log("3 saveContentFromExternal");
 }
 
 

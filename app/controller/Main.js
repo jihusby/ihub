@@ -4,7 +4,6 @@ Ext.define('App.controller.Main', {
     
     requires: [
         'App.view.SessionDetail'
-        //'Ext.MessageBox'
     ],
 
     config: {
@@ -28,9 +27,20 @@ Ext.define('App.controller.Main', {
     slideRightTransition: {type: 'slide', direction: 'right'},
 
     launch: function() {
+        console.log("1 launch");
         this.callParent(arguments);
+        Ext.getStore("Infos").load();
         Ext.getStore("Events").load();
         Ext.getStore("Sessions").load();
+        Ext.getStore("ExternalInfos").load();
+        console.log("2 launch");
+        Ext.onReady(function(){
+            console.log("3 launch: onReady");
+            console.log("4 launch - Ext.getStore(ExternalInfos):" + Ext.getStore("ExternalInfos"));
+            console.log("5 launch - Ext.getStore(Infos):" + Ext.getStore("Infos"));
+            saveContentFromExternal("Infos", "ExternalInfos");
+        }); 
+        
     },
 
     init: function() {
@@ -50,7 +60,6 @@ Ext.define('App.controller.Main', {
     },
 
     onEventDetailCommand: function(list, record) {
-        console.log("onEventDetailCommand invoked");
         this.getEventListContainer().push(getEventDetail(record.data));
     }
 });
