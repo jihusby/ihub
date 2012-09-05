@@ -33,18 +33,8 @@ Ext.define("App.view.Homepage", {
                     '<div class="footer">{item4}</div></div>'
                 ],
 
-                store: {
-                    autoLoad: true,
-                    fields: ['item1', 'item2', 'item3', 'item4'],
-                    proxy: {
-                        type: 'ajax',
-                        url: 'resources/data/hotel.json',
-                        reader: {
-                            type: 'json',
-                            rootProperty: 'responseData.feed.entries'
-                        }
-                    }
-                }
+                store: "Hotels",
+                fields: ['id', 'item0', 'item1', 'item2', 'item3', 'item4', 'item5'] 
             }
         ]
     }

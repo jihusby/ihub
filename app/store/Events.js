@@ -5,6 +5,7 @@ Ext.define("App.store.Events", {
     ],
     config: {
         model: "App.model.Event",
+        autoLoad: true,
         proxy: {
             type: 'localstorage',
             id: 'events-app-store'

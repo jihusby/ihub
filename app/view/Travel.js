@@ -2,6 +2,8 @@ Ext.define("App.view.Travel", {
     extend: 'Ext.navigation.View',
     xtype: 'travel',
     requires: [
+        'App.store.Travels',
+        'App.model.Travel',
         'Ext.TitleBar'
     ],
 
@@ -33,18 +35,8 @@ Ext.define("App.view.Travel", {
                     '</div>'
                 ],
 
-                store: {
-                    autoLoad: true,
-                    fields: ['item1', 'item2'],
-                    proxy: {
-                        type: 'ajax',
-                        url: 'resources/data/travel.json',
-                        reader: {
-                            type: 'json',
-                            rootProperty: 'responseData.feed.entries'
-                    }
-                }
-            }
+                store: "Travels",
+                fields: ['id', 'item0', 'item1', 'item2']
         }]
     }
     

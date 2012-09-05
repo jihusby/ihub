@@ -1,14 +1,14 @@
-Ext.define("App.store.ExternalInfos", {
+Ext.define("App.store.ExternalTravels", {
     extend: "Ext.data.Store",
     requires: [
-        'App.model.Info'
+        'App.model.Travel'
     ],
     config: {
-        model: "App.model.Info",
+        model: "App.model.Travel",
         autoLoad: true,
         proxy: {
             type: 'ajax',
-            url: 'resources/data/info.json',
+            url: 'resources/data/travel.json',
             reader: {
                 type: 'json',
                 rootProperty: 'items'
@@ -16,10 +16,9 @@ Ext.define("App.store.ExternalInfos", {
         },
         listeners: {
             load: function(){
-                saveContentFromExternal("Infos", "ExternalInfos");
+                saveContentFromExternal("Travels", "ExternalTravels");
             }
         }
-        
     }
 
 });

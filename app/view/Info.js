@@ -2,6 +2,8 @@ Ext.define("App.view.Info", {
     extend: 'Ext.navigation.View',
     xtype: 'info',
     requires: [
+        'App.store.Infos',
+        'App.model.Info',
         'Ext.TitleBar'
     ],
 
@@ -33,7 +35,6 @@ Ext.define("App.view.Info", {
                 ],
 
                 store: "Infos",
-                autoLoad: true,
                 fields: ['id', 'item0', 'item1', 'item2', 'item3']                
 
 //                {

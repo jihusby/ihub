@@ -52,15 +52,16 @@ function addItem(currentSessionId) {
 }
 
 function saveContentFromExternal(localStoreName, externalStoreName) {
-    console.log("1 saveContentFromExternal("+localStoreName+", "+externalStoreName+")");
+//    console.log("Copying from "+externalStoreName+" to "+localStoreName);
     var content = Ext.getStore(externalStoreName).findRecord('id', 1);
     if(content!==null){
-        console.log("2 saveContentFromExternal:content not null");
+      console.log("Copying " + localStoreName);
         var localStore = Ext.getStore(localStoreName);
         localStore.add(content);
         localStore.sync();
+    }else{
+        console.log(localStoreName + ": EXTERNAL STORAGE IS EMPTY!");
     }
-    console.log("3 saveContentFromExternal");
 }
 
 

@@ -14,14 +14,20 @@ Ext.application({
     ],
     
     models: [
+        'Hotel',
         'Info',
+        'Travel',
         'Session',
         'Event'
     ],
     
     stores: [
-        'ExternalInfos',
+        'Hotels',
+        'ExternalHotels',
         'Infos',
+        'ExternalInfos',
+        'Travels',
+        'ExternalTravels',
         'Sessions',
         'Events'
     ],

@@ -1,14 +1,14 @@
-Ext.define("App.store.Infos", {
+Ext.define("App.store.Travels", {
     extend: "Ext.data.Store",
     requires: [
         "Ext.data.proxy.LocalStorage"
     ],
     config: {
-        model: "App.model.Info",
+        model: "App.model.Travel",
         autoLoad: true,
         proxy: {
             type: 'localstorage',
-            id: 'infos-app-store'
+            id: 'travels-app-store'
         }
     }
 

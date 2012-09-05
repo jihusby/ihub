@@ -5,6 +5,7 @@ Ext.define("App.store.Sessions", {
     ],
     config: {
         model: "App.model.Session",
+        autoLoad: true,
         proxy: {
             type: 'ajax',
             url: 'resources/data/agenda.json',
