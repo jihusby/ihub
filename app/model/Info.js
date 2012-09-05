@@ -12,3 +12,4 @@ Ext.define("App.model.Info", {
         ]
     }
 });
+

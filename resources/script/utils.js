@@ -47,23 +47,63 @@ function addItem(currentSessionId) {
         eventStore.sort([
             {property: 'timestamp', direction: 'ASC'}
         ]);
-        saveContentFromExternal("Infos", "ExternalInfos");
     }
 }
 
 function saveContentFromExternal(localStoreName, externalStoreName) {
-//    console.log("Copying from "+externalStoreName+" to "+localStoreName);
+    
     var content = Ext.getStore(externalStoreName).findRecord('id', 1);
     if(content!==null){
-      console.log("Copying " + localStoreName);
-        var localStore = Ext.getStore(localStoreName);
-        localStore.add(content);
-        localStore.sync();
+        if(localStoreName === "Infos"){
+            saveInfoObject(content);
+        }else{
+            if(Ext.getStore(localStoreName).findRecord('id', 1)){
+                console.log(localStoreName + " already full");
+            }else {
+                console.log("Copying " + localStoreName);
+                var localStore = Ext.getStore(localStoreName);
+                localStore.add(content);
+                localStore.sync();
+
+            }
+        }
     }else{
         console.log(localStoreName + ": EXTERNAL STORAGE IS EMPTY!");
     }
 }
 
+function saveInfoObject(obj){
+    var localStore = Ext.getStore("Infos");
+    var localRecord = Ext.getStore("Infos").findRecord('item0', "1");
+    if(null === localRecord){
+        console.log("saving info object");
+        var inf = Ext.create("App.model.Info", {
+            item0: obj.data.item0,
+            item1: obj.data.item1,
+            item2: obj.data.item2,
+            item3: obj.data.item3
+        });
+        localStore.add(inf);
+        localStore.sync();
+    }else{
+        console.log("local info exists");
+        var externalRecord = Ext.getStore("ExternalInfos").findRecord('item0', "1");
+        if(!isEqual(localRecord, externalRecord)){
+            console.log("not equal, replacing");
+            localStore.remove(localRecord);
+            localStore.sync();
+        }
+    }
+    console.log(Ext.getStore("Infos").findRecord('item0', "1").data.item0);
+}
+
+function isEqual(record1, record2){
+    return record1.data.item0 === record1.data.item0 &&
+        record1.data.item1 === record2.data.item1 &&
+        record1.data.item2 === record2.data.item2 &&
+        record1.data.item3 === record2.data.item3;
+    
+}
 
 function removeItem(id){
     var record = Ext.getStore("Events").findRecord('externalId', id)

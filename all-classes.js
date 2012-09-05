@@ -4,6 +4,143 @@ Copyright(c) 2012 Company Name
 /**
  * @private
  */
+Ext.define('Ext.event.ListenerStack', {
+
+    currentOrder: 'current',
+
+    length: 0,
+
+    constructor: function() {
+        this.listeners = {
+            before: [],
+            current: [],
+            after: []
+        };
+
+        this.lateBindingMap = {};
+
+        return this;
+    },
+
+    add: function(fn, scope, options, order) {
+        var lateBindingMap = this.lateBindingMap,
+            listeners = this.getAll(order),
+            i = listeners.length,
+            bindingMap, listener, id;
+
+        if (typeof fn == 'string' && scope.isIdentifiable) {
+            id = scope.getId();
+
+            bindingMap = lateBindingMap[id];
+
+            if (bindingMap) {
+                if (bindingMap[fn]) {
+                    return false;
+                }
+                else {
+                    bindingMap[fn] = true;
+                }
+            }
+            else {
+                lateBindingMap[id] = bindingMap = {};
+                bindingMap[fn] = true;
+            }
+        }
+        else {
+            if (i > 0) {
+                while (i--) {
+                    listener = listeners[i];
+
+                    if (listener.fn === fn && listener.scope === scope) {
+                        listener.options = options;
+                        return false;
+                    }
+                }
+            }
+        }
+
+        listener = this.create(fn, scope, options, order);
+
+        if (options && options.prepend) {
+            delete options.prepend;
+            listeners.unshift(listener);
+        }
+        else {
+            listeners.push(listener);
+        }
+
+        this.length++;
+
+        return true;
+    },
+
+    getAt: function(index, order) {
+        return this.getAll(order)[index];
+    },
+
+    getAll: function(order) {
+        if (!order) {
+            order = this.currentOrder;
+        }
+
+        return this.listeners[order];
+    },
+
+    count: function(order) {
+        return this.getAll(order).length;
+    },
+
+    create: function(fn, scope, options, order) {
+        return {
+            stack: this,
+            fn: fn,
+            firingFn: false,
+            boundFn: false,
+            isLateBinding: typeof fn == 'string',
+            scope: scope,
+            options: options || {},
+            order: order
+        };
+    },
+
+    remove: function(fn, scope, order) {
+        var listeners = this.getAll(order),
+            i = listeners.length,
+            isRemoved = false,
+            lateBindingMap = this.lateBindingMap,
+            listener, id;
+
+        if (i > 0) {
+            // Start from the end index, faster than looping from the
+            // beginning for "single" listeners,
+            // which are normally LIFO
+            while (i--) {
+                listener = listeners[i];
+
+                if (listener.fn === fn && listener.scope === scope) {
+                    listeners.splice(i, 1);
+                    isRemoved = true;
+                    this.length--;
+
+                    if (typeof fn == 'string' && scope.isIdentifiable) {
+                        id = scope.getId();
+
+                        if (lateBindingMap[id] && lateBindingMap[id][fn]) {
+                            delete lateBindingMap[id][fn];
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        return isRemoved;
+    }
+});
+
+/**
+ * @private
+ */
 Ext.define('Ext.event.Controller', {
 
     isFiring: false,
@@ -273,143 +410,6 @@ Ext.define('Ext.event.Controller', {
         }
 
         return this;
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.event.ListenerStack', {
-
-    currentOrder: 'current',
-
-    length: 0,
-
-    constructor: function() {
-        this.listeners = {
-            before: [],
-            current: [],
-            after: []
-        };
-
-        this.lateBindingMap = {};
-
-        return this;
-    },
-
-    add: function(fn, scope, options, order) {
-        var lateBindingMap = this.lateBindingMap,
-            listeners = this.getAll(order),
-            i = listeners.length,
-            bindingMap, listener, id;
-
-        if (typeof fn == 'string' && scope.isIdentifiable) {
-            id = scope.getId();
-
-            bindingMap = lateBindingMap[id];
-
-            if (bindingMap) {
-                if (bindingMap[fn]) {
-                    return false;
-                }
-                else {
-                    bindingMap[fn] = true;
-                }
-            }
-            else {
-                lateBindingMap[id] = bindingMap = {};
-                bindingMap[fn] = true;
-            }
-        }
-        else {
-            if (i > 0) {
-                while (i--) {
-                    listener = listeners[i];
-
-                    if (listener.fn === fn && listener.scope === scope) {
-                        listener.options = options;
-                        return false;
-                    }
-                }
-            }
-        }
-
-        listener = this.create(fn, scope, options, order);
-
-        if (options && options.prepend) {
-            delete options.prepend;
-            listeners.unshift(listener);
-        }
-        else {
-            listeners.push(listener);
-        }
-
-        this.length++;
-
-        return true;
-    },
-
-    getAt: function(index, order) {
-        return this.getAll(order)[index];
-    },
-
-    getAll: function(order) {
-        if (!order) {
-            order = this.currentOrder;
-        }
-
-        return this.listeners[order];
-    },
-
-    count: function(order) {
-        return this.getAll(order).length;
-    },
-
-    create: function(fn, scope, options, order) {
-        return {
-            stack: this,
-            fn: fn,
-            firingFn: false,
-            boundFn: false,
-            isLateBinding: typeof fn == 'string',
-            scope: scope,
-            options: options || {},
-            order: order
-        };
-    },
-
-    remove: function(fn, scope, order) {
-        var listeners = this.getAll(order),
-            i = listeners.length,
-            isRemoved = false,
-            lateBindingMap = this.lateBindingMap,
-            listener, id;
-
-        if (i > 0) {
-            // Start from the end index, faster than looping from the
-            // beginning for "single" listeners,
-            // which are normally LIFO
-            while (i--) {
-                listener = listeners[i];
-
-                if (listener.fn === fn && listener.scope === scope) {
-                    listeners.splice(i, 1);
-                    isRemoved = true;
-                    this.length--;
-
-                    if (typeof fn == 'string' && scope.isIdentifiable) {
-                        id = scope.getId();
-
-                        if (lateBindingMap[id] && lateBindingMap[id][fn]) {
-                            delete lateBindingMap[id][fn];
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        return isRemoved;
     }
 });
 
@@ -1836,6 +1836,28 @@ Ext.define('Ext.fx.easing.Abstract', {
 /**
  * @private
  */
+Ext.define('Ext.fx.easing.Bounce', {
+
+    extend: 'Ext.fx.easing.Abstract',
+
+    config: {
+        springTension: 0.3,
+        acceleration: 30,
+        startVelocity: 0
+    },
+
+    getValue: function() {
+        var deltaTime = Ext.Date.now() - this.getStartTime(),
+            theta = (deltaTime / this.getAcceleration()),
+            powTime = theta * Math.pow(Math.E, -this.getSpringTension() * theta);
+
+        return this.getStartValue() + (this.getStartVelocity() * powTime);
+    }
+});
+
+/**
+ * @private
+ */
 Ext.define('Ext.fx.easing.Momentum', {
 
     extend: 'Ext.fx.easing.Abstract',
@@ -1878,28 +1900,6 @@ Ext.define('Ext.fx.easing.Momentum', {
 
     getVelocity: function() {
         return this.getFrictionFactor() * this.velocity;
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.easing.Bounce', {
-
-    extend: 'Ext.fx.easing.Abstract',
-
-    config: {
-        springTension: 0.3,
-        acceleration: 30,
-        startVelocity: 0
-    },
-
-    getValue: function() {
-        var deltaTime = Ext.Date.now() - this.getStartTime(),
-            theta = (deltaTime / this.getAcceleration()),
-            powTime = theta * Math.pow(Math.E, -this.getSpringTension() * theta);
-
-        return this.getStartValue() + (this.getStartVelocity() * powTime);
     }
 });
 
@@ -4966,21 +4966,6 @@ Ext.define('Ext.fx.animation.Fade', {
 /**
  * @private
  */
-Ext.define('Ext.fx.animation.FadeOut', {
-    extend: 'Ext.fx.animation.Fade',
-    alias: 'animation.fadeOut',
-
-    config: {
-        // @hide
-        out: true,
-
-        before: {}
-    }
-});
-
-/**
- * @private
- */
 Ext.define('Ext.fx.animation.Flip', {
     extend: 'Ext.fx.animation.Abstract',
 
@@ -5073,6 +5058,21 @@ Ext.define('Ext.fx.animation.Flip', {
         });
 
         return this.callParent(arguments);
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.animation.FadeOut', {
+    extend: 'Ext.fx.animation.Fade',
+    alias: 'animation.fadeOut',
+
+    config: {
+        // @hide
+        out: true,
+
+        before: {}
     }
 });
 
@@ -29480,121 +29480,6 @@ function setSource(id, color){
 
 
 
-
-Ext.define('App.controller.Main', {
-    extend: 'Ext.app.Controller',
-    
-    requires: [
-        'App.view.SessionDetail'
-    ],
-
-    config: {
-        refs: {
-            mainView: 'mainview',
-            sessionListContainer: 'sessionlistcontainer',
-            eventListContainer: 'eventlistcontainer'
-        },
-
-        control: {
-            'sessionlist': {
-                disclose: 'onSessionDetailCommand'
-            },
-            'eventlist': {
-                disclose: 'onEventDetailCommand'
-            }
-        }
-    },
-
-    slideLeftTransition: {type: 'slide', direction: 'left'},
-    slideRightTransition: {type: 'slide', direction: 'right'},
-
-    launch: function() {
-        console.log("1 launch");
-        this.callParent(arguments);
-        Ext.getStore("Infos").load();
-        Ext.getStore("Events").load();
-        Ext.getStore("Sessions").load();
-        Ext.getStore("ExternalInfos").load();
-        console.log("2 launch");
-        Ext.onReady(function(){
-            console.log("3 launch: onReady");
-            console.log("4 launch - Ext.getStore(ExternalInfos):" + Ext.getStore("ExternalInfos"));
-            console.log("5 launch - Ext.getStore(Infos):" + Ext.getStore("Infos"));
-            saveContentFromExternal("Infos", "ExternalInfos");
-        }); 
-        
-    },
-
-    init: function() {
-        this.callParent(arguments);
-    },
-
-    onSessionListCommand: function() {
-        Ext.Viewport.animateActiveItem(this.getMainView(), this.slideRightTransition);
-    },
-    
-    onSessionDetailCommand: function(list, record) {
-        this.getSessionListContainer().push(getSessionDetail(record.data));
-    },
-
-    onEventListCommand: function() {
-        Ext.Viewport.animateActiveItem(this.getMainView(), this.slideRightTransition);
-    },
-
-    onEventDetailCommand: function(list, record) {
-        this.getEventListContainer().push(getEventDetail(record.data));
-    }
-});
-
-function getSessionDetail(record) {
-    var btnText = isEventSaved(record.id)?"Fjern fra huskeliste":"Legg til i huskeliste";
-    this.setMainWindow();
-    return {
-            xtype: 'sessiondetail',
-            title: record.startTime,
-            data: record,
-            tpl: getSessionDetailTemplate(btnText)
-    }
-}
-
-function getEventDetail(record) {
-    return {
-            xtype: 'sessiondetail',
-            title: record.startTime + " - " + record.endTime,
-            data: record,
-            tpl: getEventDetailTemplate()
-    }
-}
-
-function showPopupMap(image, imageTitle){
-    var popup = new Ext.Panel({
-        floating: true,
-        modal: true,
-        width: 320,
-        height: 420,
-        html: '<body style="margin: 0px 0px 0px 0px; padding: 0px 0px 0px 0px;"><img src="resources/images/maps/'+image+'" style="height:100%; width:100%"></body>',
-        items: [{
-            xtype: 'toolbar',
-            title: imageTitle,
-            docked: 'top',
-            items: [{
-                xtype: 'spacer'
-            },{
-                text: 'Lukk',
-                handler: function(){
-                    popup.hide();
-                }
-            }]
-        }]
-    });
-    
-    popup.show();
-}
-
-
-  
-  
-
 /**
  * {@link Ext.TitleBar}'s are most commonly used as a docked item within an {@link Ext.Container}.
  *
@@ -33918,330 +33803,6 @@ Ext.define('Ext.dataview.element.Container', {
 });
 
 /**
-Represents a collection of a set of key and value pairs. Each key in the HashMap must be unique, the same
-key cannot exist twice. Access to items is provided via the key only. Sample usage:
-
-    var map = Ext.create('Ext.util.HashMap');
-    map.add('key1', 1);
-    map.add('key2', 2);
-    map.add('key3', 3);
-
-    map.each(function(key, value, length){
-        console.log(key, value, length);
-    });
-
-The HashMap is an unordered class, there is no guarantee when iterating over the items that they will be in
-any particular order. If this is required, then use a {@link Ext.util.MixedCollection}.
-
- */
-Ext.define('Ext.util.HashMap', {
-    mixins: {
-        observable: 'Ext.mixin.Observable'
-    },
-
-    /**
-     * @cfg {Function} keyFn
-     * A function that is used to retrieve a default key for a passed object.
-     * A default is provided that returns the **id** property on the object.
-     * This function is only used if the add method is called with a single argument.
-     */
-
-    /**
-     * Creates new HashMap.
-     * @param {Object} config The configuration options
-     */
-    constructor: function(config) {
-        /**
-         * @event add
-         * Fires when a new item is added to the hash
-         * @param {Ext.util.HashMap} this.
-         * @param {String} key The key of the added item.
-         * @param {Object} value The value of the added item.
-         */
-        /**
-         * @event clear
-         * Fires when the hash is cleared.
-         * @param {Ext.util.HashMap} this.
-         */
-        /**
-         * @event remove
-         * Fires when an item is removed from the hash.
-         * @param {Ext.util.HashMap} this.
-         * @param {String} key The key of the removed item.
-         * @param {Object} value The value of the removed item.
-         */
-        /**
-         * @event replace
-         * Fires when an item is replaced in the hash.
-         * @param {Ext.util.HashMap} this.
-         * @param {String} key The key of the replaced item.
-         * @param {Object} value The new value for the item.
-         * @param {Object} old The old value for the item.
-         */
-
-        this.callParent();
-
-        this.mixins.observable.constructor.call(this);
-
-        this.clear(true);
-    },
-
-    /**
-     * Gets the number of items in the hash.
-     * @return {Number} The number of items in the hash.
-     */
-    getCount: function() {
-        return this.length;
-    },
-
-    /**
-     * Implementation for being able to extract the key from an object if only
-     * a single argument is passed.
-     * @private
-     * @param {String} key The key
-     * @param {Object} value The value
-     * @return {Array} [key, value]
-     */
-    getData: function(key, value) {
-        // if we have no value, it means we need to get the key from the object
-        if (value === undefined) {
-            value = key;
-            key = this.getKey(value);
-        }
-
-        return [key, value];
-    },
-
-    /**
-     * Extracts the key from an object. This is a default implementation, it may be overridden
-     * @private
-     * @param {Object} o The object to get the key from
-     * @return {String} The key to use.
-     */
-    getKey: function(o) {
-        return o.id;
-    },
-
-    /**
-     * Add a new item to the hash. An exception will be thrown if the key already exists.
-     * @param {String} key The key of the new item.
-     * @param {Object} value The value of the new item.
-     * @return {Object} The value of the new item added.
-     */
-    add: function(key, value) {
-        var me = this,
-            data;
-
-        if (me.containsKey(key)) {
-            throw new Error('This key already exists in the HashMap');
-        }
-
-        data = this.getData(key, value);
-        key = data[0];
-        value = data[1];
-        me.map[key] = value;
-        ++me.length;
-        me.fireEvent('add', me, key, value);
-        return value;
-    },
-
-    /**
-     * Replaces an item in the hash. If the key doesn't exist, the
-     * {@link #method-add} method will be used.
-     * @param {String} key The key of the item.
-     * @param {Object} value The new value for the item.
-     * @return {Object} The new value of the item.
-     */
-    replace: function(key, value) {
-        var me = this,
-            map = me.map,
-            old;
-
-        if (!me.containsKey(key)) {
-            me.add(key, value);
-        }
-        old = map[key];
-        map[key] = value;
-        me.fireEvent('replace', me, key, value, old);
-        return value;
-    },
-
-    /**
-     * Remove an item from the hash.
-     * @param {Object} o The value of the item to remove.
-     * @return {Boolean} True if the item was successfully removed.
-     */
-    remove: function(o) {
-        var key = this.findKey(o);
-        if (key !== undefined) {
-            return this.removeByKey(key);
-        }
-        return false;
-    },
-
-    /**
-     * Remove an item from the hash.
-     * @param {String} key The key to remove.
-     * @return {Boolean} True if the item was successfully removed.
-     */
-    removeByKey: function(key) {
-        var me = this,
-            value;
-
-        if (me.containsKey(key)) {
-            value = me.map[key];
-            delete me.map[key];
-            --me.length;
-            me.fireEvent('remove', me, key, value);
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Retrieves an item with a particular key.
-     * @param {String} key The key to lookup.
-     * @return {Object} The value at that key. If it doesn't exist, <tt>undefined</tt> is returned.
-     */
-    get: function(key) {
-        return this.map[key];
-    },
-
-    /**
-     * Removes all items from the hash.
-     * @return {Ext.util.HashMap} this
-     */
-    clear: function(/* private */ initial) {
-        var me = this;
-        me.map = {};
-        me.length = 0;
-        if (initial !== true) {
-            me.fireEvent('clear', me);
-        }
-        return me;
-    },
-
-    /**
-     * Checks whether a key exists in the hash.
-     * @param {String} key The key to check for.
-     * @return {Boolean} True if they key exists in the hash.
-     */
-    containsKey: function(key) {
-        return this.map[key] !== undefined;
-    },
-
-    /**
-     * Checks whether a value exists in the hash.
-     * @param {Object} value The value to check for.
-     * @return {Boolean} True if the value exists in the dictionary.
-     */
-    contains: function(value) {
-        return this.containsKey(this.findKey(value));
-    },
-
-    /**
-     * Return all of the keys in the hash.
-     * @return {Array} An array of keys.
-     */
-    getKeys: function() {
-        return this.getArray(true);
-    },
-
-    /**
-     * Return all of the values in the hash.
-     * @return {Array} An array of values.
-     */
-    getValues: function() {
-        return this.getArray(false);
-    },
-
-    /**
-     * Gets either the keys/values in an array from the hash.
-     * @private
-     * @param {Boolean} isKey True to extract the keys, otherwise, the value
-     * @return {Array} An array of either keys/values from the hash.
-     */
-    getArray: function(isKey) {
-        var arr = [],
-            key,
-            map = this.map;
-        for (key in map) {
-            if (map.hasOwnProperty(key)) {
-                arr.push(isKey ? key : map[key]);
-            }
-        }
-        return arr;
-    },
-
-    /**
-     * Executes the specified function once for each item in the hash.
-     * Returning false from the function will cease iteration.
-     *
-     * The paramaters passed to the function are:
-     * <div class="mdetail-params"><ul>
-     * <li><b>key</b> : String<p class="sub-desc">The key of the item</p></li>
-     * <li><b>value</b> : Number<p class="sub-desc">The value of the item</p></li>
-     * <li><b>length</b> : Number<p class="sub-desc">The total number of items in the hash</p></li>
-     * </ul></div>
-     * @param {Function} fn The function to execute.
-     * @param {Object} scope The scope to execute in. Defaults to <tt>this</tt>.
-     * @return {Ext.util.HashMap} this
-     */
-    each: function(fn, scope) {
-        // copy items so they may be removed during iteration.
-        var items = Ext.apply({}, this.map),
-            key,
-            length = this.length;
-
-        scope = scope || this;
-        for (key in items) {
-            if (items.hasOwnProperty(key)) {
-                if (fn.call(scope, key, items[key], length) === false) {
-                    break;
-                }
-            }
-        }
-        return this;
-    },
-
-    /**
-     * Performs a shallow copy on this hash.
-     * @return {Ext.util.HashMap} The new hash object.
-     */
-    clone: function() {
-        var hash = new Ext.util.HashMap(),
-            map = this.map,
-            key;
-
-        hash.suspendEvents();
-        for (key in map) {
-            if (map.hasOwnProperty(key)) {
-                hash.add(key, map[key]);
-            }
-        }
-        hash.resumeEvents();
-        return hash;
-    },
-
-    /**
-     * @private
-     * Find the key for a value.
-     * @param {Object} value The value to find.
-     * @return {Object} The value of the item. Returns <tt>undefined</tt> if not found.
-     */
-    findKey: function(value) {
-        var key,
-            map = this.map;
-
-        for (key in map) {
-            if (map.hasOwnProperty(key) && map[key] === value) {
-                return key;
-            }
-        }
-        return undefined;
-    }
-});
-/**
  * @author Ed Spencer
  *
  * Simple class that represents a Request that will be made by any {@link Ext.data.proxy.Server} subclass.
@@ -35249,6 +34810,330 @@ Ext.define('Ext.data.Connection', {
     }
 });
 
+/**
+Represents a collection of a set of key and value pairs. Each key in the HashMap must be unique, the same
+key cannot exist twice. Access to items is provided via the key only. Sample usage:
+
+    var map = Ext.create('Ext.util.HashMap');
+    map.add('key1', 1);
+    map.add('key2', 2);
+    map.add('key3', 3);
+
+    map.each(function(key, value, length){
+        console.log(key, value, length);
+    });
+
+The HashMap is an unordered class, there is no guarantee when iterating over the items that they will be in
+any particular order. If this is required, then use a {@link Ext.util.MixedCollection}.
+
+ */
+Ext.define('Ext.util.HashMap', {
+    mixins: {
+        observable: 'Ext.mixin.Observable'
+    },
+
+    /**
+     * @cfg {Function} keyFn
+     * A function that is used to retrieve a default key for a passed object.
+     * A default is provided that returns the **id** property on the object.
+     * This function is only used if the add method is called with a single argument.
+     */
+
+    /**
+     * Creates new HashMap.
+     * @param {Object} config The configuration options
+     */
+    constructor: function(config) {
+        /**
+         * @event add
+         * Fires when a new item is added to the hash
+         * @param {Ext.util.HashMap} this.
+         * @param {String} key The key of the added item.
+         * @param {Object} value The value of the added item.
+         */
+        /**
+         * @event clear
+         * Fires when the hash is cleared.
+         * @param {Ext.util.HashMap} this.
+         */
+        /**
+         * @event remove
+         * Fires when an item is removed from the hash.
+         * @param {Ext.util.HashMap} this.
+         * @param {String} key The key of the removed item.
+         * @param {Object} value The value of the removed item.
+         */
+        /**
+         * @event replace
+         * Fires when an item is replaced in the hash.
+         * @param {Ext.util.HashMap} this.
+         * @param {String} key The key of the replaced item.
+         * @param {Object} value The new value for the item.
+         * @param {Object} old The old value for the item.
+         */
+
+        this.callParent();
+
+        this.mixins.observable.constructor.call(this);
+
+        this.clear(true);
+    },
+
+    /**
+     * Gets the number of items in the hash.
+     * @return {Number} The number of items in the hash.
+     */
+    getCount: function() {
+        return this.length;
+    },
+
+    /**
+     * Implementation for being able to extract the key from an object if only
+     * a single argument is passed.
+     * @private
+     * @param {String} key The key
+     * @param {Object} value The value
+     * @return {Array} [key, value]
+     */
+    getData: function(key, value) {
+        // if we have no value, it means we need to get the key from the object
+        if (value === undefined) {
+            value = key;
+            key = this.getKey(value);
+        }
+
+        return [key, value];
+    },
+
+    /**
+     * Extracts the key from an object. This is a default implementation, it may be overridden
+     * @private
+     * @param {Object} o The object to get the key from
+     * @return {String} The key to use.
+     */
+    getKey: function(o) {
+        return o.id;
+    },
+
+    /**
+     * Add a new item to the hash. An exception will be thrown if the key already exists.
+     * @param {String} key The key of the new item.
+     * @param {Object} value The value of the new item.
+     * @return {Object} The value of the new item added.
+     */
+    add: function(key, value) {
+        var me = this,
+            data;
+
+        if (me.containsKey(key)) {
+            throw new Error('This key already exists in the HashMap');
+        }
+
+        data = this.getData(key, value);
+        key = data[0];
+        value = data[1];
+        me.map[key] = value;
+        ++me.length;
+        me.fireEvent('add', me, key, value);
+        return value;
+    },
+
+    /**
+     * Replaces an item in the hash. If the key doesn't exist, the
+     * {@link #method-add} method will be used.
+     * @param {String} key The key of the item.
+     * @param {Object} value The new value for the item.
+     * @return {Object} The new value of the item.
+     */
+    replace: function(key, value) {
+        var me = this,
+            map = me.map,
+            old;
+
+        if (!me.containsKey(key)) {
+            me.add(key, value);
+        }
+        old = map[key];
+        map[key] = value;
+        me.fireEvent('replace', me, key, value, old);
+        return value;
+    },
+
+    /**
+     * Remove an item from the hash.
+     * @param {Object} o The value of the item to remove.
+     * @return {Boolean} True if the item was successfully removed.
+     */
+    remove: function(o) {
+        var key = this.findKey(o);
+        if (key !== undefined) {
+            return this.removeByKey(key);
+        }
+        return false;
+    },
+
+    /**
+     * Remove an item from the hash.
+     * @param {String} key The key to remove.
+     * @return {Boolean} True if the item was successfully removed.
+     */
+    removeByKey: function(key) {
+        var me = this,
+            value;
+
+        if (me.containsKey(key)) {
+            value = me.map[key];
+            delete me.map[key];
+            --me.length;
+            me.fireEvent('remove', me, key, value);
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * Retrieves an item with a particular key.
+     * @param {String} key The key to lookup.
+     * @return {Object} The value at that key. If it doesn't exist, <tt>undefined</tt> is returned.
+     */
+    get: function(key) {
+        return this.map[key];
+    },
+
+    /**
+     * Removes all items from the hash.
+     * @return {Ext.util.HashMap} this
+     */
+    clear: function(/* private */ initial) {
+        var me = this;
+        me.map = {};
+        me.length = 0;
+        if (initial !== true) {
+            me.fireEvent('clear', me);
+        }
+        return me;
+    },
+
+    /**
+     * Checks whether a key exists in the hash.
+     * @param {String} key The key to check for.
+     * @return {Boolean} True if they key exists in the hash.
+     */
+    containsKey: function(key) {
+        return this.map[key] !== undefined;
+    },
+
+    /**
+     * Checks whether a value exists in the hash.
+     * @param {Object} value The value to check for.
+     * @return {Boolean} True if the value exists in the dictionary.
+     */
+    contains: function(value) {
+        return this.containsKey(this.findKey(value));
+    },
+
+    /**
+     * Return all of the keys in the hash.
+     * @return {Array} An array of keys.
+     */
+    getKeys: function() {
+        return this.getArray(true);
+    },
+
+    /**
+     * Return all of the values in the hash.
+     * @return {Array} An array of values.
+     */
+    getValues: function() {
+        return this.getArray(false);
+    },
+
+    /**
+     * Gets either the keys/values in an array from the hash.
+     * @private
+     * @param {Boolean} isKey True to extract the keys, otherwise, the value
+     * @return {Array} An array of either keys/values from the hash.
+     */
+    getArray: function(isKey) {
+        var arr = [],
+            key,
+            map = this.map;
+        for (key in map) {
+            if (map.hasOwnProperty(key)) {
+                arr.push(isKey ? key : map[key]);
+            }
+        }
+        return arr;
+    },
+
+    /**
+     * Executes the specified function once for each item in the hash.
+     * Returning false from the function will cease iteration.
+     *
+     * The paramaters passed to the function are:
+     * <div class="mdetail-params"><ul>
+     * <li><b>key</b> : String<p class="sub-desc">The key of the item</p></li>
+     * <li><b>value</b> : Number<p class="sub-desc">The value of the item</p></li>
+     * <li><b>length</b> : Number<p class="sub-desc">The total number of items in the hash</p></li>
+     * </ul></div>
+     * @param {Function} fn The function to execute.
+     * @param {Object} scope The scope to execute in. Defaults to <tt>this</tt>.
+     * @return {Ext.util.HashMap} this
+     */
+    each: function(fn, scope) {
+        // copy items so they may be removed during iteration.
+        var items = Ext.apply({}, this.map),
+            key,
+            length = this.length;
+
+        scope = scope || this;
+        for (key in items) {
+            if (items.hasOwnProperty(key)) {
+                if (fn.call(scope, key, items[key], length) === false) {
+                    break;
+                }
+            }
+        }
+        return this;
+    },
+
+    /**
+     * Performs a shallow copy on this hash.
+     * @return {Ext.util.HashMap} The new hash object.
+     */
+    clone: function() {
+        var hash = new Ext.util.HashMap(),
+            map = this.map,
+            key;
+
+        hash.suspendEvents();
+        for (key in map) {
+            if (map.hasOwnProperty(key)) {
+                hash.add(key, map[key]);
+            }
+        }
+        hash.resumeEvents();
+        return hash;
+    },
+
+    /**
+     * @private
+     * Find the key for a value.
+     * @param {Object} value The value to find.
+     * @return {Object} The value of the item. Returns <tt>undefined</tt> if not found.
+     */
+    findKey: function(value) {
+        var key,
+            map = this.map;
+
+        for (key in map) {
+            if (map.hasOwnProperty(key) && map[key] === value) {
+                return key;
+            }
+        }
+        return undefined;
+    }
+});
 /**
  * A DataItem is a container for {@link Ext.dataview.DataView} with useComponents: true. It ties together
  * {@link Ext.data.Model records} to its contained Components via a {@link #dataMap dataMap} configuration.
@@ -36267,79 +36152,13 @@ Ext.define("App.view.Homepage", {
                     '<div class="footer">{item4}</div></div>'
                 ],
 
-                store: {
-                    autoLoad: true,
-                    fields: ['item1', 'item2', 'item3', 'item4'],
-                    proxy: {
-                        type: 'ajax',
-                        url: 'resources/data/hotel.json',
-                        reader: {
-                            type: 'json',
-                            rootProperty: 'responseData.feed.entries'
-                        }
-                    }
-                }
+                store: "Hotels",
+                fields: ['id', 'item0', 'item1', 'item2', 'item3', 'item4', 'item5'] 
             }
         ]
     }
 
 });
-
-Ext.define("App.view.Travel", {
-    extend: 'Ext.navigation.View',
-    xtype: 'travel',
-    requires: [
-        'Ext.TitleBar'
-    ],
-
-    config: {
-        scrollable: true,
-        items: [
-            {
-                title: 'Reiseinfo',
-                maxWidth: 750,
-                xtype: 'dataview',
-
-                items: [
-                    {
-                        xtype: 'button',
-                        ui: 'normal',
-                        id: 'travelBtn',
-                        text: 'Bykart',
-                        cls: 'buttonContact',
-                        docked: 'bottom',
-                        handler: function() {
-                            showPopupMap("areamap.jpg", "Bykart");
-                        }
-                    }],
-
-                itemTpl: [
-                    '<div class="textBlock">',
-                    '<div class="header">{item1}</div>',
-                    '<div class="contentText">{item2}</div></div>',
-                    '</div>'
-                ],
-
-                store: {
-                    autoLoad: true,
-                    fields: ['item1', 'item2'],
-                    proxy: {
-                        type: 'ajax',
-                        url: 'resources/data/travel.json',
-                        reader: {
-                            type: 'json',
-                            rootProperty: 'responseData.feed.entries'
-                    }
-                }
-            }
-        }]
-    }
-    
-});
-
-function showPopupMap(image, title){
-    showPopup(image, title);
-}
 
 /**
  * @private
@@ -38935,6 +38754,53 @@ Ext.define('Ext.data.Field', {
 });
 
 /**
+ * @aside guide ajax
+ *
+ * A singleton instance of an {@link Ext.data.Connection}. This class
+ * is used to communicate with your server side code. It can be used as follows:
+ *
+ *     Ext.Ajax.request({
+ *         url: 'page.php',
+ *         params: {
+ *             id: 1
+ *         },
+ *         success: function(response){
+ *             var text = response.responseText;
+ *             // process server response here
+ *         }
+ *     });
+ *
+ * Default options for all requests can be set by changing a property on the Ext.Ajax class:
+ *
+ *     Ext.Ajax.timeout = 60000; // 60 seconds
+ *
+ * Any options specified in the request method for the Ajax request will override any
+ * defaults set on the Ext.Ajax class. In the code sample below, the timeout for the
+ * request will be 60 seconds.
+ *
+ *     Ext.Ajax.timeout = 120000; // 120 seconds
+ *     Ext.Ajax.request({
+ *         url: 'page.aspx',
+ *         timeout: 60000
+ *     });
+ *
+ * In general, this class will be used for all Ajax requests in your application.
+ * The main reason for creating a separate {@link Ext.data.Connection} is for a
+ * series of requests that share common settings that are different to all other
+ * requests in the application.
+ */
+Ext.define('Ext.Ajax', {
+    extend: 'Ext.data.Connection',
+    singleton: true,
+
+    /**
+     * @property {Boolean} autoAbort
+     * Whether a new request should abort any pending requests.
+     */
+    autoAbort : false
+});
+
+/**
  * @private
  */
 Ext.define('Ext.AbstractManager', {
@@ -39262,53 +39128,6 @@ Ext.define('Ext.data.ModelManager', {
             'extending Ext.data.Model: Ext.define("MyModel", {extend: "Ext.data.Model", fields: []});.');
         return this.ModelManager.registerType.apply(this.ModelManager, arguments);
     };
-});
-
-/**
- * @aside guide ajax
- *
- * A singleton instance of an {@link Ext.data.Connection}. This class
- * is used to communicate with your server side code. It can be used as follows:
- *
- *     Ext.Ajax.request({
- *         url: 'page.php',
- *         params: {
- *             id: 1
- *         },
- *         success: function(response){
- *             var text = response.responseText;
- *             // process server response here
- *         }
- *     });
- *
- * Default options for all requests can be set by changing a property on the Ext.Ajax class:
- *
- *     Ext.Ajax.timeout = 60000; // 60 seconds
- *
- * Any options specified in the request method for the Ajax request will override any
- * defaults set on the Ext.Ajax class. In the code sample below, the timeout for the
- * request will be 60 seconds.
- *
- *     Ext.Ajax.timeout = 120000; // 120 seconds
- *     Ext.Ajax.request({
- *         url: 'page.aspx',
- *         timeout: 60000
- *     });
- *
- * In general, this class will be used for all Ajax requests in your application.
- * The main reason for creating a separate {@link Ext.data.Connection} is for a
- * series of requests that share common settings that are different to all other
- * requests in the application.
- */
-Ext.define('Ext.Ajax', {
-    extend: 'Ext.data.Connection',
-    singleton: true,
-
-    /**
-     * @property {Boolean} autoAbort
-     * Whether a new request should abort any pending requests.
-     */
-    autoAbort : false
 });
 
 /**
@@ -46871,6 +46690,49 @@ Ext.define('Ext.data.Model', {
     this.cache = new Ext.util.Collection(this.generateCacheId);
 });
 
+Ext.define("App.model.Info", {
+    extend: "Ext.data.Model",
+    
+    config: {
+        idProperty: 'id',
+        fields: [
+            { name: 'id', type: 'string' },
+            { name: 'item0', type: 'string' },
+            { name: 'item1', type: 'string' },
+            { name: 'item2', type: 'string' },
+            { name: 'item3', type: 'string' }
+        ]
+    }
+});
+Ext.define("App.model.Hotel", {
+    extend: "Ext.data.Model",
+    
+    config: {
+        idProperty: 'id',
+        fields: [
+            { name: 'id', type: 'string' },
+            { name: 'item0', type: 'string' },
+            { name: 'item1', type: 'string' },
+            { name: 'item2', type: 'string' },
+            { name: 'item3', type: 'string' },
+            { name: 'item4', type: 'string' },
+            { name: 'item5', type: 'string' }
+        ]
+    }
+});
+Ext.define("App.model.Travel", {
+    extend: "Ext.data.Model",
+    
+    config: {
+        idProperty: 'id',
+        fields: [
+            { name: 'id', type: 'string' },
+            { name: 'item0', type: 'string' },
+            { name: 'item1', type: 'string' },
+            { name: 'item2', type: 'string' },
+        ]
+    }
+});
 Ext.define("App.model.Session", {
     extend: "Ext.data.Model",
     
@@ -46889,20 +46751,6 @@ Ext.define("App.model.Session", {
             { name: 'speaker', type: 'string' },
             { name: 'ingress', type: 'string' },
             { name: 'description', type: 'string' }
-        ]
-    }
-});
-Ext.define("App.model.Info", {
-    extend: "Ext.data.Model",
-    
-    config: {
-        idProperty: 'id',
-        fields: [
-            { name: 'id', type: 'string' },
-            { name: 'item0', type: 'string' },
-            { name: 'item1', type: 'string' },
-            { name: 'item2', type: 'string' },
-            { name: 'item3', type: 'string' }
         ]
     }
 });
@@ -49169,6 +49017,33 @@ Ext.define('Ext.data.Store', {
 
 });
 
+Ext.define("App.store.ExternalHotels", {
+    extend: "Ext.data.Store",
+    requires: [
+        'App.model.Hotel'
+    ],
+    config: {
+        model: "App.model.Hotel",
+        autoLoad: true,
+        proxy: {
+            type: 'ajax',
+            url: 'resources/data/hotel.json',
+            reader: {
+                type: 'json',
+                rootProperty: 'items'
+            }
+        },
+        listeners: {
+            load: function(){
+                saveContentFromExternal("Hotels", "ExternalHotels");
+            }
+        }
+    }
+
+});
+
+
+
 Ext.define("App.store.ExternalInfos", {
     extend: "Ext.data.Store",
     requires: [
@@ -49176,6 +49051,7 @@ Ext.define("App.store.ExternalInfos", {
     ],
     config: {
         model: "App.model.Info",
+        autoLoad: true,
         proxy: {
             type: 'ajax',
             url: 'resources/data/info.json',
@@ -49183,7 +49059,13 @@ Ext.define("App.store.ExternalInfos", {
                 type: 'json',
                 rootProperty: 'items'
             }
+        },
+        listeners: {
+            load: function(){
+                saveContentFromExternal("Infos", "ExternalInfos");
+            }
         }
+        
     }
 
 });
@@ -49195,6 +49077,7 @@ Ext.define("App.store.Sessions", {
     ],
     config: {
         model: "App.model.Session",
+        autoLoad: true,
         proxy: {
             type: 'ajax',
             url: 'resources/data/agenda.json',
@@ -49273,6 +49156,132 @@ Ext.define("App.view.SessionListContainer", {
                 xtype: 'sessionlist'
         }]
     }
+});
+
+
+Ext.define('App.controller.Main', {
+    extend: 'Ext.app.Controller',
+    
+    requires: [
+        'App.view.SessionDetail',
+        'App.view.SessionList'
+    ],
+
+    config: {
+        refs: {
+            mainView: 'mainview',
+            sessionListContainer: 'sessionlistcontainer',
+            eventListContainer: 'eventlistcontainer'
+        },
+
+        control: {
+            'sessionlist': {
+                disclose: 'onSessionDetailCommand'
+            },
+            'eventlist': {
+                disclose: 'onEventDetailCommand'
+            }
+        }
+    },
+
+    slideLeftTransition: {type: 'slide', direction: 'left'},
+    slideRightTransition: {type: 'slide', direction: 'right'},
+
+    launch: function() {
+        this.callParent(arguments);
+    },
+
+    init: function() {
+        this.callParent(arguments);
+    },
+
+    onSessionListCommand: function() {
+        Ext.Viewport.animateActiveItem(this.getMainView(), this.slideRightTransition);
+    },
+    
+    onSessionDetailCommand: function(list, record) {
+        this.getSessionListContainer().push(getSessionDetail(record.data));
+    },
+
+    onEventListCommand: function() {
+        Ext.Viewport.animateActiveItem(this.getMainView(), this.slideRightTransition);
+    },
+
+    onEventDetailCommand: function(list, record) {
+        this.getEventListContainer().push(getEventDetail(record.data));
+    }
+});
+
+function getSessionDetail(record) {
+    var btnText = isEventSaved(record.id)?"Fjern fra huskeliste":"Legg til i huskeliste";
+    this.setMainWindow();
+    return {
+            xtype: 'sessiondetail',
+            title: record.startTime,
+            data: record,
+            tpl: getSessionDetailTemplate(btnText)
+    }
+}
+
+function getEventDetail(record) {
+    return {
+            xtype: 'sessiondetail',
+            title: record.startTime + " - " + record.endTime,
+            data: record,
+            tpl: getEventDetailTemplate()
+    }
+}
+
+function showPopupMap(image, imageTitle){
+    var popup = new Ext.Panel({
+        floating: true,
+        modal: true,
+        width: 320,
+        height: 420,
+        html: '<body style="margin: 0px 0px 0px 0px; padding: 0px 0px 0px 0px;"><img src="resources/images/maps/'+image+'" style="height:100%; width:100%"></body>',
+        items: [{
+            xtype: 'toolbar',
+            title: imageTitle,
+            docked: 'top',
+            items: [{
+                xtype: 'spacer'
+            },{
+                text: 'Lukk',
+                handler: function(){
+                    popup.hide();
+                }
+            }]
+        }]
+    });
+    
+    popup.show();
+}
+  
+  
+
+Ext.define("App.store.ExternalTravels", {
+    extend: "Ext.data.Store",
+    requires: [
+        'App.model.Travel'
+    ],
+    config: {
+        model: "App.model.Travel",
+        autoLoad: true,
+        proxy: {
+            type: 'ajax',
+            url: 'resources/data/travel.json',
+            reader: {
+                type: 'json',
+                rootProperty: 'items'
+            }
+        },
+        listeners: {
+            load: function(){
+                saveContentFromExternal("Travels", "ExternalTravels");
+            }
+        }
+    }
+
 });
 
 /**
@@ -49778,6 +49787,21 @@ Ext.define('Ext.data.proxy.LocalStorage', {
     }
 });
 
+Ext.define("App.store.Hotels", {
+    extend: "Ext.data.Store",
+    requires: [
+        "Ext.data.proxy.LocalStorage"
+    ],
+    config: {
+        model: "App.model.Hotel",
+        autoLoad: true,
+        proxy: {
+            type: 'localstorage',
+            id: 'hotels-app-store'
+        }
+    }
+
+});
 Ext.define("App.store.Infos", {
     extend: "Ext.data.Store",
     requires: [
@@ -49785,6 +49809,7 @@ Ext.define("App.store.Infos", {
     ],
     config: {
         model: "App.model.Info",
+        autoLoad: true,
         proxy: {
             type: 'localstorage',
             id: 'infos-app-store'
@@ -49792,6 +49817,7 @@ Ext.define("App.store.Infos", {
     }
 
 });
+
 Ext.define("App.view.Info", {
     extend: 'Ext.navigation.View',
     xtype: 'info',
@@ -49829,7 +49855,6 @@ Ext.define("App.view.Info", {
                 ],
 
                 store: "Infos",
-                autoLoad: true,
                 fields: ['id', 'item0', 'item1', 'item2', 'item3']                
 
 //                {
@@ -49853,6 +49878,69 @@ function showPopupMap(image, title){
     showPopup(image, title);
 }
 
+Ext.define("App.store.Travels", {
+    extend: "Ext.data.Store",
+    requires: [
+        "Ext.data.proxy.LocalStorage"
+    ],
+    config: {
+        model: "App.model.Travel",
+        autoLoad: true,
+        proxy: {
+            type: 'localstorage',
+            id: 'travels-app-store'
+        }
+    }
+
+});
+Ext.define("App.view.Travel", {
+    extend: 'Ext.navigation.View',
+    xtype: 'travel',
+    requires: [
+        'App.store.Travels',
+        'App.model.Travel',
+        'Ext.TitleBar'
+    ],
+
+    config: {
+        scrollable: true,
+        items: [
+            {
+                title: 'Reiseinfo',
+                maxWidth: 750,
+                xtype: 'dataview',
+
+                items: [
+                    {
+                        xtype: 'button',
+                        ui: 'normal',
+                        id: 'travelBtn',
+                        text: 'Bykart',
+                        cls: 'buttonContact',
+                        docked: 'bottom',
+                        handler: function() {
+                            showPopupMap("areamap.jpg", "Bykart");
+                        }
+                    }],
+
+                itemTpl: [
+                    '<div class="textBlock">',
+                    '<div class="header">{item1}</div>',
+                    '<div class="contentText">{item2}</div></div>',
+                    '</div>'
+                ],
+
+                store: "Travels",
+                fields: ['id', 'item0', 'item1', 'item2']
+        }]
+    }
+    
+});
+
+function showPopupMap(image, title){
+    showPopup(image, title);
+}
+
 Ext.define("App.store.Events", {
     extend: "Ext.data.Store",
     requires: [
@@ -49860,6 +49948,7 @@ Ext.define("App.store.Events", {
     ],
     config: {
         model: "App.model.Event",
+        autoLoad: true,
         proxy: {
             type: 'localstorage',
             id: 'events-app-store'

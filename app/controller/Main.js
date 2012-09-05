@@ -29,6 +29,10 @@ Ext.define('App.controller.Main', {
 
     launch: function() {
         this.callParent(arguments);
+//        Ext.onReady(function(){
+//            console.log("1: local record is " + Ext.getStore("Infos").findRecord('id', 1).data.item1);
+//        }); 
+        
     },
 
     init: function() {
