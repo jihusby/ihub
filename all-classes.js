@@ -1836,28 +1836,6 @@ Ext.define('Ext.fx.easing.Abstract', {
 /**
  * @private
  */
-Ext.define('Ext.fx.easing.Bounce', {
-
-    extend: 'Ext.fx.easing.Abstract',
-
-    config: {
-        springTension: 0.3,
-        acceleration: 30,
-        startVelocity: 0
-    },
-
-    getValue: function() {
-        var deltaTime = Ext.Date.now() - this.getStartTime(),
-            theta = (deltaTime / this.getAcceleration()),
-            powTime = theta * Math.pow(Math.E, -this.getSpringTension() * theta);
-
-        return this.getStartValue() + (this.getStartVelocity() * powTime);
-    }
-});
-
-/**
- * @private
- */
 Ext.define('Ext.fx.easing.Momentum', {
 
     extend: 'Ext.fx.easing.Abstract',
@@ -1900,6 +1878,28 @@ Ext.define('Ext.fx.easing.Momentum', {
 
     getVelocity: function() {
         return this.getFrictionFactor() * this.velocity;
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.easing.Bounce', {
+
+    extend: 'Ext.fx.easing.Abstract',
+
+    config: {
+        springTension: 0.3,
+        acceleration: 30,
+        startVelocity: 0
+    },
+
+    getValue: function() {
+        var deltaTime = Ext.Date.now() - this.getStartTime(),
+            theta = (deltaTime / this.getAcceleration()),
+            powTime = theta * Math.pow(Math.E, -this.getSpringTension() * theta);
+
+        return this.getStartValue() + (this.getStartVelocity() * powTime);
     }
 });
 
@@ -4966,6 +4966,21 @@ Ext.define('Ext.fx.animation.Fade', {
 /**
  * @private
  */
+Ext.define('Ext.fx.animation.FadeOut', {
+    extend: 'Ext.fx.animation.Fade',
+    alias: 'animation.fadeOut',
+
+    config: {
+        // @hide
+        out: true,
+
+        before: {}
+    }
+});
+
+/**
+ * @private
+ */
 Ext.define('Ext.fx.animation.Flip', {
     extend: 'Ext.fx.animation.Abstract',
 
@@ -5058,21 +5073,6 @@ Ext.define('Ext.fx.animation.Flip', {
         });
 
         return this.callParent(arguments);
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.animation.FadeOut', {
-    extend: 'Ext.fx.animation.Fade',
-    alias: 'animation.fadeOut',
-
-    config: {
-        // @hide
-        out: true,
-
-        before: {}
     }
 });
 
@@ -9912,6 +9912,29 @@ Ext.define('Ext.fx.layout.card.Cover', {
 /**
  * @private
  */
+Ext.define('Ext.fx.layout.card.Fade', {
+    extend: 'Ext.fx.layout.card.Style',
+
+    alias: 'fx.layout.card.fade',
+
+    config: {
+        reverse: null,
+        
+        inAnimation: {
+            type: 'fade',
+            easing: 'ease-out'
+        },
+        outAnimation: {
+            type: 'fade',
+            easing: 'ease-out',
+            out: true
+        }
+    }
+});
+
+/**
+ * @private
+ */
 Ext.define('Ext.fx.layout.card.Reveal', {
     extend: 'Ext.fx.layout.card.Style',
 
@@ -9943,29 +9966,6 @@ Ext.define('Ext.fx.layout.card.Reveal', {
     updateReverse: function(reverse) {
         this.getInAnimation().setReverse(reverse);
         this.getOutAnimation().setReverse(reverse);
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.layout.card.Fade', {
-    extend: 'Ext.fx.layout.card.Style',
-
-    alias: 'fx.layout.card.fade',
-
-    config: {
-        reverse: null,
-        
-        inAnimation: {
-            type: 'fade',
-            easing: 'ease-out'
-        },
-        outAnimation: {
-            type: 'fade',
-            easing: 'ease-out',
-            out: true
-        }
     }
 });
 
@@ -27794,112 +27794,6 @@ Ext.define('Ext.app.Controller', {
 
 /**
  * @author Ed Spencer
- * @private
- *
- * Manages the stack of {@link Ext.app.Action} instances that have been decoded, pushes new urls into the browser's
- * location object and listens for changes in url, firing the {@link #change} event when a change is detected.
- *
- * This is tied to an {@link Ext.app.Application Application} instance. The Application performs all of the
- * interactions with the History object, no additional integration should be required.
- */
-Ext.define('Ext.app.History', {
-    mixins: ['Ext.mixin.Observable'],
-
-    /**
-     * @event change
-     * Fires when a change in browser url is detected
-     * @param {String} url The new url, after the hash (e.g. http://myapp.com/#someUrl returns 'someUrl')
-     */
-
-    config: {
-        /**
-         * @cfg {Array} actions The stack of {@link Ext.app.Action action} instances that have occured so far
-         */
-        actions: [],
-
-        /**
-         * @cfg {Boolean} updateUrl True to automatically update the browser's url when {@link #add} is called
-         */
-        updateUrl: true,
-
-        /**
-         * @cfg {String} token The current token as read from the browser's location object
-         */
-        token: ''
-    },
-
-    constructor: function(config) {
-        if (Ext.feature.has.History) {
-            window.addEventListener('hashchange', Ext.bind(this.detectStateChange, this));
-        }
-        else {
-            setInterval(Ext.bind(this.detectStateChange, this), 50);
-        }
-
-        this.initConfig(config);
-    },
-
-    /**
-     * Adds an {@link Ext.app.Action Action} to the stack, optionally updating the browser's url and firing the
-     * {@link #change} event.
-     * @param {Ext.app.Action} action The Action to add to the stack
-     * @param {Boolean} silent Cancels the firing of the {@link #change} event if true
-     */
-    add: function(action, silent) {
-        this.getActions().push(Ext.factory(action, Ext.app.Action));
-
-        var url = action.getUrl();
-
-        if (this.getUpdateUrl()) {
-            // history.pushState({}, action.getTitle(), "#" + action.getUrl());
-            this.setToken(url);
-            window.location.hash = url;
-        }
-
-        if (silent !== true) {
-            this.fireEvent('change', url);
-        }
-
-        this.setToken(url);
-    },
-
-    /**
-     * @private
-     */
-    back: function() {
-        this.getActions().pop().run();
-    },
-
-    /**
-     * @private
-     */
-    applyToken: function(token) {
-        return token[0] == '#' ? token.substr(1) : token;
-    },
-
-    /**
-     * @private
-     */
-    detectStateChange: function() {
-        var newToken = this.applyToken(window.location.hash),
-            oldToken = this.getToken();
-
-        if (newToken != oldToken) {
-            this.onStateChange();
-            this.setToken(newToken);
-        }
-    },
-
-    /**
-     * @private
-     */
-    onStateChange: function() {
-        this.fireEvent('change', window.location.hash.substr(1));
-    }
-});
-
-/**
- * @author Ed Spencer
  *
  * A Profile represents a range of devices that fall under a common category. For the vast majority of apps that use
  * device profiles, the app defines a Phone profile and a Tablet profile. Doing this enables you to easily customize
@@ -28284,6 +28178,112 @@ Ext.define('Ext.app.Action', {
         return controller + "/" + this.getAction();
     }
 });
+/**
+ * @author Ed Spencer
+ * @private
+ *
+ * Manages the stack of {@link Ext.app.Action} instances that have been decoded, pushes new urls into the browser's
+ * location object and listens for changes in url, firing the {@link #change} event when a change is detected.
+ *
+ * This is tied to an {@link Ext.app.Application Application} instance. The Application performs all of the
+ * interactions with the History object, no additional integration should be required.
+ */
+Ext.define('Ext.app.History', {
+    mixins: ['Ext.mixin.Observable'],
+
+    /**
+     * @event change
+     * Fires when a change in browser url is detected
+     * @param {String} url The new url, after the hash (e.g. http://myapp.com/#someUrl returns 'someUrl')
+     */
+
+    config: {
+        /**
+         * @cfg {Array} actions The stack of {@link Ext.app.Action action} instances that have occured so far
+         */
+        actions: [],
+
+        /**
+         * @cfg {Boolean} updateUrl True to automatically update the browser's url when {@link #add} is called
+         */
+        updateUrl: true,
+
+        /**
+         * @cfg {String} token The current token as read from the browser's location object
+         */
+        token: ''
+    },
+
+    constructor: function(config) {
+        if (Ext.feature.has.History) {
+            window.addEventListener('hashchange', Ext.bind(this.detectStateChange, this));
+        }
+        else {
+            setInterval(Ext.bind(this.detectStateChange, this), 50);
+        }
+
+        this.initConfig(config);
+    },
+
+    /**
+     * Adds an {@link Ext.app.Action Action} to the stack, optionally updating the browser's url and firing the
+     * {@link #change} event.
+     * @param {Ext.app.Action} action The Action to add to the stack
+     * @param {Boolean} silent Cancels the firing of the {@link #change} event if true
+     */
+    add: function(action, silent) {
+        this.getActions().push(Ext.factory(action, Ext.app.Action));
+
+        var url = action.getUrl();
+
+        if (this.getUpdateUrl()) {
+            // history.pushState({}, action.getTitle(), "#" + action.getUrl());
+            this.setToken(url);
+            window.location.hash = url;
+        }
+
+        if (silent !== true) {
+            this.fireEvent('change', url);
+        }
+
+        this.setToken(url);
+    },
+
+    /**
+     * @private
+     */
+    back: function() {
+        this.getActions().pop().run();
+    },
+
+    /**
+     * @private
+     */
+    applyToken: function(token) {
+        return token[0] == '#' ? token.substr(1) : token;
+    },
+
+    /**
+     * @private
+     */
+    detectStateChange: function() {
+        var newToken = this.applyToken(window.location.hash),
+            oldToken = this.getToken();
+
+        if (newToken != oldToken) {
+            this.onStateChange();
+            this.setToken(newToken);
+        }
+    },
+
+    /**
+     * @private
+     */
+    onStateChange: function() {
+        this.fireEvent('change', window.location.hash.substr(1));
+    }
+});
+
 /**
  * @author Ed Spencer
  * @private
@@ -31730,6 +31730,288 @@ Ext.define('Ext.util.Grouper', {
 /**
  * @private
  */
+Ext.define('Ext.mixin.Filterable', {
+    extend: 'Ext.mixin.Mixin',
+
+    requires: [
+        'Ext.util.Filter'
+    ],
+
+    mixinConfig: {
+        id: 'filterable'
+    },
+
+    config: {
+        /**
+         * @cfg {Array} filters
+         * An array with filters. A filter can be an instance of Ext.util.Filter,
+         * an object representing an Ext.util.Filter configuration, or a filter function.
+         */
+        filters: null,
+
+        /**
+         * @cfg {String} filterRoot
+         * The root inside each item in which the properties exist that we want to filter on.
+         * This is useful for filtering records in which the data exists inside a 'data' property.
+         */
+        filterRoot: null
+    },
+
+    /**
+     * @property {Boolean} dirtyFilterFn
+     * A flag indicating wether the currently cashed filter function is still valid. Read-only.
+     */
+    dirtyFilterFn: false,
+
+    /**
+     * @property currentSortFn
+     * This is the cached sorting function which is a generated function that calls all the
+     * configured sorters in the correct order. This is a read-only property.
+     */
+    filterFn: null,
+
+    /**
+     * @property {Boolean} filtered
+     * A read-only flag indicating if this object is filtered
+     */
+    filtered: false,
+
+    applyFilters: function(filters, collection) {
+        if (!collection) {
+            collection = this.createFiltersCollection();
+        }
+
+        collection.clear();
+
+        this.filtered = false;
+        this.dirtyFilterFn = true;
+
+        if (filters) {
+            this.addFilters(filters);
+        }
+
+        return collection;
+    },
+
+    createFiltersCollection: function() {
+        this._filters = Ext.create('Ext.util.Collection', function(filter) {
+            return filter.getId();
+        });
+        return this._filters;
+    },
+
+    /**
+     * This method adds a filter.
+     * @param {Ext.util.Sorter/Function/Object} filter Can be an instance of Ext.util.Filter,
+     * an object representing an Ext.util.Filter configuration, or a filter function.
+     */
+    addFilter: function(filter) {
+        this.addFilters([filter]);
+    },
+
+    /**
+     * This method adds all the filters in a passed array.
+     * @param {Array} filters An array with filters. A filter can be an instance of Ext.util.Filter,
+     * an object representing an Ext.util.Filter configuration, or a filter function.
+     */
+    addFilters: function(filters) {
+        var currentFilters = this.getFilters();
+        return this.insertFilters(currentFilters ? currentFilters.length : 0, filters);
+    },
+
+    /**
+     * This method adds a filter at a given index.
+     * @param {Number} index The index at which to insert the filter.
+     * @param {Ext.util.Sorter/Function/Object} filter Can be an instance of Ext.util.Filter,
+     * an object representing an Ext.util.Filter configuration, or a filter function.
+     */
+    insertFilter: function(index, filter) {
+        return this.insertFilters(index, [filter]);
+    },
+
+    /**
+     * This method inserts all the filters in the passed array at the given index.
+     * @param {Number} index The index at which to insert the filters.
+     * @param {Array} filters Each filter can be an instance of Ext.util.Filter,
+     * an object representing an Ext.util.Filter configuration, or a filter function.
+     */
+    insertFilters: function(index, filters) {
+        // We begin by making sure we are dealing with an array of sorters
+        if (!Ext.isArray(filters)) {
+            filters = [filters];
+        }
+
+        var ln = filters.length,
+            filterRoot = this.getFilterRoot(),
+            currentFilters = this.getFilters(),
+            newFilters = [],
+            filterConfig, i, filter;
+
+        if (!currentFilters) {
+            currentFilters = this.createFiltersCollection();
+        }
+
+        // We first have to convert every sorter into a proper Sorter instance
+        for (i = 0; i < ln; i++) {
+            filter = filters[i];
+            filterConfig = {
+                root: filterRoot
+            };
+
+            if (Ext.isFunction(filter)) {
+                filterConfig.filterFn = filter;
+            }
+            // If we are dealing with an object, we assume its a Sorter configuration. In this case
+            // we create an instance of Sorter passing this configuration.
+            else if (Ext.isObject(filter)) {
+                if (!filter.isFilter) {
+                    if (filter.fn) {
+                        filter.filterFn = filter.fn;
+                        delete filter.fn;
+                    }
+
+                    filterConfig = Ext.apply(filterConfig, filter);
+                }
+                else {
+                    newFilters.push(filter);
+                    if (!filter.getRoot()) {
+                        filter.setRoot(filterRoot);
+                    }
+                    continue;
+                }
+            }
+            // Finally we get to the point where it has to be invalid
+            else {
+                Ext.Logger.warn('Invalid filter specified:', filter);
+            }
+
+            // If a sorter config was created, make it an instance
+            filter = Ext.create('Ext.util.Filter', filterConfig);
+            newFilters.push(filter);
+        }
+
+        // Now lets add the newly created sorters.
+        for (i = 0, ln = newFilters.length; i < ln; i++) {
+            currentFilters.insert(index + i, newFilters[i]);
+        }
+
+        this.dirtyFilterFn = true;
+
+        if (currentFilters.length) {
+            this.filtered = true;
+        }
+
+        return currentFilters;
+    },
+
+    /**
+     * This method removes all the filters in a passed array.
+     * @param {Array} filters Each value in the array can be a string (property name),
+     * function (sorterFn), an object containing a property and value keys or
+     * {@link Ext.util.Sorter Sorter} instance.
+     */
+    removeFilters: function(filters) {
+        // We begin by making sure we are dealing with an array of sorters
+        if (!Ext.isArray(filters)) {
+            filters = [filters];
+        }
+
+        var ln = filters.length,
+            currentFilters = this.getFilters(),
+            i, filter;
+
+        for (i = 0; i < ln; i++) {
+            filter = filters[i];
+
+            if (typeof filter === 'string') {
+                currentFilters.each(function(item) {
+                    if (item.getProperty() === filter) {
+                        currentFilters.remove(item);
+                    }
+                });
+            }
+            else if (typeof filter === 'function') {
+                currentFilters.each(function(item) {
+                    if (item.getFilterFn() === filter) {
+                        currentFilters.remove(item);
+                    }
+                });
+            }
+            else {
+                if (filter.isFilter) {
+                    currentFilters.remove(filter);
+                }
+                else if (filter.property !== undefined && filter.value !== undefined) {
+                    currentFilters.each(function(item) {
+                        if (item.getProperty() === filter.property && item.getValue() === filter.value) {
+                            currentFilters.remove(item);
+                        }
+                    });
+                }
+            }
+        }
+
+        if (!currentFilters.length) {
+            this.filtered = false;
+        }
+    },
+
+    /**
+     * This updates the cached sortFn based on the current sorters.
+     * @return {Function} sortFn The generated sort function.
+     * @private
+     */
+    updateFilterFn: function() {
+        var filters = this.getFilters().items;
+
+        this.filterFn = function(item) {
+            var isMatch = true,
+                length = filters.length,
+                i;
+
+            for (i = 0; i < length; i++) {
+                var filter = filters[i],
+                    fn     = filter.getFilterFn(),
+                    scope  = filter.getScope() || this;
+
+                isMatch = isMatch && fn.call(scope, item);
+            }
+
+            return isMatch;
+        };
+
+        this.dirtyFilterFn = false;
+        return this.filterFn;
+    },
+
+    /**
+     * This method will sort an array based on the currently configured {@link Ext.data.Store#sorters sorters}.
+     * @param {Array} data The array you want to have sorted
+     * @return {Array} The array you passed after it is sorted
+     */
+    filter: function(data) {
+        return this.getFilters().length ? Ext.Array.filter(data, this.getFilterFn()) : data;
+    },
+
+    isFiltered: function(item) {
+        return this.getFilters().length ? !this.getFilterFn()(item) : false;
+    },
+
+    /**
+     * Returns an up to date sort function.
+     * @return {Function} sortFn The sort function.
+     */
+    getFilterFn: function() {
+        if (this.dirtyFilterFn) {
+            return this.updateFilterFn();
+        }
+        return this.filterFn;
+    }
+});
+
+/**
+ * @private
+ */
 Ext.define('Ext.mixin.Sortable', {
     extend: 'Ext.mixin.Mixin',
 
@@ -32068,284 +32350,33 @@ Ext.define('Ext.mixin.Sortable', {
 });
 
 /**
- * @private
+ * @author Ed Spencer
+ * @class Ext.data.Error
+ *
+ * <p>This is used when validating a record. The validate method will return an Ext.data.Errors collection
+ * containing Ext.data.Error instances. Each error has a field and a message.</p>
+ *
+ * <p>Usually this class does not need to be instantiated directly - instances are instead created
+ * automatically when {@link Ext.data.Model#validate validate} on a model instance.</p>
  */
-Ext.define('Ext.mixin.Filterable', {
-    extend: 'Ext.mixin.Mixin',
 
-    requires: [
-        'Ext.util.Filter'
-    ],
-
-    mixinConfig: {
-        id: 'filterable'
-    },
-
+Ext.define('Ext.data.Error', {
     config: {
         /**
-         * @cfg {Array} filters
-         * An array with filters. A filter can be an instance of Ext.util.Filter,
-         * an object representing an Ext.util.Filter configuration, or a filter function.
+         * @cfg {String} field
+         * The name of the field this error belongs to.
          */
-        filters: null,
+        field: null,
 
         /**
-         * @cfg {String} filterRoot
-         * The root inside each item in which the properties exist that we want to filter on.
-         * This is useful for filtering records in which the data exists inside a 'data' property.
+         * @cfg {String} message
+         * The message containing the description of the error.
          */
-        filterRoot: null
+        message: ''
     },
 
-    /**
-     * @property {Boolean} dirtyFilterFn
-     * A flag indicating wether the currently cashed filter function is still valid. Read-only.
-     */
-    dirtyFilterFn: false,
-
-    /**
-     * @property currentSortFn
-     * This is the cached sorting function which is a generated function that calls all the
-     * configured sorters in the correct order. This is a read-only property.
-     */
-    filterFn: null,
-
-    /**
-     * @property {Boolean} filtered
-     * A read-only flag indicating if this object is filtered
-     */
-    filtered: false,
-
-    applyFilters: function(filters, collection) {
-        if (!collection) {
-            collection = this.createFiltersCollection();
-        }
-
-        collection.clear();
-
-        this.filtered = false;
-        this.dirtyFilterFn = true;
-
-        if (filters) {
-            this.addFilters(filters);
-        }
-
-        return collection;
-    },
-
-    createFiltersCollection: function() {
-        this._filters = Ext.create('Ext.util.Collection', function(filter) {
-            return filter.getId();
-        });
-        return this._filters;
-    },
-
-    /**
-     * This method adds a filter.
-     * @param {Ext.util.Sorter/Function/Object} filter Can be an instance of Ext.util.Filter,
-     * an object representing an Ext.util.Filter configuration, or a filter function.
-     */
-    addFilter: function(filter) {
-        this.addFilters([filter]);
-    },
-
-    /**
-     * This method adds all the filters in a passed array.
-     * @param {Array} filters An array with filters. A filter can be an instance of Ext.util.Filter,
-     * an object representing an Ext.util.Filter configuration, or a filter function.
-     */
-    addFilters: function(filters) {
-        var currentFilters = this.getFilters();
-        return this.insertFilters(currentFilters ? currentFilters.length : 0, filters);
-    },
-
-    /**
-     * This method adds a filter at a given index.
-     * @param {Number} index The index at which to insert the filter.
-     * @param {Ext.util.Sorter/Function/Object} filter Can be an instance of Ext.util.Filter,
-     * an object representing an Ext.util.Filter configuration, or a filter function.
-     */
-    insertFilter: function(index, filter) {
-        return this.insertFilters(index, [filter]);
-    },
-
-    /**
-     * This method inserts all the filters in the passed array at the given index.
-     * @param {Number} index The index at which to insert the filters.
-     * @param {Array} filters Each filter can be an instance of Ext.util.Filter,
-     * an object representing an Ext.util.Filter configuration, or a filter function.
-     */
-    insertFilters: function(index, filters) {
-        // We begin by making sure we are dealing with an array of sorters
-        if (!Ext.isArray(filters)) {
-            filters = [filters];
-        }
-
-        var ln = filters.length,
-            filterRoot = this.getFilterRoot(),
-            currentFilters = this.getFilters(),
-            newFilters = [],
-            filterConfig, i, filter;
-
-        if (!currentFilters) {
-            currentFilters = this.createFiltersCollection();
-        }
-
-        // We first have to convert every sorter into a proper Sorter instance
-        for (i = 0; i < ln; i++) {
-            filter = filters[i];
-            filterConfig = {
-                root: filterRoot
-            };
-
-            if (Ext.isFunction(filter)) {
-                filterConfig.filterFn = filter;
-            }
-            // If we are dealing with an object, we assume its a Sorter configuration. In this case
-            // we create an instance of Sorter passing this configuration.
-            else if (Ext.isObject(filter)) {
-                if (!filter.isFilter) {
-                    if (filter.fn) {
-                        filter.filterFn = filter.fn;
-                        delete filter.fn;
-                    }
-
-                    filterConfig = Ext.apply(filterConfig, filter);
-                }
-                else {
-                    newFilters.push(filter);
-                    if (!filter.getRoot()) {
-                        filter.setRoot(filterRoot);
-                    }
-                    continue;
-                }
-            }
-            // Finally we get to the point where it has to be invalid
-            else {
-                Ext.Logger.warn('Invalid filter specified:', filter);
-            }
-
-            // If a sorter config was created, make it an instance
-            filter = Ext.create('Ext.util.Filter', filterConfig);
-            newFilters.push(filter);
-        }
-
-        // Now lets add the newly created sorters.
-        for (i = 0, ln = newFilters.length; i < ln; i++) {
-            currentFilters.insert(index + i, newFilters[i]);
-        }
-
-        this.dirtyFilterFn = true;
-
-        if (currentFilters.length) {
-            this.filtered = true;
-        }
-
-        return currentFilters;
-    },
-
-    /**
-     * This method removes all the filters in a passed array.
-     * @param {Array} filters Each value in the array can be a string (property name),
-     * function (sorterFn), an object containing a property and value keys or
-     * {@link Ext.util.Sorter Sorter} instance.
-     */
-    removeFilters: function(filters) {
-        // We begin by making sure we are dealing with an array of sorters
-        if (!Ext.isArray(filters)) {
-            filters = [filters];
-        }
-
-        var ln = filters.length,
-            currentFilters = this.getFilters(),
-            i, filter;
-
-        for (i = 0; i < ln; i++) {
-            filter = filters[i];
-
-            if (typeof filter === 'string') {
-                currentFilters.each(function(item) {
-                    if (item.getProperty() === filter) {
-                        currentFilters.remove(item);
-                    }
-                });
-            }
-            else if (typeof filter === 'function') {
-                currentFilters.each(function(item) {
-                    if (item.getFilterFn() === filter) {
-                        currentFilters.remove(item);
-                    }
-                });
-            }
-            else {
-                if (filter.isFilter) {
-                    currentFilters.remove(filter);
-                }
-                else if (filter.property !== undefined && filter.value !== undefined) {
-                    currentFilters.each(function(item) {
-                        if (item.getProperty() === filter.property && item.getValue() === filter.value) {
-                            currentFilters.remove(item);
-                        }
-                    });
-                }
-            }
-        }
-
-        if (!currentFilters.length) {
-            this.filtered = false;
-        }
-    },
-
-    /**
-     * This updates the cached sortFn based on the current sorters.
-     * @return {Function} sortFn The generated sort function.
-     * @private
-     */
-    updateFilterFn: function() {
-        var filters = this.getFilters().items;
-
-        this.filterFn = function(item) {
-            var isMatch = true,
-                length = filters.length,
-                i;
-
-            for (i = 0; i < length; i++) {
-                var filter = filters[i],
-                    fn     = filter.getFilterFn(),
-                    scope  = filter.getScope() || this;
-
-                isMatch = isMatch && fn.call(scope, item);
-            }
-
-            return isMatch;
-        };
-
-        this.dirtyFilterFn = false;
-        return this.filterFn;
-    },
-
-    /**
-     * This method will sort an array based on the currently configured {@link Ext.data.Store#sorters sorters}.
-     * @param {Array} data The array you want to have sorted
-     * @return {Array} The array you passed after it is sorted
-     */
-    filter: function(data) {
-        return this.getFilters().length ? Ext.Array.filter(data, this.getFilterFn()) : data;
-    },
-
-    isFiltered: function(item) {
-        return this.getFilters().length ? !this.getFilterFn()(item) : false;
-    },
-
-    /**
-     * Returns an up to date sort function.
-     * @return {Function} sortFn The sort function.
-     */
-    getFilterFn: function() {
-        if (this.dirtyFilterFn) {
-            return this.updateFilterFn();
-        }
-        return this.filterFn;
+    constructor: function(config) {
+        this.initConfig(config);
     }
 });
 
@@ -32781,155 +32812,6 @@ Ext.define('Ext.util.Inflector', {
         this.singular(irregulars[singular], singular);
     }
 });
-/**
- * @author Ed Spencer
- * @class Ext.data.Error
- *
- * <p>This is used when validating a record. The validate method will return an Ext.data.Errors collection
- * containing Ext.data.Error instances. Each error has a field and a message.</p>
- *
- * <p>Usually this class does not need to be instantiated directly - instances are instead created
- * automatically when {@link Ext.data.Model#validate validate} on a model instance.</p>
- */
-
-Ext.define('Ext.data.Error', {
-    config: {
-        /**
-         * @cfg {String} field
-         * The name of the field this error belongs to.
-         */
-        field: null,
-
-        /**
-         * @cfg {String} message
-         * The message containing the description of the error.
-         */
-        message: ''
-    },
-
-    constructor: function(config) {
-        this.initConfig(config);
-    }
-});
-
-/**
- * Used in the {@link Ext.tab.Bar} component. This shouldn't be used directly, instead use
- * {@link Ext.tab.Bar} or {@link Ext.tab.Panel}.
- * @private
- */
-Ext.define('Ext.tab.Tab', {
-    extend: 'Ext.Button',
-    xtype: 'tab',
-    alternateClassName: 'Ext.Tab',
-
-    // @private
-    isTab: true,
-
-    config: {
-        /**
-         * @cfg
-         * @inheritdoc
-         */
-        baseCls: Ext.baseCSSPrefix + 'tab',
-
-        /**
-         * @cfg {String} pressedCls
-         * The CSS class to be applied to a Tab when it is pressed. Defaults to 'x-tab-pressed'.
-         * Providing your own CSS for this class enables you to customize the pressed state.
-         * @accessor
-         */
-        pressedCls: Ext.baseCSSPrefix + 'tab-pressed',
-
-        /**
-         * @cfg {String} activeCls
-         * The CSS class to be applied to a Tab when it is active. Defaults to 'x-tab-active'.
-         * Providing your own CSS for this class enables you to customize the active state.
-         * @accessor
-         */
-        activeCls: Ext.baseCSSPrefix + 'tab-active',
-
-        /**
-         * @cfg {Boolean} active
-         * Set this to true to have the tab be active by default.
-         * @accessor
-         */
-        active: false,
-
-        /**
-         * @cfg {String} title
-         * The title of the card that this tab is bound to.
-         * @accessor
-         */
-        title: '&nbsp;'
-    },
-
-    // We need to override this so the iconElement is properly hidden using visibilty
-    // when we render it.
-    template: [
-        {
-            tag: 'span',
-            reference: 'badgeElement',
-            hidden: true
-        },
-        {
-            tag: 'span',
-            className: Ext.baseCSSPrefix + 'button-icon',
-            reference: 'iconElement',
-            style: 'visibility: hidden !important'
-        },
-        {
-            tag: 'span',
-            reference: 'textElement',
-            hidden: true
-        }
-    ],
-
-    /**
-     * @event activate
-     * Fires when a tab is activated
-     * @param {Ext.tab.Tab} this
-     */
-
-    /**
-     * @event deactivate
-     * Fires when a tab is deactivated
-     * @param {Ext.tab.Tab} this
-     */
-
-    updateTitle: function(title) {
-        this.setText(title);
-    },
-
-    hideIconElement: function() {
-        this.iconElement.dom.style.setProperty('visibility', 'hidden', '!important');
-    },
-
-    showIconElement: function() {
-        this.iconElement.dom.style.setProperty('visibility', 'visible', '!important');
-    },
-
-    updateActive: function(active, oldActive) {
-        var activeCls = this.getActiveCls();
-        if (active && !oldActive) {
-            this.element.addCls(activeCls);
-            this.fireEvent('activate', this);
-        } else if (oldActive) {
-            this.element.removeCls(activeCls);
-            this.fireEvent('deactivate', this);
-        }
-    }
-}, function() {
-    this.override({
-        activate: function() {
-            this.setActive(true);
-        },
-
-        deactivate: function() {
-            this.setActive(false);
-        }
-    });
-});
-
 /**
  * Tracks what records are currently selected in a databound widget. This class is mixed in to {@link Ext.dataview.DataView} and
  * all subclasses.
@@ -33800,6 +33682,124 @@ Ext.define('Ext.dataview.element.Container', {
         }
         this.callParent();
     }
+});
+
+/**
+ * Used in the {@link Ext.tab.Bar} component. This shouldn't be used directly, instead use
+ * {@link Ext.tab.Bar} or {@link Ext.tab.Panel}.
+ * @private
+ */
+Ext.define('Ext.tab.Tab', {
+    extend: 'Ext.Button',
+    xtype: 'tab',
+    alternateClassName: 'Ext.Tab',
+
+    // @private
+    isTab: true,
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        baseCls: Ext.baseCSSPrefix + 'tab',
+
+        /**
+         * @cfg {String} pressedCls
+         * The CSS class to be applied to a Tab when it is pressed. Defaults to 'x-tab-pressed'.
+         * Providing your own CSS for this class enables you to customize the pressed state.
+         * @accessor
+         */
+        pressedCls: Ext.baseCSSPrefix + 'tab-pressed',
+
+        /**
+         * @cfg {String} activeCls
+         * The CSS class to be applied to a Tab when it is active. Defaults to 'x-tab-active'.
+         * Providing your own CSS for this class enables you to customize the active state.
+         * @accessor
+         */
+        activeCls: Ext.baseCSSPrefix + 'tab-active',
+
+        /**
+         * @cfg {Boolean} active
+         * Set this to true to have the tab be active by default.
+         * @accessor
+         */
+        active: false,
+
+        /**
+         * @cfg {String} title
+         * The title of the card that this tab is bound to.
+         * @accessor
+         */
+        title: '&nbsp;'
+    },
+
+    // We need to override this so the iconElement is properly hidden using visibilty
+    // when we render it.
+    template: [
+        {
+            tag: 'span',
+            reference: 'badgeElement',
+            hidden: true
+        },
+        {
+            tag: 'span',
+            className: Ext.baseCSSPrefix + 'button-icon',
+            reference: 'iconElement',
+            style: 'visibility: hidden !important'
+        },
+        {
+            tag: 'span',
+            reference: 'textElement',
+            hidden: true
+        }
+    ],
+
+    /**
+     * @event activate
+     * Fires when a tab is activated
+     * @param {Ext.tab.Tab} this
+     */
+
+    /**
+     * @event deactivate
+     * Fires when a tab is deactivated
+     * @param {Ext.tab.Tab} this
+     */
+
+    updateTitle: function(title) {
+        this.setText(title);
+    },
+
+    hideIconElement: function() {
+        this.iconElement.dom.style.setProperty('visibility', 'hidden', '!important');
+    },
+
+    showIconElement: function() {
+        this.iconElement.dom.style.setProperty('visibility', 'visible', '!important');
+    },
+
+    updateActive: function(active, oldActive) {
+        var activeCls = this.getActiveCls();
+        if (active && !oldActive) {
+            this.element.addCls(activeCls);
+            this.fireEvent('activate', this);
+        } else if (oldActive) {
+            this.element.removeCls(activeCls);
+            this.fireEvent('deactivate', this);
+        }
+    }
+}, function() {
+    this.override({
+        activate: function() {
+            this.setActive(true);
+        },
+
+        deactivate: function() {
+            this.setActive(false);
+        }
+    });
 });
 
 /**
@@ -37248,6 +37248,142 @@ Ext.define('Ext.data.Errors', {
 });
 
 /**
+ * @private
+*/
+Ext.define('Ext.dataview.element.List', {
+    extend: 'Ext.dataview.element.Container',
+
+    updateBaseCls: function(newBaseCls) {
+        var me = this;
+
+        me.itemClsShortCache = newBaseCls + '-item';
+
+        me.headerClsShortCache = newBaseCls + '-header';
+        me.headerClsCache = '.' + me.headerClsShortCache;
+
+        me.headerItemClsShortCache = newBaseCls + '-header-item';
+
+        me.footerClsShortCache = newBaseCls + '-footer-item';
+        me.footerClsCache = '.' + me.footerClsShortCache;
+
+        me.labelClsShortCache = newBaseCls + '-item-label';
+        me.labelClsCache = '.' + me.labelClsShortCache;
+
+        me.disclosureClsShortCache = newBaseCls + '-disclosure';
+        me.disclosureClsCache = '.' + me.disclosureClsShortCache;
+
+        me.iconClsShortCache = newBaseCls + '-icon';
+        me.iconClsCache = '.' + me.iconClsShortCache;
+
+        this.callParent(arguments);
+    },
+
+    hiddenDisplayCache: Ext.baseCSSPrefix + 'hidden-display',
+
+    getItemElementConfig: function(index, data) {
+        var me = this,
+            dataview = me.dataview,
+            itemCls = dataview.getItemCls(),
+            cls = me.itemClsShortCache,
+            config, iconSrc;
+
+        if (itemCls) {
+            cls += ' ' + itemCls;
+        }
+
+        config = {
+            cls: cls,
+            children: [{
+                cls: me.labelClsShortCache,
+                html: dataview.getItemTpl().apply(data)
+            }]
+        };
+
+        if (dataview.getIcon()) {
+            iconSrc = data.iconSrc;
+            config.children.push({
+                cls: me.iconClsShortCache,
+                style: 'background-image: ' + iconSrc ? 'url("' + newSrc + '")' : ''
+            });
+        }
+
+        if (dataview.getOnItemDisclosure()) {
+            config.children.push({
+                cls: me.disclosureClsShortCache + ((data[dataview.getDisclosureProperty()] === false) ? me.hiddenDisplayCache : '')
+            });
+        }
+        return config;
+    },
+
+    updateListItem: function(record, item) {
+        var me = this,
+            dataview = me.dataview,
+            extItem = Ext.fly(item),
+            innerItem = extItem.down(me.labelClsCache, true),
+            data = record.data,
+            disclosureProperty = dataview.getDisclosureProperty(),
+            disclosure = data && data.hasOwnProperty(disclosureProperty),
+            iconSrc = data && data.hasOwnProperty('iconSrc'),
+            disclosureEl, iconEl;
+
+        innerItem.innerHTML = dataview.getItemTpl().apply(data);
+
+        if (disclosure && data[disclosureProperty] === false) {
+            disclosureEl = extItem.down(me.disclosureClsCache);
+            disclosureEl[disclosure ? 'removeCls' : 'addCls'](me.hiddenDisplayCache);
+        }
+
+        if (dataview.getIcon()) {
+            iconEl = extItem.down(me.iconClsCache, true);
+            iconEl.style.backgroundImage = iconSrc ? 'url("' + iconSrc + '")' : '';
+        }
+    },
+
+    doRemoveHeaders: function() {
+        var me = this,
+            headerClsShortCache = me.headerItemClsShortCache,
+            existingHeaders = me.element.query(me.headerClsCache),
+            existingHeadersLn = existingHeaders.length,
+            i = 0,
+            item;
+
+        for (; i < existingHeadersLn; i++) {
+            item = existingHeaders[i];
+            Ext.fly(item.parentNode).removeCls(headerClsShortCache);
+            Ext.removeNode(item);
+        }
+    },
+
+    doRemoveFooterCls: function() {
+        var me = this,
+            footerClsShortCache = me.footerClsShortCache,
+            existingFooters = me.element.query(me.footerClsCache),
+            existingFootersLn = existingFooters.length,
+            i = 0;
+
+        for (; i < existingFootersLn; i++) {
+            Ext.fly(existingFooters[i]).removeCls(footerClsShortCache);
+        }
+    },
+
+    doAddHeader: function(item, html) {
+        item = Ext.fly(item);
+        if (html) {
+            item.insertFirst(Ext.Element.create({
+                cls: this.headerClsShortCache,
+                html: html
+            }));
+        }
+        item.addCls(this.headerItemClsShortCache);
+    },
+
+    destroy: function() {
+        this.doRemoveHeaders();
+        this.callParent();
+    }
+});
+
+/**
  * Ext.tab.Bar is used internally by {@link Ext.tab.Panel} to create the bar of tabs that appears at the top of the tab
  * panel. It's unusual to use it directly, instead see the {@link Ext.tab.Panel tab panel docs} for usage instructions.
  *
@@ -37844,142 +37980,6 @@ function setMainWindow(elementIndex){
 }
 
 /**
- * @private
-*/
-Ext.define('Ext.dataview.element.List', {
-    extend: 'Ext.dataview.element.Container',
-
-    updateBaseCls: function(newBaseCls) {
-        var me = this;
-
-        me.itemClsShortCache = newBaseCls + '-item';
-
-        me.headerClsShortCache = newBaseCls + '-header';
-        me.headerClsCache = '.' + me.headerClsShortCache;
-
-        me.headerItemClsShortCache = newBaseCls + '-header-item';
-
-        me.footerClsShortCache = newBaseCls + '-footer-item';
-        me.footerClsCache = '.' + me.footerClsShortCache;
-
-        me.labelClsShortCache = newBaseCls + '-item-label';
-        me.labelClsCache = '.' + me.labelClsShortCache;
-
-        me.disclosureClsShortCache = newBaseCls + '-disclosure';
-        me.disclosureClsCache = '.' + me.disclosureClsShortCache;
-
-        me.iconClsShortCache = newBaseCls + '-icon';
-        me.iconClsCache = '.' + me.iconClsShortCache;
-
-        this.callParent(arguments);
-    },
-
-    hiddenDisplayCache: Ext.baseCSSPrefix + 'hidden-display',
-
-    getItemElementConfig: function(index, data) {
-        var me = this,
-            dataview = me.dataview,
-            itemCls = dataview.getItemCls(),
-            cls = me.itemClsShortCache,
-            config, iconSrc;
-
-        if (itemCls) {
-            cls += ' ' + itemCls;
-        }
-
-        config = {
-            cls: cls,
-            children: [{
-                cls: me.labelClsShortCache,
-                html: dataview.getItemTpl().apply(data)
-            }]
-        };
-
-        if (dataview.getIcon()) {
-            iconSrc = data.iconSrc;
-            config.children.push({
-                cls: me.iconClsShortCache,
-                style: 'background-image: ' + iconSrc ? 'url("' + newSrc + '")' : ''
-            });
-        }
-
-        if (dataview.getOnItemDisclosure()) {
-            config.children.push({
-                cls: me.disclosureClsShortCache + ((data[dataview.getDisclosureProperty()] === false) ? me.hiddenDisplayCache : '')
-            });
-        }
-        return config;
-    },
-
-    updateListItem: function(record, item) {
-        var me = this,
-            dataview = me.dataview,
-            extItem = Ext.fly(item),
-            innerItem = extItem.down(me.labelClsCache, true),
-            data = record.data,
-            disclosureProperty = dataview.getDisclosureProperty(),
-            disclosure = data && data.hasOwnProperty(disclosureProperty),
-            iconSrc = data && data.hasOwnProperty('iconSrc'),
-            disclosureEl, iconEl;
-
-        innerItem.innerHTML = dataview.getItemTpl().apply(data);
-
-        if (disclosure && data[disclosureProperty] === false) {
-            disclosureEl = extItem.down(me.disclosureClsCache);
-            disclosureEl[disclosure ? 'removeCls' : 'addCls'](me.hiddenDisplayCache);
-        }
-
-        if (dataview.getIcon()) {
-            iconEl = extItem.down(me.iconClsCache, true);
-            iconEl.style.backgroundImage = iconSrc ? 'url("' + iconSrc + '")' : '';
-        }
-    },
-
-    doRemoveHeaders: function() {
-        var me = this,
-            headerClsShortCache = me.headerItemClsShortCache,
-            existingHeaders = me.element.query(me.headerClsCache),
-            existingHeadersLn = existingHeaders.length,
-            i = 0,
-            item;
-
-        for (; i < existingHeadersLn; i++) {
-            item = existingHeaders[i];
-            Ext.fly(item.parentNode).removeCls(headerClsShortCache);
-            Ext.removeNode(item);
-        }
-    },
-
-    doRemoveFooterCls: function() {
-        var me = this,
-            footerClsShortCache = me.footerClsShortCache,
-            existingFooters = me.element.query(me.footerClsCache),
-            existingFootersLn = existingFooters.length,
-            i = 0;
-
-        for (; i < existingFootersLn; i++) {
-            Ext.fly(existingFooters[i]).removeCls(footerClsShortCache);
-        }
-    },
-
-    doAddHeader: function(item, html) {
-        item = Ext.fly(item);
-        if (html) {
-            item.insertFirst(Ext.Element.create({
-                cls: this.headerClsShortCache,
-                html: html
-            }));
-        }
-        item.addCls(this.headerItemClsShortCache);
-    },
-
-    destroy: function() {
-        this.doRemoveHeaders();
-        this.callParent();
-    }
-});
-
-/**
  * @docauthor Evan Trimboli <evan@sencha.com>
  * @aside guide stores
  *
@@ -38138,6 +38138,53 @@ Ext.define('Ext.data.StoreManager', {
     Ext.getStore = function(name) {
         return Ext.data.StoreManager.lookup(name);
     };
+});
+
+/**
+ * @aside guide ajax
+ *
+ * A singleton instance of an {@link Ext.data.Connection}. This class
+ * is used to communicate with your server side code. It can be used as follows:
+ *
+ *     Ext.Ajax.request({
+ *         url: 'page.php',
+ *         params: {
+ *             id: 1
+ *         },
+ *         success: function(response){
+ *             var text = response.responseText;
+ *             // process server response here
+ *         }
+ *     });
+ *
+ * Default options for all requests can be set by changing a property on the Ext.Ajax class:
+ *
+ *     Ext.Ajax.timeout = 60000; // 60 seconds
+ *
+ * Any options specified in the request method for the Ajax request will override any
+ * defaults set on the Ext.Ajax class. In the code sample below, the timeout for the
+ * request will be 60 seconds.
+ *
+ *     Ext.Ajax.timeout = 120000; // 120 seconds
+ *     Ext.Ajax.request({
+ *         url: 'page.aspx',
+ *         timeout: 60000
+ *     });
+ *
+ * In general, this class will be used for all Ajax requests in your application.
+ * The main reason for creating a separate {@link Ext.data.Connection} is for a
+ * series of requests that share common settings that are different to all other
+ * requests in the application.
+ */
+Ext.define('Ext.Ajax', {
+    extend: 'Ext.data.Connection',
+    singleton: true,
+
+    /**
+     * @property {Boolean} autoAbort
+     * Whether a new request should abort any pending requests.
+     */
+    autoAbort : false
 });
 
 /**
@@ -38751,53 +38798,6 @@ Ext.define('Ext.data.Field', {
      * @deprecated 2.0.0 Please use {@link #allowNull} instead.
      */
     Ext.deprecateProperty(this, 'useNull', 'allowNull');
-});
-
-/**
- * @aside guide ajax
- *
- * A singleton instance of an {@link Ext.data.Connection}. This class
- * is used to communicate with your server side code. It can be used as follows:
- *
- *     Ext.Ajax.request({
- *         url: 'page.php',
- *         params: {
- *             id: 1
- *         },
- *         success: function(response){
- *             var text = response.responseText;
- *             // process server response here
- *         }
- *     });
- *
- * Default options for all requests can be set by changing a property on the Ext.Ajax class:
- *
- *     Ext.Ajax.timeout = 60000; // 60 seconds
- *
- * Any options specified in the request method for the Ajax request will override any
- * defaults set on the Ext.Ajax class. In the code sample below, the timeout for the
- * request will be 60 seconds.
- *
- *     Ext.Ajax.timeout = 120000; // 120 seconds
- *     Ext.Ajax.request({
- *         url: 'page.aspx',
- *         timeout: 60000
- *     });
- *
- * In general, this class will be used for all Ajax requests in your application.
- * The main reason for creating a separate {@link Ext.data.Connection} is for a
- * series of requests that share common settings that are different to all other
- * requests in the application.
- */
-Ext.define('Ext.Ajax', {
-    extend: 'Ext.data.Connection',
-    singleton: true,
-
-    /**
-     * @property {Boolean} autoAbort
-     * Whether a new request should abort any pending requests.
-     */
-    autoAbort : false
 });
 
 /**
@@ -39436,212 +39436,174 @@ Ext.define('Ext.data.association.Association', {
 /**
  * @aside guide models
  *
- * Represents a one-to-many relationship between two models. Usually created indirectly via a model definition:
+ * Represents a one to one association with another model. The owner model is expected to have
+ * a foreign key which references the primary key of the associated model:
  *
- *     Ext.define('Product', {
+ *     Ext.define('Person', {
  *         extend: 'Ext.data.Model',
  *         config: {
  *             fields: [
- *                 {name: 'id',      type: 'int'},
- *                 {name: 'user_id', type: 'int'},
- *                 {name: 'name',    type: 'string'}
+ *                 { name: 'id', type: 'int' },
+ *                 { name: 'name', type: 'string' },
+ *                 { name: 'address_id', type: 'int'}
+ *             ],
+ *
+ *             // we can use the hasOne shortcut on the model to create a hasOne association
+ *             associations: { type: 'hasOne', model: 'Address' }
+ *         }
+ *     });
+ *
+ *     Ext.define('Address', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 { name: 'id', type: 'int' },
+ *                 { name: 'number', type: 'string' },
+ *                 { name: 'street', type: 'string' },
+ *                 { name: 'city', type: 'string' },
+ *                 { name: 'zip', type: 'string' },
  *             ]
  *         }
  *     });
  *
- *     Ext.define('User', {
+ * In the example above we have created models for People and Addresses, and linked them together
+ * by saying that each Person has a single Address. This automatically links each Person to an Address
+ * based on the Persons address_id, and provides new functions on the Person model:
+ *
+ * ## Generated getter function
+ *
+ * The first function that is added to the owner model is a getter function:
+ *
+ *     var person = Ext.create('Person', {
+ *         id: 100,
+ *         address_id: 20,
+ *         name: 'John Smith'
+ *     });
+ *
+ *     person.getAddress(function(address, operation) {
+ *         // do something with the address object
+ *         alert(address.get('id')); // alerts 20
+ *     }, this);
+ *
+ * The getAddress function was created on the Person model when we defined the association. This uses the
+ * Persons configured {@link Ext.data.proxy.Proxy proxy} to load the Address asynchronously, calling the provided
+ * callback when it has loaded.
+ *
+ * The new getAddress function will also accept an object containing success, failure and callback properties
+ * - callback will always be called, success will only be called if the associated model was loaded successfully
+ * and failure will only be called if the associatied model could not be loaded:
+ *
+ *     person.getAddress({
+ *         reload: true, // force a reload if the owner model is already cached
+ *         callback: function(address, operation) {}, // a function that will always be called
+ *         success : function(address, operation) {}, // a function that will only be called if the load succeeded
+ *         failure : function(address, operation) {}, // a function that will only be called if the load did not succeed
+ *         scope   : this // optionally pass in a scope object to execute the callbacks in
+ *     });
+ *
+ * In each case above the callbacks are called with two arguments - the associated model instance and the
+ * {@link Ext.data.Operation operation} object that was executed to load that instance. The Operation object is
+ * useful when the instance could not be loaded.
+ *
+ * Once the getter has been called on the model, it will be cached if the getter is called a second time. To
+ * force the model to reload, specify reload: true in the options object.
+ *
+ * ## Generated setter function
+ *
+ * The second generated function sets the associated model instance - if only a single argument is passed to
+ * the setter then the following two calls are identical:
+ *
+ *     // this call...
+ *     person.setAddress(10);
+ *
+ *     // is equivalent to this call:
+ *     person.set('address_id', 10);
+ *
+ * An instance of the owner model can also be passed as a parameter.
+ *
+ * If we pass in a second argument, the model will be automatically saved and the second argument passed to
+ * the owner model's {@link Ext.data.Model#save save} method:
+ *
+ *     person.setAddress(10, function(address, operation) {
+ *         // the address has been saved
+ *         alert(address.get('address_id')); //now alerts 10
+ *     });
+ *
+ *     //alternative syntax:
+ *     person.setAddress(10, {
+ *         callback: function(address, operation), // a function that will always be called
+ *         success : function(address, operation), // a function that will only be called if the load succeeded
+ *         failure : function(address, operation), // a function that will only be called if the load did not succeed
+ *         scope   : this //optionally pass in a scope object to execute the callbacks in
+ *     })
+ *
+ * ## Customisation
+ *
+ * Associations reflect on the models they are linking to automatically set up properties such as the
+ * {@link #primaryKey} and {@link #foreignKey}. These can alternatively be specified:
+ *
+ *     Ext.define('Person', {
  *         extend: 'Ext.data.Model',
  *         config: {
  *             fields: [
- *                 {name: 'id',   type: 'int'},
- *                 {name: 'name', type: 'string'}
+ *                 // ...
  *             ],
- *             // we can use the hasMany shortcut on the model to create a hasMany association
- *             hasMany: {model: 'Product', name: 'products'}
- *         }
- *     });
  *
- * `
- *
- * Above we created Product and User models, and linked them by saying that a User hasMany Products. This gives us a new
- * function on every User instance, in this case the function is called 'products' because that is the name we specified
- * in the association configuration above.
- *
- * This new function returns a specialized {@link Ext.data.Store Store} which is automatically filtered to load only
- * Products for the given model instance:
- *
- *     //first, we load up a User with id of 1
- *     var user = Ext.create('User', {id: 1, name: 'Ed'});
- *
- *     //the user.products function was created automatically by the association and returns a {@link Ext.data.Store Store}
- *     //the created store is automatically scoped to the set of Products for the User with id of 1
- *     var products = user.products();
- *
- *     //we still have all of the usual Store functions, for example it's easy to add a Product for this User
- *     products.add({
- *         name: 'Another Product'
- *     });
- *
- *     //saves the changes to the store - this automatically sets the new Product's user_id to 1 before saving
- *     products.sync();
- *
- * The new Store is only instantiated the first time you call products() to conserve memory and processing time, though
- * calling products() a second time returns the same store instance.
- *
- * _Custom filtering_
- *
- * The Store is automatically furnished with a filter - by default this filter tells the store to only return records
- * where the associated model's foreign key matches the owner model's primary key. For example, if a User with ID = 100
- * hasMany Products, the filter loads only Products with user_id == 100.
- *
- * Sometimes we want to filter by another field - for example in the case of a Twitter search application we may have
- * models for Search and Tweet:
- *
- *     Ext.define('Search', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 'id', 'query'
- *             ],
- *
- *             hasMany: {
- *                 model: 'Tweet',
- *                 name : 'tweets',
- *                 filterProperty: 'query'
- *             }
- *         }
- *     });
- *
- *     Ext.define('Tweet', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 'id', 'text', 'from_user'
+ *             associations: [
+ *                 { type: 'hasOne', model: 'Address', primaryKey: 'unique_id', foreignKey: 'addr_id' }
  *             ]
  *         }
  *     });
  *
- *     //returns a Store filtered by the filterProperty
- *     var store = new Search({query: 'Sencha Touch'}).tweets();
- *
- * The tweets association above is filtered by the query property by setting the {@link #filterProperty}, and is
- * equivalent to this:
- *
- *     var store = Ext.create('Ext.data.Store', {
- *         model: 'Tweet',
- *         filters: [
- *             {
- *                 property: 'query',
- *                 value   : 'Sencha Touch'
- *             }
- *         ]
- *     });
+ * Here we replaced the default primary key (defaults to 'id') and foreign key (calculated as 'address_id')
+ * with our own settings. Usually this will not be needed.
  */
-Ext.define('Ext.data.association.HasMany', {
+Ext.define('Ext.data.association.HasOne', {
     extend: 'Ext.data.association.Association',
-    alternateClassName: 'Ext.data.HasManyAssociation',
-    requires: ['Ext.util.Inflector'],
+    alternateClassName: 'Ext.data.HasOneAssociation',
 
-    alias: 'association.hasmany',
+    alias: 'association.hasone',
 
     config: {
         /**
-         * @cfg {String} foreignKey
-         * The name of the foreign key on the associated model that links it to the owner model. Defaults to the
-         * lowercased name of the owner model plus "_id", e.g. an association with a model called Group hasMany Users
-         * would create 'group_id' as the foreign key. When the remote store is loaded, the store is automatically
-         * filtered so that only records with a matching foreign key are included in the resulting child store. This can
-         * be overridden by specifying the {@link #filterProperty}.
+         * @cfg {String} foreignKey The name of the foreign key on the owner model that links it to the associated
+         * model. Defaults to the lowercased name of the associated model plus "_id", e.g. an association with a
+         * model called Person would set up a address_id foreign key.
          *
-         *     Ext.define('Group', {
+         *     Ext.define('Person', {
          *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'name'],
-         *         hasMany: 'User'
+         *         fields: ['id', 'name', 'address_id'], // refers to the id of the address object
+         *         hasOne: 'Address'
          *     });
          *
-         *     Ext.define('User', {
+         *     Ext.define('Address', {
          *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'name', 'group_id'], // refers to the id of the group that this user belongs to
-         *         belongsTo: 'Group'
+         *         fields: ['id', 'number', 'street', 'city', 'zip'],
+         *         belongsTo: 'Person'
          *     });
+         *     var Person = new Person({
+         *         id: 1,
+         *         name: 'John Smith',
+         *         address_id: 13
+         *     }, 1);
+         *     person.getAddress(); // Will make a call to the server asking for address_id 13
+         *
          */
         foreignKey: undefined,
 
         /**
-         * @cfg {String} name
-         * The name of the function to create on the owner model to retrieve the child store. If not specified, the
-         * pluralized name of the child model is used.
-         *
-         *     // This will create a users() method on any Group model instance
-         *     Ext.define('Group', {
-         *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'name'],
-         *         hasMany: 'User'
-         *     });
-         *     var group = new Group();
-         *     console.log(group.users());
-         *
-         *     // The method to retrieve the users will now be getUserList
-         *     Ext.define('Group', {
-         *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'name'],
-         *         hasMany: {model: 'User', name: 'getUserList'}
-         *     });
-         *     var group = new Group();
-         *     console.log(group.getUserList());
+         * @cfg {String} getterName The name of the getter function that will be added to the local model's prototype.
+         * Defaults to 'get' + the name of the foreign model, e.g. getAddress
          */
+        getterName: undefined,
 
         /**
-         * @cfg {Object} store
-         * Optional configuration object that will be passed to the generated Store. Defaults to an empty Object.
+         * @cfg {String} setterName The name of the setter function that will be added to the local model's prototype.
+         * Defaults to 'set' + the name of the foreign model, e.g. setAddress
          */
-        store: undefined,
+        setterName: undefined,
 
-        /**
-         * @cfg {String} storeName
-         * Optional The name of the store by which you can reference it on this class as a property.
-         */
-        storeName: undefined,
-
-        /**
-         * @cfg {String} [filterProperty=null]
-         * Optionally overrides the default filter that is set up on the associated Store. If this is not set, a filter
-         * is automatically created which filters the association based on the configured {@link #foreignKey}. See intro
-         * docs for more details. Defaults to null.
-         */
-        filterProperty: null,
-
-        /**
-         * @cfg {Boolean} [autoLoad=false]
-         * True to automatically load the related store from a remote source when instantiated. Defaults to false.
-         */
-        autoLoad: false
-    },
-
-    constructor: function(config) {
-        config = config || {};
-
-        if (config.storeConfig) {
-            Ext.Logger.warn('storeConfig is deprecated on an association. Instead use the store configuration.');
-            config.store = config.storeConfig;
-            delete config.storeConfig;
-        }
-
-        this.callParent([config]);
-    },
-
-    applyName: function(name) {
-        if (!name) {
-            name = Ext.util.Inflector.pluralize(this.getAssociatedName().toLowerCase());
-        }
-        return name;
-    },
-
-    applyStoreName: function(name) {
-        if (!name) {
-            name = this.getName() + 'Store';
-        }
-        return name;
+        instanceName: undefined
     },
 
     applyForeignKey: function(foreignKey) {
@@ -39654,14 +39616,6 @@ Ext.define('Ext.data.association.HasMany', {
             }
         }
         return foreignKey;
-    },
-
-    applyAssociationKey: function(associationKey) {
-        if (!associationKey) {
-            var associatedName = this.getAssociatedName();
-            associationKey = Ext.util.Inflector.pluralize(associatedName[0].toLowerCase() + associatedName.slice(1));
-        }
-        return associationKey;
     },
 
     updateForeignKey: function(foreignKey, oldForeignKey) {
@@ -39685,66 +39639,148 @@ Ext.define('Ext.data.association.HasMany', {
         }
     },
 
+    applyInstanceName: function(instanceName) {
+        if (!instanceName) {
+            instanceName = this.getAssociatedName() + 'BelongsToInstance';
+        }
+        return instanceName;
+    },
+
+    applyAssociationKey: function(associationKey) {
+        if (!associationKey) {
+            var associatedName = this.getAssociatedName();
+            associationKey = associatedName[0].toLowerCase() + associatedName.slice(1);
+        }
+        return associationKey;
+    },
+
+    applyGetterName: function(getterName) {
+        if (!getterName) {
+            var associatedName = this.getAssociatedName();
+            getterName = 'get' + associatedName[0].toUpperCase() + associatedName.slice(1);
+        }
+        return getterName;
+    },
+
+    applySetterName: function(setterName) {
+        if (!setterName) {
+            var associatedName = this.getAssociatedName();
+            setterName = 'set' + associatedName[0].toUpperCase() + associatedName.slice(1);
+        }
+        return setterName;
+    },
+
+    updateGetterName: function(getterName, oldGetterName) {
+        var ownerProto = this.getOwnerModel().prototype;
+        if (oldGetterName) {
+            delete ownerProto[oldGetterName];
+        }
+        if (getterName) {
+            ownerProto[getterName] = this.createGetter();
+        }
+    },
+
+    updateSetterName: function(setterName, oldSetterName) {
+        var ownerProto = this.getOwnerModel().prototype;
+        if (oldSetterName) {
+            delete ownerProto[oldSetterName];
+        }
+        if (setterName) {
+            ownerProto[setterName] = this.createSetter();
+        }
+    },
+
     /**
      * @private
-     * Creates a function that returns an Ext.data.Store which is configured to load a set of data filtered
-     * by the owner model's primary key - e.g. in a hasMany association where Group hasMany Users, this function
-     * returns a Store configured to return the filtered set of a single Group's Users.
-     * @return {Function} The store-generating function
+     * Returns a setter function to be placed on the owner model's prototype
+     * @return {Function} The setter function
      */
-    applyStore: function(storeConfig) {
-        var me = this,
-            association     = me,
-            associatedModel = me.getAssociatedModel(),
-            storeName       = me.getStoreName(),
+    createSetter: function() {
+        var me              = this,
             foreignKey      = me.getForeignKey(),
-            primaryKey      = me.getPrimaryKey(),
-            filterProperty  = me.getFilterProperty(),
-            autoLoad        = me.getAutoLoad();
+            instanceName    = me.getInstanceName(),
+            associatedModel = me.getAssociatedModel();
 
-        return function() {
-            var me = this,
-                config, filter,
-                modelDefaults = {};
+        //'this' refers to the Model instance inside this function
+        return function(value, options, scope) {
+            var Model = Ext.data.Model,
+                record;
 
-            if (me[storeName] === undefined) {
-                if (filterProperty) {
-                    filter = {
-                        property  : filterProperty,
-                        value     : me.get(filterProperty),
-                        exactMatch: true
-                    };
-                } else {
-                    filter = {
-                        property  : foreignKey,
-                        value     : me.get(primaryKey),
-                        exactMatch: true
-                    };
-                }
-
-                modelDefaults[foreignKey] = me.get(primaryKey);
-
-                config = Ext.apply({}, storeConfig, {
-                    model        : associatedModel,
-                    filters      : [filter],
-                    remoteFilter : true,
-                    modelDefaults: modelDefaults
-                });
-
-                me[storeName] = Ext.create('Ext.data.Store', config);
-                if (autoLoad) {
-                    me[storeName].load(function(records, operation) {
-                        association.updateInverseInstances(me);
-                    });
-                }
+            if (value && value.isModel) {
+                value = value.getId();
             }
 
-            return me[storeName];
+            this.set(foreignKey, value);
+
+            record = Model.cache.get(Model.generateCacheId(associatedModel.modelName, value));
+            if (record) {
+                this[instanceName] = record;
+            }
+
+            if (Ext.isFunction(options)) {
+                options = {
+                    callback: options,
+                    scope: scope || this
+                };
+            }
+
+            if (Ext.isObject(options)) {
+                return this.save(options);
+            }
         };
     },
 
-    updateStore: function(store) {
-        this.getOwnerModel().prototype[this.getName()] = store;
+    /**
+     * @private
+     * Returns a getter function to be placed on the owner model's prototype. We cache the loaded instance
+     * the first time it is loaded so that subsequent calls to the getter always receive the same reference.
+     * @return {Function} The getter function
+     */
+    createGetter: function() {
+        var me              = this,
+            associatedModel = me.getAssociatedModel(),
+            foreignKey      = me.getForeignKey(),
+            instanceName    = me.getInstanceName();
+
+        //'this' refers to the Model instance inside this function
+        return function(options, scope) {
+            options = options || {};
+
+            var model = this,
+                foreignKeyId = model.get(foreignKey),
+                success, instance, args;
+
+            if (options.reload === true || model[instanceName] === undefined) {
+                if (typeof options == 'function') {
+                    options = {
+                        callback: options,
+                        scope: scope || model
+                    };
+                }
+
+                // Overwrite the success handler so we can assign the current instance
+                success = options.success;
+                options.success = function(rec){
+                    model[instanceName] = rec;
+                    if (success) {
+                        success.call(this, arguments);
+                    }
+                };
+
+                associatedModel.load(foreignKeyId, options);
+            } else {
+                instance = model[instanceName];
+                args = [instance];
+                scope = scope || model;
+
+                Ext.callback(options, scope, args);
+                Ext.callback(options.success, scope, args);
+                Ext.callback(options.failure, scope, args);
+                Ext.callback(options.callback, scope, args);
+
+                return instance;
+            }
+        };
     },
 
     /**
@@ -39755,40 +39791,24 @@ Ext.define('Ext.data.association.HasMany', {
      * @param {Object} associationData The raw associated data
      */
     read: function(record, reader, associationData) {
-        var store = record[this.getName()](),
-            records = reader.read(associationData).getRecords();
+        var inverse = this.getInverseAssociation(),
+            newRecord = reader.read([associationData]).getRecords()[0];
 
-        store.add(records);
-        this.updateInverseInstances(record);
-    },
-
-    updateInverseInstances: function(record) {
-        var store = record[this.getName()](),
-            inverse = this.getInverseAssociation();
+        record[this.getInstanceName()] = newRecord;
 
         //if the inverse association was found, set it now on each record we've just created
         if (inverse) {
-            store.each(function(associatedRecord) {
-                associatedRecord[inverse.getInstanceName()] = record;
-            });
+            newRecord[inverse.getInstanceName()] = record;
         }
     },
 
     getInverseAssociation: function() {
         var ownerName = this.getOwnerModel().modelName;
 
-        //now that we've added the related records to the hasMany association, set the inverse belongsTo
-        //association on each of them if it exists
         return this.getAssociatedModel().associations.findBy(function(assoc) {
             return assoc.getType().toLowerCase() === 'belongsto' && assoc.getAssociatedModel().modelName === ownerName;
         });
     }
-
-}, function() {
-    /**
-     * @cfg {Object} storeConfig
-     */
-    Ext.deprecateProperty(this, 'storeConfig', 'store');
 });
 
 /**
@@ -40169,174 +40189,212 @@ Ext.define('Ext.data.association.BelongsTo', {
 /**
  * @aside guide models
  *
- * Represents a one to one association with another model. The owner model is expected to have
- * a foreign key which references the primary key of the associated model:
+ * Represents a one-to-many relationship between two models. Usually created indirectly via a model definition:
  *
- *     Ext.define('Person', {
+ *     Ext.define('Product', {
  *         extend: 'Ext.data.Model',
  *         config: {
  *             fields: [
- *                 { name: 'id', type: 'int' },
- *                 { name: 'name', type: 'string' },
- *                 { name: 'address_id', type: 'int'}
- *             ],
- *
- *             // we can use the hasOne shortcut on the model to create a hasOne association
- *             associations: { type: 'hasOne', model: 'Address' }
- *         }
- *     });
- *
- *     Ext.define('Address', {
- *         extend: 'Ext.data.Model',
- *         config: {
- *             fields: [
- *                 { name: 'id', type: 'int' },
- *                 { name: 'number', type: 'string' },
- *                 { name: 'street', type: 'string' },
- *                 { name: 'city', type: 'string' },
- *                 { name: 'zip', type: 'string' },
+ *                 {name: 'id',      type: 'int'},
+ *                 {name: 'user_id', type: 'int'},
+ *                 {name: 'name',    type: 'string'}
  *             ]
  *         }
  *     });
  *
- * In the example above we have created models for People and Addresses, and linked them together
- * by saying that each Person has a single Address. This automatically links each Person to an Address
- * based on the Persons address_id, and provides new functions on the Person model:
- *
- * ## Generated getter function
- *
- * The first function that is added to the owner model is a getter function:
- *
- *     var person = Ext.create('Person', {
- *         id: 100,
- *         address_id: 20,
- *         name: 'John Smith'
- *     });
- *
- *     person.getAddress(function(address, operation) {
- *         // do something with the address object
- *         alert(address.get('id')); // alerts 20
- *     }, this);
- *
- * The getAddress function was created on the Person model when we defined the association. This uses the
- * Persons configured {@link Ext.data.proxy.Proxy proxy} to load the Address asynchronously, calling the provided
- * callback when it has loaded.
- *
- * The new getAddress function will also accept an object containing success, failure and callback properties
- * - callback will always be called, success will only be called if the associated model was loaded successfully
- * and failure will only be called if the associatied model could not be loaded:
- *
- *     person.getAddress({
- *         reload: true, // force a reload if the owner model is already cached
- *         callback: function(address, operation) {}, // a function that will always be called
- *         success : function(address, operation) {}, // a function that will only be called if the load succeeded
- *         failure : function(address, operation) {}, // a function that will only be called if the load did not succeed
- *         scope   : this // optionally pass in a scope object to execute the callbacks in
- *     });
- *
- * In each case above the callbacks are called with two arguments - the associated model instance and the
- * {@link Ext.data.Operation operation} object that was executed to load that instance. The Operation object is
- * useful when the instance could not be loaded.
- *
- * Once the getter has been called on the model, it will be cached if the getter is called a second time. To
- * force the model to reload, specify reload: true in the options object.
- *
- * ## Generated setter function
- *
- * The second generated function sets the associated model instance - if only a single argument is passed to
- * the setter then the following two calls are identical:
- *
- *     // this call...
- *     person.setAddress(10);
- *
- *     // is equivalent to this call:
- *     person.set('address_id', 10);
- *
- * An instance of the owner model can also be passed as a parameter.
- *
- * If we pass in a second argument, the model will be automatically saved and the second argument passed to
- * the owner model's {@link Ext.data.Model#save save} method:
- *
- *     person.setAddress(10, function(address, operation) {
- *         // the address has been saved
- *         alert(address.get('address_id')); //now alerts 10
- *     });
- *
- *     //alternative syntax:
- *     person.setAddress(10, {
- *         callback: function(address, operation), // a function that will always be called
- *         success : function(address, operation), // a function that will only be called if the load succeeded
- *         failure : function(address, operation), // a function that will only be called if the load did not succeed
- *         scope   : this //optionally pass in a scope object to execute the callbacks in
- *     })
- *
- * ## Customisation
- *
- * Associations reflect on the models they are linking to automatically set up properties such as the
- * {@link #primaryKey} and {@link #foreignKey}. These can alternatively be specified:
- *
- *     Ext.define('Person', {
+ *     Ext.define('User', {
  *         extend: 'Ext.data.Model',
  *         config: {
  *             fields: [
- *                 // ...
+ *                 {name: 'id',   type: 'int'},
+ *                 {name: 'name', type: 'string'}
+ *             ],
+ *             // we can use the hasMany shortcut on the model to create a hasMany association
+ *             hasMany: {model: 'Product', name: 'products'}
+ *         }
+ *     });
+ *
+ * `
+ *
+ * Above we created Product and User models, and linked them by saying that a User hasMany Products. This gives us a new
+ * function on every User instance, in this case the function is called 'products' because that is the name we specified
+ * in the association configuration above.
+ *
+ * This new function returns a specialized {@link Ext.data.Store Store} which is automatically filtered to load only
+ * Products for the given model instance:
+ *
+ *     //first, we load up a User with id of 1
+ *     var user = Ext.create('User', {id: 1, name: 'Ed'});
+ *
+ *     //the user.products function was created automatically by the association and returns a {@link Ext.data.Store Store}
+ *     //the created store is automatically scoped to the set of Products for the User with id of 1
+ *     var products = user.products();
+ *
+ *     //we still have all of the usual Store functions, for example it's easy to add a Product for this User
+ *     products.add({
+ *         name: 'Another Product'
+ *     });
+ *
+ *     //saves the changes to the store - this automatically sets the new Product's user_id to 1 before saving
+ *     products.sync();
+ *
+ * The new Store is only instantiated the first time you call products() to conserve memory and processing time, though
+ * calling products() a second time returns the same store instance.
+ *
+ * _Custom filtering_
+ *
+ * The Store is automatically furnished with a filter - by default this filter tells the store to only return records
+ * where the associated model's foreign key matches the owner model's primary key. For example, if a User with ID = 100
+ * hasMany Products, the filter loads only Products with user_id == 100.
+ *
+ * Sometimes we want to filter by another field - for example in the case of a Twitter search application we may have
+ * models for Search and Tweet:
+ *
+ *     Ext.define('Search', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 'id', 'query'
  *             ],
  *
- *             associations: [
- *                 { type: 'hasOne', model: 'Address', primaryKey: 'unique_id', foreignKey: 'addr_id' }
+ *             hasMany: {
+ *                 model: 'Tweet',
+ *                 name : 'tweets',
+ *                 filterProperty: 'query'
+ *             }
+ *         }
+ *     });
+ *
+ *     Ext.define('Tweet', {
+ *         extend: 'Ext.data.Model',
+ *         config: {
+ *             fields: [
+ *                 'id', 'text', 'from_user'
  *             ]
  *         }
  *     });
  *
- * Here we replaced the default primary key (defaults to 'id') and foreign key (calculated as 'address_id')
- * with our own settings. Usually this will not be needed.
+ *     //returns a Store filtered by the filterProperty
+ *     var store = new Search({query: 'Sencha Touch'}).tweets();
+ *
+ * The tweets association above is filtered by the query property by setting the {@link #filterProperty}, and is
+ * equivalent to this:
+ *
+ *     var store = Ext.create('Ext.data.Store', {
+ *         model: 'Tweet',
+ *         filters: [
+ *             {
+ *                 property: 'query',
+ *                 value   : 'Sencha Touch'
+ *             }
+ *         ]
+ *     });
  */
-Ext.define('Ext.data.association.HasOne', {
+Ext.define('Ext.data.association.HasMany', {
     extend: 'Ext.data.association.Association',
-    alternateClassName: 'Ext.data.HasOneAssociation',
+    alternateClassName: 'Ext.data.HasManyAssociation',
+    requires: ['Ext.util.Inflector'],
 
-    alias: 'association.hasone',
+    alias: 'association.hasmany',
 
     config: {
         /**
-         * @cfg {String} foreignKey The name of the foreign key on the owner model that links it to the associated
-         * model. Defaults to the lowercased name of the associated model plus "_id", e.g. an association with a
-         * model called Person would set up a address_id foreign key.
+         * @cfg {String} foreignKey
+         * The name of the foreign key on the associated model that links it to the owner model. Defaults to the
+         * lowercased name of the owner model plus "_id", e.g. an association with a model called Group hasMany Users
+         * would create 'group_id' as the foreign key. When the remote store is loaded, the store is automatically
+         * filtered so that only records with a matching foreign key are included in the resulting child store. This can
+         * be overridden by specifying the {@link #filterProperty}.
          *
-         *     Ext.define('Person', {
+         *     Ext.define('Group', {
          *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'name', 'address_id'], // refers to the id of the address object
-         *         hasOne: 'Address'
+         *         fields: ['id', 'name'],
+         *         hasMany: 'User'
          *     });
          *
-         *     Ext.define('Address', {
+         *     Ext.define('User', {
          *         extend: 'Ext.data.Model',
-         *         fields: ['id', 'number', 'street', 'city', 'zip'],
-         *         belongsTo: 'Person'
+         *         fields: ['id', 'name', 'group_id'], // refers to the id of the group that this user belongs to
+         *         belongsTo: 'Group'
          *     });
-         *     var Person = new Person({
-         *         id: 1,
-         *         name: 'John Smith',
-         *         address_id: 13
-         *     }, 1);
-         *     person.getAddress(); // Will make a call to the server asking for address_id 13
-         *
          */
         foreignKey: undefined,
 
         /**
-         * @cfg {String} getterName The name of the getter function that will be added to the local model's prototype.
-         * Defaults to 'get' + the name of the foreign model, e.g. getAddress
+         * @cfg {String} name
+         * The name of the function to create on the owner model to retrieve the child store. If not specified, the
+         * pluralized name of the child model is used.
+         *
+         *     // This will create a users() method on any Group model instance
+         *     Ext.define('Group', {
+         *         extend: 'Ext.data.Model',
+         *         fields: ['id', 'name'],
+         *         hasMany: 'User'
+         *     });
+         *     var group = new Group();
+         *     console.log(group.users());
+         *
+         *     // The method to retrieve the users will now be getUserList
+         *     Ext.define('Group', {
+         *         extend: 'Ext.data.Model',
+         *         fields: ['id', 'name'],
+         *         hasMany: {model: 'User', name: 'getUserList'}
+         *     });
+         *     var group = new Group();
+         *     console.log(group.getUserList());
          */
-        getterName: undefined,
 
         /**
-         * @cfg {String} setterName The name of the setter function that will be added to the local model's prototype.
-         * Defaults to 'set' + the name of the foreign model, e.g. setAddress
+         * @cfg {Object} store
+         * Optional configuration object that will be passed to the generated Store. Defaults to an empty Object.
          */
-        setterName: undefined,
+        store: undefined,
 
-        instanceName: undefined
+        /**
+         * @cfg {String} storeName
+         * Optional The name of the store by which you can reference it on this class as a property.
+         */
+        storeName: undefined,
+
+        /**
+         * @cfg {String} [filterProperty=null]
+         * Optionally overrides the default filter that is set up on the associated Store. If this is not set, a filter
+         * is automatically created which filters the association based on the configured {@link #foreignKey}. See intro
+         * docs for more details. Defaults to null.
+         */
+        filterProperty: null,
+
+        /**
+         * @cfg {Boolean} [autoLoad=false]
+         * True to automatically load the related store from a remote source when instantiated. Defaults to false.
+         */
+        autoLoad: false
+    },
+
+    constructor: function(config) {
+        config = config || {};
+
+        if (config.storeConfig) {
+            Ext.Logger.warn('storeConfig is deprecated on an association. Instead use the store configuration.');
+            config.store = config.storeConfig;
+            delete config.storeConfig;
+        }
+
+        this.callParent([config]);
+    },
+
+    applyName: function(name) {
+        if (!name) {
+            name = Ext.util.Inflector.pluralize(this.getAssociatedName().toLowerCase());
+        }
+        return name;
+    },
+
+    applyStoreName: function(name) {
+        if (!name) {
+            name = this.getName() + 'Store';
+        }
+        return name;
     },
 
     applyForeignKey: function(foreignKey) {
@@ -40349,6 +40407,14 @@ Ext.define('Ext.data.association.HasOne', {
             }
         }
         return foreignKey;
+    },
+
+    applyAssociationKey: function(associationKey) {
+        if (!associationKey) {
+            var associatedName = this.getAssociatedName();
+            associationKey = Ext.util.Inflector.pluralize(associatedName[0].toLowerCase() + associatedName.slice(1));
+        }
+        return associationKey;
     },
 
     updateForeignKey: function(foreignKey, oldForeignKey) {
@@ -40372,148 +40438,66 @@ Ext.define('Ext.data.association.HasOne', {
         }
     },
 
-    applyInstanceName: function(instanceName) {
-        if (!instanceName) {
-            instanceName = this.getAssociatedName() + 'BelongsToInstance';
-        }
-        return instanceName;
-    },
-
-    applyAssociationKey: function(associationKey) {
-        if (!associationKey) {
-            var associatedName = this.getAssociatedName();
-            associationKey = associatedName[0].toLowerCase() + associatedName.slice(1);
-        }
-        return associationKey;
-    },
-
-    applyGetterName: function(getterName) {
-        if (!getterName) {
-            var associatedName = this.getAssociatedName();
-            getterName = 'get' + associatedName[0].toUpperCase() + associatedName.slice(1);
-        }
-        return getterName;
-    },
-
-    applySetterName: function(setterName) {
-        if (!setterName) {
-            var associatedName = this.getAssociatedName();
-            setterName = 'set' + associatedName[0].toUpperCase() + associatedName.slice(1);
-        }
-        return setterName;
-    },
-
-    updateGetterName: function(getterName, oldGetterName) {
-        var ownerProto = this.getOwnerModel().prototype;
-        if (oldGetterName) {
-            delete ownerProto[oldGetterName];
-        }
-        if (getterName) {
-            ownerProto[getterName] = this.createGetter();
-        }
-    },
-
-    updateSetterName: function(setterName, oldSetterName) {
-        var ownerProto = this.getOwnerModel().prototype;
-        if (oldSetterName) {
-            delete ownerProto[oldSetterName];
-        }
-        if (setterName) {
-            ownerProto[setterName] = this.createSetter();
-        }
-    },
-
     /**
      * @private
-     * Returns a setter function to be placed on the owner model's prototype
-     * @return {Function} The setter function
+     * Creates a function that returns an Ext.data.Store which is configured to load a set of data filtered
+     * by the owner model's primary key - e.g. in a hasMany association where Group hasMany Users, this function
+     * returns a Store configured to return the filtered set of a single Group's Users.
+     * @return {Function} The store-generating function
      */
-    createSetter: function() {
-        var me              = this,
-            foreignKey      = me.getForeignKey(),
-            instanceName    = me.getInstanceName(),
-            associatedModel = me.getAssociatedModel();
-
-        //'this' refers to the Model instance inside this function
-        return function(value, options, scope) {
-            var Model = Ext.data.Model,
-                record;
-
-            if (value && value.isModel) {
-                value = value.getId();
-            }
-
-            this.set(foreignKey, value);
-
-            record = Model.cache.get(Model.generateCacheId(associatedModel.modelName, value));
-            if (record) {
-                this[instanceName] = record;
-            }
-
-            if (Ext.isFunction(options)) {
-                options = {
-                    callback: options,
-                    scope: scope || this
-                };
-            }
-
-            if (Ext.isObject(options)) {
-                return this.save(options);
-            }
-        };
-    },
-
-    /**
-     * @private
-     * Returns a getter function to be placed on the owner model's prototype. We cache the loaded instance
-     * the first time it is loaded so that subsequent calls to the getter always receive the same reference.
-     * @return {Function} The getter function
-     */
-    createGetter: function() {
-        var me              = this,
+    applyStore: function(storeConfig) {
+        var me = this,
+            association     = me,
             associatedModel = me.getAssociatedModel(),
+            storeName       = me.getStoreName(),
             foreignKey      = me.getForeignKey(),
-            instanceName    = me.getInstanceName();
+            primaryKey      = me.getPrimaryKey(),
+            filterProperty  = me.getFilterProperty(),
+            autoLoad        = me.getAutoLoad();
 
-        //'this' refers to the Model instance inside this function
-        return function(options, scope) {
-            options = options || {};
+        return function() {
+            var me = this,
+                config, filter,
+                modelDefaults = {};
 
-            var model = this,
-                foreignKeyId = model.get(foreignKey),
-                success, instance, args;
-
-            if (options.reload === true || model[instanceName] === undefined) {
-                if (typeof options == 'function') {
-                    options = {
-                        callback: options,
-                        scope: scope || model
+            if (me[storeName] === undefined) {
+                if (filterProperty) {
+                    filter = {
+                        property  : filterProperty,
+                        value     : me.get(filterProperty),
+                        exactMatch: true
+                    };
+                } else {
+                    filter = {
+                        property  : foreignKey,
+                        value     : me.get(primaryKey),
+                        exactMatch: true
                     };
                 }
 
-                // Overwrite the success handler so we can assign the current instance
-                success = options.success;
-                options.success = function(rec){
-                    model[instanceName] = rec;
-                    if (success) {
-                        success.call(this, arguments);
-                    }
-                };
+                modelDefaults[foreignKey] = me.get(primaryKey);
 
-                associatedModel.load(foreignKeyId, options);
-            } else {
-                instance = model[instanceName];
-                args = [instance];
-                scope = scope || model;
+                config = Ext.apply({}, storeConfig, {
+                    model        : associatedModel,
+                    filters      : [filter],
+                    remoteFilter : true,
+                    modelDefaults: modelDefaults
+                });
 
-                Ext.callback(options, scope, args);
-                Ext.callback(options.success, scope, args);
-                Ext.callback(options.failure, scope, args);
-                Ext.callback(options.callback, scope, args);
-
-                return instance;
+                me[storeName] = Ext.create('Ext.data.Store', config);
+                if (autoLoad) {
+                    me[storeName].load(function(records, operation) {
+                        association.updateInverseInstances(me);
+                    });
+                }
             }
+
+            return me[storeName];
         };
+    },
+
+    updateStore: function(store) {
+        this.getOwnerModel().prototype[this.getName()] = store;
     },
 
     /**
@@ -40524,24 +40508,40 @@ Ext.define('Ext.data.association.HasOne', {
      * @param {Object} associationData The raw associated data
      */
     read: function(record, reader, associationData) {
-        var inverse = this.getInverseAssociation(),
-            newRecord = reader.read([associationData]).getRecords()[0];
+        var store = record[this.getName()](),
+            records = reader.read(associationData).getRecords();
 
-        record[this.getInstanceName()] = newRecord;
+        store.add(records);
+        this.updateInverseInstances(record);
+    },
+
+    updateInverseInstances: function(record) {
+        var store = record[this.getName()](),
+            inverse = this.getInverseAssociation();
 
         //if the inverse association was found, set it now on each record we've just created
         if (inverse) {
-            newRecord[inverse.getInstanceName()] = record;
+            store.each(function(associatedRecord) {
+                associatedRecord[inverse.getInstanceName()] = record;
+            });
         }
     },
 
     getInverseAssociation: function() {
         var ownerName = this.getOwnerModel().modelName;
 
+        //now that we've added the related records to the hasMany association, set the inverse belongsTo
+        //association on each of them if it exists
         return this.getAssociatedModel().associations.findBy(function(assoc) {
             return assoc.getType().toLowerCase() === 'belongsto' && assoc.getAssociatedModel().modelName === ownerName;
         });
     }
+
+}, function() {
+    /**
+     * @cfg {Object} storeConfig
+     */
+    Ext.deprecateProperty(this, 'storeConfig', 'store');
 });
 
 /**
@@ -46690,20 +46690,6 @@ Ext.define('Ext.data.Model', {
     this.cache = new Ext.util.Collection(this.generateCacheId);
 });
 
-Ext.define("App.model.Info", {
-    extend: "Ext.data.Model",
-    
-    config: {
-        idProperty: 'id',
-        fields: [
-            { name: 'id', type: 'string' },
-            { name: 'item0', type: 'string' },
-            { name: 'item1', type: 'string' },
-            { name: 'item2', type: 'string' },
-            { name: 'item3', type: 'string' }
-        ]
-    }
-});
 Ext.define("App.model.Hotel", {
     extend: "Ext.data.Model",
     
@@ -46720,7 +46706,7 @@ Ext.define("App.model.Hotel", {
         ]
     }
 });
-Ext.define("App.model.Travel", {
+Ext.define("App.model.Info", {
     extend: "Ext.data.Model",
     
     config: {
@@ -46730,9 +46716,12 @@ Ext.define("App.model.Travel", {
             { name: 'item0', type: 'string' },
             { name: 'item1', type: 'string' },
             { name: 'item2', type: 'string' },
+            { name: 'item3', type: 'string' }
         ]
     }
 });
+
+
 Ext.define("App.model.Session", {
     extend: "Ext.data.Model",
     
@@ -46751,6 +46740,19 @@ Ext.define("App.model.Session", {
             { name: 'speaker', type: 'string' },
             { name: 'ingress', type: 'string' },
             { name: 'description', type: 'string' }
+        ]
+    }
+});
+Ext.define("App.model.Travel", {
+    extend: "Ext.data.Model",
+    
+    config: {
+        idProperty: 'id',
+        fields: [
+            { name: 'id', type: 'string' },
+            { name: 'item0', type: 'string' },
+            { name: 'item1', type: 'string' },
+            { name: 'item2', type: 'string' },
         ]
     }
 });
@@ -49044,6 +49046,31 @@ Ext.define("App.store.ExternalHotels", {
 
 
 
+Ext.define("App.store.ExternalTravels", {
+    extend: "Ext.data.Store",
+    requires: [
+        'App.model.Travel'
+    ],
+    config: {
+        model: "App.model.Travel",
+        autoLoad: true,
+        proxy: {
+            type: 'ajax',
+            url: 'resources/data/travel.json',
+            reader: {
+                type: 'json',
+                rootProperty: 'items'
+            }
+        },
+        listeners: {
+            load: function(){
+                saveContentFromExternal("Travels", "ExternalTravels");
+            }
+        }
+    }
+
+});
+
 Ext.define("App.store.ExternalInfos", {
     extend: "Ext.data.Store",
     requires: [
@@ -49189,6 +49216,10 @@ Ext.define('App.controller.Main', {
 
     launch: function() {
         this.callParent(arguments);
+//        Ext.onReady(function(){
+//            console.log("1: local record is " + Ext.getStore("Infos").findRecord('id', 1).data.item1);
+//        }); 
+        
     },
 
     init: function() {
@@ -49258,31 +49289,6 @@ function showPopupMap(image, imageTitle){
 }
   
   
-
-Ext.define("App.store.ExternalTravels", {
-    extend: "Ext.data.Store",
-    requires: [
-        'App.model.Travel'
-    ],
-    config: {
-        model: "App.model.Travel",
-        autoLoad: true,
-        proxy: {
-            type: 'ajax',
-            url: 'resources/data/travel.json',
-            reader: {
-                type: 'json',
-                rootProperty: 'items'
-            }
-        },
-        listeners: {
-            load: function(){
-                saveContentFromExternal("Travels", "ExternalTravels");
-            }
-        }
-    }
-
-});
 
 /**
  * @author Ed Spencer
@@ -49787,21 +49793,6 @@ Ext.define('Ext.data.proxy.LocalStorage', {
     }
 });
 
-Ext.define("App.store.Hotels", {
-    extend: "Ext.data.Store",
-    requires: [
-        "Ext.data.proxy.LocalStorage"
-    ],
-    config: {
-        model: "App.model.Hotel",
-        autoLoad: true,
-        proxy: {
-            type: 'localstorage',
-            id: 'hotels-app-store'
-        }
-    }
-
-});
 Ext.define("App.store.Infos", {
     extend: "Ext.data.Store",
     requires: [
@@ -49941,6 +49932,21 @@ function showPopupMap(image, title){
     showPopup(image, title);
 }
 
+Ext.define("App.store.Hotels", {
+    extend: "Ext.data.Store",
+    requires: [
+        "Ext.data.proxy.LocalStorage"
+    ],
+    config: {
+        model: "App.model.Hotel",
+        autoLoad: true,
+        proxy: {
+            type: 'localstorage',
+            id: 'hotels-app-store'
+        }
+    }
+
+});
 Ext.define("App.store.Events", {
     extend: "Ext.data.Store",
     requires: [

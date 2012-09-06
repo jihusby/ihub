@@ -13,13 +13,15 @@ Ext.define("App.store.ExternalInfos", {
                 type: 'json',
                 rootProperty: 'items'
             }
-        },
-        listeners: {
-            load: function(){
-                saveContentFromExternal("Infos", "ExternalInfos");
-            }
         }
+//        listeners: {
+//            load: function(){
+//                return saveContentFromExternal("Infos", "ExternalInfos");
+//            }
+//        }
         
     }
 
 });
+
+

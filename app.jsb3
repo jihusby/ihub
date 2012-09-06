@@ -75,13 +75,13 @@
                     "path": "sdk/src/fx/easing/"
                 },
                 {
-                    "clsName": "Ext.fx.easing.Bounce",
-                    "name": "Bounce.js",
+                    "clsName": "Ext.fx.easing.Momentum",
+                    "name": "Momentum.js",
                     "path": "sdk/src/fx/easing/"
                 },
                 {
-                    "clsName": "Ext.fx.easing.Momentum",
-                    "name": "Momentum.js",
+                    "clsName": "Ext.fx.easing.Bounce",
+                    "name": "Bounce.js",
                     "path": "sdk/src/fx/easing/"
                 },
                 {
@@ -150,13 +150,13 @@
                     "path": "sdk/src/fx/animation/"
                 },
                 {
-                    "clsName": "Ext.fx.animation.Flip",
-                    "name": "Flip.js",
+                    "clsName": "Ext.fx.animation.FadeOut",
+                    "name": "FadeOut.js",
                     "path": "sdk/src/fx/animation/"
                 },
                 {
-                    "clsName": "Ext.fx.animation.FadeOut",
-                    "name": "FadeOut.js",
+                    "clsName": "Ext.fx.animation.Flip",
+                    "name": "Flip.js",
                     "path": "sdk/src/fx/animation/"
                 },
                 {
@@ -270,13 +270,13 @@
                     "path": "sdk/src/fx/layout/card/"
                 },
                 {
-                    "clsName": "Ext.fx.layout.card.Reveal",
-                    "name": "Reveal.js",
+                    "clsName": "Ext.fx.layout.card.Fade",
+                    "name": "Fade.js",
                     "path": "sdk/src/fx/layout/card/"
                 },
                 {
-                    "clsName": "Ext.fx.layout.card.Fade",
-                    "name": "Fade.js",
+                    "clsName": "Ext.fx.layout.card.Reveal",
+                    "name": "Reveal.js",
                     "path": "sdk/src/fx/layout/card/"
                 },
                 {
@@ -640,11 +640,6 @@
                     "path": "sdk/src/app/"
                 },
                 {
-                    "clsName": "Ext.app.History",
-                    "name": "History.js",
-                    "path": "sdk/src/app/"
-                },
-                {
                     "clsName": "Ext.app.Profile",
                     "name": "Profile.js",
                     "path": "sdk/src/app/"
@@ -652,6 +647,11 @@
                 {
                     "clsName": "Ext.app.Action",
                     "name": "Action.js",
+                    "path": "sdk/src/app/"
+                },
+                {
+                    "clsName": "Ext.app.History",
+                    "name": "History.js",
                     "path": "sdk/src/app/"
                 },
                 {
@@ -710,14 +710,19 @@
                     "path": "sdk/src/util/"
                 },
                 {
+                    "clsName": "Ext.mixin.Filterable",
+                    "name": "Filterable.js",
+                    "path": "sdk/src/mixin/"
+                },
+                {
                     "clsName": "Ext.mixin.Sortable",
                     "name": "Sortable.js",
                     "path": "sdk/src/mixin/"
                 },
                 {
-                    "clsName": "Ext.mixin.Filterable",
-                    "name": "Filterable.js",
-                    "path": "sdk/src/mixin/"
+                    "clsName": "Ext.data.Error",
+                    "name": "Error.js",
+                    "path": "sdk/src/data/"
                 },
                 {
                     "clsName": "Ext.data.SortTypes",
@@ -730,16 +735,6 @@
                     "path": "sdk/src/util/"
                 },
                 {
-                    "clsName": "Ext.data.Error",
-                    "name": "Error.js",
-                    "path": "sdk/src/data/"
-                },
-                {
-                    "clsName": "Ext.tab.Tab",
-                    "name": "Tab.js",
-                    "path": "sdk/src/tab/"
-                },
-                {
                     "clsName": "Ext.mixin.Selectable",
                     "name": "Selectable.js",
                     "path": "sdk/src/mixin/"
@@ -748,6 +743,11 @@
                     "clsName": "Ext.dataview.element.Container",
                     "name": "Container.js",
                     "path": "sdk/src/dataview/element/"
+                },
+                {
+                    "clsName": "Ext.tab.Tab",
+                    "name": "Tab.js",
+                    "path": "sdk/src/tab/"
                 },
                 {
                     "clsName": "Ext.data.Request",
@@ -805,6 +805,11 @@
                     "path": "sdk/src/data/"
                 },
                 {
+                    "clsName": "Ext.dataview.element.List",
+                    "name": "List.js",
+                    "path": "sdk/src/dataview/element/"
+                },
+                {
                     "clsName": "Ext.tab.Bar",
                     "name": "Bar.js",
                     "path": "sdk/src/tab/"
@@ -820,14 +825,14 @@
                     "path": "app/view/"
                 },
                 {
-                    "clsName": "Ext.dataview.element.List",
-                    "name": "List.js",
-                    "path": "sdk/src/dataview/element/"
-                },
-                {
                     "clsName": "Ext.data.StoreManager",
                     "name": "StoreManager.js",
                     "path": "sdk/src/data/"
+                },
+                {
+                    "clsName": "Ext.Ajax",
+                    "name": "Ajax.js",
+                    "path": "sdk/src/"
                 },
                 {
                     "clsName": "Ext.data.Types",
@@ -838,11 +843,6 @@
                     "clsName": "Ext.data.Field",
                     "name": "Field.js",
                     "path": "sdk/src/data/"
-                },
-                {
-                    "clsName": "Ext.Ajax",
-                    "name": "Ajax.js",
-                    "path": "sdk/src/"
                 },
                 {
                     "clsName": "Ext.AbstractManager",
@@ -860,8 +860,8 @@
                     "path": "sdk/src/data/association/"
                 },
                 {
-                    "clsName": "Ext.data.association.HasMany",
-                    "name": "HasMany.js",
+                    "clsName": "Ext.data.association.HasOne",
+                    "name": "HasOne.js",
                     "path": "sdk/src/data/association/"
                 },
                 {
@@ -870,8 +870,8 @@
                     "path": "sdk/src/data/association/"
                 },
                 {
-                    "clsName": "Ext.data.association.HasOne",
-                    "name": "HasOne.js",
+                    "clsName": "Ext.data.association.HasMany",
+                    "name": "HasMany.js",
                     "path": "sdk/src/data/association/"
                 },
                 {
@@ -925,23 +925,23 @@
                     "path": "sdk/src/data/"
                 },
                 {
-                    "clsName": "App.model.Info",
-                    "name": "Info.js",
-                    "path": "app/model/"
-                },
-                {
                     "clsName": "App.model.Hotel",
                     "name": "Hotel.js",
                     "path": "app/model/"
                 },
                 {
-                    "clsName": "App.model.Travel",
-                    "name": "Travel.js",
+                    "clsName": "App.model.Info",
+                    "name": "Info.js",
                     "path": "app/model/"
                 },
                 {
                     "clsName": "App.model.Session",
                     "name": "Session.js",
+                    "path": "app/model/"
+                },
+                {
+                    "clsName": "App.model.Travel",
+                    "name": "Travel.js",
                     "path": "app/model/"
                 },
                 {
@@ -962,6 +962,11 @@
                 {
                     "clsName": "App.store.ExternalHotels",
                     "name": "ExternalHotels.js",
+                    "path": "app/store/"
+                },
+                {
+                    "clsName": "App.store.ExternalTravels",
+                    "name": "ExternalTravels.js",
                     "path": "app/store/"
                 },
                 {
@@ -990,11 +995,6 @@
                     "path": "app/controller/"
                 },
                 {
-                    "clsName": "App.store.ExternalTravels",
-                    "name": "ExternalTravels.js",
-                    "path": "app/store/"
-                },
-                {
                     "clsName": "Ext.data.proxy.WebStorage",
                     "name": "WebStorage.js",
                     "path": "sdk/src/data/proxy/"
@@ -1003,11 +1003,6 @@
                     "clsName": "Ext.data.proxy.LocalStorage",
                     "name": "LocalStorage.js",
                     "path": "sdk/src/data/proxy/"
-                },
-                {
-                    "clsName": "App.store.Hotels",
-                    "name": "Hotels.js",
-                    "path": "app/store/"
                 },
                 {
                     "clsName": "App.store.Infos",
@@ -1028,6 +1023,11 @@
                     "clsName": "App.view.Travel",
                     "name": "Travel.js",
                     "path": "app/view/"
+                },
+                {
+                    "clsName": "App.store.Hotels",
+                    "name": "Hotels.js",
+                    "path": "app/store/"
                 },
                 {
                     "clsName": "App.store.Events",

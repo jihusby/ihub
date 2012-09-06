@@ -4,12 +4,15 @@ Ext.define('App.controller.Main', {
     
     requires: [
         'App.view.SessionDetail',
-        'App.view.SessionList'
+        'App.view.SessionList',
+        'App.view.Main',
+        'App.view.Info',
     ],
 
     config: {
         refs: {
             mainView: 'mainview',
+            info: 'info',
             sessionListContainer: 'sessionlistcontainer',
             eventListContainer: 'eventlistcontainer'
         },
@@ -20,23 +23,51 @@ Ext.define('App.controller.Main', {
             },
             'eventlist': {
                 disclose: 'onEventDetailCommand'
+            },
+            'info' : {
+                painted: 'onInfoPaintedCommand'
             }
         }
+
     },
 
     slideLeftTransition: {type: 'slide', direction: 'left'},
     slideRightTransition: {type: 'slide', direction: 'right'},
 
+
     launch: function() {
         this.callParent(arguments);
-//        Ext.onReady(function(){
-//            console.log("1: local record is " + Ext.getStore("Infos").findRecord('id', 1).data.item1);
-//        }); 
+        var main = this.getMainView();
+        
+            
+        var pollExternalStores = function(num) {
+            var task = Ext.create('Ext.util.DelayedTask', function() {
+                Ext.getStore("ExternalInfos").load();
+                var result = "";
+                Ext.onReady(function(){
+                    result = saveContentFromExternal("Infos", "ExternalInfos");
+                });
+                setBadgeText(main.getTabBar().items.items[1], result);
+                pollExternalStores.call(this, num+1);
+                
+            }, this);
+
+            task.delay(3000);
+        };
+
+        pollExternalStores(1);
+            
         
     },
 
     init: function() {
         this.callParent(arguments);
+    },
+
+    onInfoPaintedCommand: function(obj) {
+        var main = this.getMainView();
+        clearBadgeText(main.getTabBar().items.items[1]);
+        
     },
 
     onSessionListCommand: function() {
@@ -55,6 +86,16 @@ Ext.define('App.controller.Main', {
         this.getEventListContainer().push(getEventDetail(record.data));
     }
 });
+
+function setBadgeText(item, updated) {
+    if(updated){
+        console.log("setBadgeText:" + updated + " on " + item.id);
+        item.setBadgeText("NB!");
+    }
+}
+function clearBadgeText(item) {
+    item.setBadgeText("");
+}
 
 function getSessionDetail(record) {
     var btnText = isEventSaved(record.id)?"Fjern fra huskeliste":"Legg til i huskeliste";

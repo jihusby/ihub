@@ -52,15 +52,17 @@ function addItem(currentSessionId) {
 
 function saveContentFromExternal(localStoreName, externalStoreName) {
     
+    var result = false;
     var content = Ext.getStore(externalStoreName).findRecord('id', 1);
     if(content!==null){
         if(localStoreName === "Infos"){
-            saveInfoObject(content);
+            result = saveInfoObject(content);
+//            console.log("saveContentFromExternal: " + result);
         }else{
             if(Ext.getStore(localStoreName).findRecord('id', 1)){
-                console.log(localStoreName + " already full");
+//                console.log(localStoreName + " already full");
             }else {
-                console.log("Copying " + localStoreName);
+//                console.log("Copying " + localStoreName);
                 var localStore = Ext.getStore(localStoreName);
                 localStore.add(content);
                 localStore.sync();
@@ -70,39 +72,49 @@ function saveContentFromExternal(localStoreName, externalStoreName) {
     }else{
         console.log(localStoreName + ": EXTERNAL STORAGE IS EMPTY!");
     }
+    
+    console.log("saveContentFromExternal returning " + result);
+    return result;
 }
 
 function saveInfoObject(obj){
     var localStore = Ext.getStore("Infos");
-    var localRecord = Ext.getStore("Infos").findRecord('item0', "1");
-    if(null === localRecord){
-        console.log("saving info object");
-        var inf = Ext.create("App.model.Info", {
-            item0: obj.data.item0,
-            item1: obj.data.item1,
-            item2: obj.data.item2,
-            item3: obj.data.item3
-        });
-        localStore.add(inf);
+    var localRecord = localStore.findRecord('item0', "1");
+    var externalStore = Ext.getStore("ExternalInfos");
+    var externalRecord = externalStore.findRecord('item0', "1");
+    var result = false;
+    if(null===localRecord) {
+//        console.log("Local record empty");
+        localStore.add(getRecordCopy(obj, "Info"));
         localStore.sync();
-    }else{
-        console.log("local info exists");
-        var externalRecord = Ext.getStore("ExternalInfos").findRecord('item0', "1");
-        if(!isEqual(localRecord, externalRecord)){
-            console.log("not equal, replacing");
-            localStore.remove(localRecord);
+        result = true;
+    }else {
+//        console.log("local record exists");
+        if(!isRecordEqual(localRecord, externalRecord)){
+            console.log("--- not equal, replacing ----");
+            localStore.removeAll();
+            localStore.add(getRecordCopy(obj, "Info"));
             localStore.sync();
+            result = true;
         }
     }
-    console.log(Ext.getStore("Infos").findRecord('item0', "1").data.item0);
+    return result;
 }
 
-function isEqual(record1, record2){
+function isRecordEqual(record1, record2){
     return record1.data.item0 === record1.data.item0 &&
         record1.data.item1 === record2.data.item1 &&
         record1.data.item2 === record2.data.item2 &&
         record1.data.item3 === record2.data.item3;
-    
+}
+
+function getRecordCopy(record, type) {
+    return Ext.create("App.model."+type, {
+        item0: record.data.item0,
+        item1: record.data.item1,
+        item2: record.data.item2,
+        item3: record.data.item3
+    });
 }
 
 function removeItem(id){

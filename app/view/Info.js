@@ -6,8 +6,8 @@ Ext.define("App.view.Info", {
         'App.model.Info',
         'Ext.TitleBar'
     ],
-
     config: {
+        
         scrollable: true,
         items: [
             {
@@ -36,21 +36,15 @@ Ext.define("App.view.Info", {
 
                 store: "Infos",
                 fields: ['id', 'item0', 'item1', 'item2', 'item3']                
-
-//                {
-//                    autoLoad: true,
-//                    fields: ['item0', 'item1', 'item2', 'item3'],
-//                    proxy: {
-//                        type: 'ajax',
-//                        url: 'resources/data/info.json',
-//                        reader: {
-//                            type: 'json',
-//                            rootProperty: 'responseData.feed.entries'
-//                    }
-//                }
-//            }
         }]
+    },
+
+    listeners: {
+        painted: function(){
+            this.fireEvent('painted');
+        }
     }
+    
     
 });
 

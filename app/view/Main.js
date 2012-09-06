@@ -1,8 +1,10 @@
 Ext.define("App.view.Main", {
     extend: 'Ext.tab.Panel',
     id: 'mainview',
+    xtype: 'mainview',
     
     config: {
+        id: "tabBar",
         tabBarPosition: 'bottom',
         defaults: {
             layout: 'card'
@@ -18,7 +20,7 @@ Ext.define("App.view.Main", {
                 id: 'home',
                 title: 'Rica',
                 iconCls: 'home',
-                onComplete: function () {
+                onInitialize: function () {
                     setMainWindow(0);
                 }, 
                 listeners: {
@@ -41,6 +43,9 @@ Ext.define("App.view.Main", {
                     activate : function() {
                         setMainWindow(1);
                     }
+//                    painted: function(obj){
+//                            this.fireEvent('painted', obj);
+//                    }
                 },
                 items: [
                     {
@@ -95,8 +100,7 @@ Ext.define("App.view.Main", {
                         xtype: 'eventlistcontainer'
                     }
                 ]
-            }
-
+            }            
         ]
     }
 });
@@ -129,4 +133,9 @@ function setMainWindow(elementIndex){
             }
         }
     }
+}
+
+function testing(object) {
+    object.setBadgeText("FAEN");
+    console.log("----info----");
 }
