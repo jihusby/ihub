@@ -8,6 +8,7 @@ Ext.define("App.model.Travel", {
             { name: 'item0', type: 'string' },
             { name: 'item1', type: 'string' },
             { name: 'item2', type: 'string' },
+            { name: 'item3', type: 'string' }
         ]
     }
 });

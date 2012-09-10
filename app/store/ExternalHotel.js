@@ -1,4 +1,4 @@
-Ext.define("App.store.ExternalHotels", {
+Ext.define("App.store.ExternalHotel", {
     extend: "Ext.data.Store",
     requires: [
         'App.model.Hotel'
@@ -12,11 +12,6 @@ Ext.define("App.store.ExternalHotels", {
             reader: {
                 type: 'json',
                 rootProperty: 'items'
-            }
-        },
-        listeners: {
-            load: function(){
-                saveContentFromExternal("Hotels", "ExternalHotels");
             }
         }
     }

@@ -17,7 +17,7 @@ resources/script/add2home.js
 app/controller/Main.js
 app/view/EventList.js
 app/view/EventListContainer.js
-app/view/Homepage.js
+app/view/Hotel.js
 app/view/Info.js
 app/view/Main.js
 app/view/Offline.js
@@ -25,9 +25,9 @@ app/view/SessionDetail.js
 app/view/SessionList.js
 app/view/SessionListContainer.js
 app/view/Travel.js
-app/store/Hotels.js
-app/store/Infos.js
-app/store/Travels.js
+app/store/Hotel.js
+app/store/Info.js
+app/store/Travel.js
 app/store/Events.js
 app/store/Sessions.js
 app/model/Hotel.js

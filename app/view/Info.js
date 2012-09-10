@@ -2,12 +2,12 @@ Ext.define("App.view.Info", {
     extend: 'Ext.navigation.View',
     xtype: 'info',
     requires: [
-        'App.store.Infos',
+        'App.store.Info',
         'App.model.Info',
         'Ext.TitleBar'
     ],
+    
     config: {
-        
         scrollable: true,
         items: [
             {
@@ -34,16 +34,17 @@ Ext.define("App.view.Info", {
                     '<div class="contentText">{item3}</div></div>'
                 ],
 
-                store: "Infos",
+                store: "Info",
                 fields: ['id', 'item0', 'item1', 'item2', 'item3']                
-        }]
-    },
+        }],
 
-    listeners: {
-        painted: function(){
-            this.fireEvent('painted');
+        listeners: {
+            painted: function(){
+                this.fireEvent('paintedEvent');
+            }
         }
     }
+
     
     
 });

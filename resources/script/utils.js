@@ -53,18 +53,19 @@ function addItem(currentSessionId) {
 function saveContentFromExternal(localStoreName, externalStoreName) {
     
     var result = false;
-    var content = Ext.getStore(externalStoreName).findRecord('id', 1);
-    if(content!==null){
-        if(localStoreName === "Infos"){
-            result = saveInfoObject(content);
-//            console.log("saveContentFromExternal: " + result);
+    var externalContent = Ext.getStore(externalStoreName).findRecord('id', 1);
+    if(externalContent!==null){
+        if(localStoreName === "Info" || 
+            localStoreName === "Hotel" ||
+            localStoreName === "Travel"){
+            result = saveContentObject(externalContent, localStoreName);
         }else{
             if(Ext.getStore(localStoreName).findRecord('id', 1)){
 //                console.log(localStoreName + " already full");
             }else {
 //                console.log("Copying " + localStoreName);
                 var localStore = Ext.getStore(localStoreName);
-                localStore.add(content);
+                localStore.add(externalContent);
                 localStore.sync();
 
             }
@@ -73,39 +74,33 @@ function saveContentFromExternal(localStoreName, externalStoreName) {
         console.log(localStoreName + ": EXTERNAL STORAGE IS EMPTY!");
     }
     
-    console.log("saveContentFromExternal returning " + result);
     return result;
 }
 
-function saveInfoObject(obj){
-    var localStore = Ext.getStore("Infos");
+function saveContentObject(obj, objectName){
+    var localStore = Ext.getStore(objectName);
     var localRecord = localStore.findRecord('item0', "1");
-    var externalStore = Ext.getStore("ExternalInfos");
+    var externalStore = Ext.getStore("External"+objectName);
     var externalRecord = externalStore.findRecord('item0', "1");
     var result = false;
-    if(null===localRecord) {
-//        console.log("Local record empty");
-        localStore.add(getRecordCopy(obj, "Info"));
+    if(!isRecordEqual(localRecord, externalRecord)){
+        console.log("--- not equal, replacing ----");
+        localStore.removeAll();
+        localStore.add(getRecordCopy(obj, objectName));
         localStore.sync();
         result = true;
-    }else {
-//        console.log("local record exists");
-        if(!isRecordEqual(localRecord, externalRecord)){
-            console.log("--- not equal, replacing ----");
-            localStore.removeAll();
-            localStore.add(getRecordCopy(obj, "Info"));
-            localStore.sync();
-            result = true;
-        }
     }
     return result;
 }
 
 function isRecordEqual(record1, record2){
-    return record1.data.item0 === record1.data.item0 &&
-        record1.data.item1 === record2.data.item1 &&
-        record1.data.item2 === record2.data.item2 &&
-        record1.data.item3 === record2.data.item3;
+    if(record1){
+        return record1.data.item0 === record1.data.item0 &&
+            record1.data.item1 === record2.data.item1 &&
+            record1.data.item2 === record2.data.item2 &&
+            record1.data.item3 === record2.data.item3;
+    }
+    return false;
 }
 
 function getRecordCopy(record, type) {

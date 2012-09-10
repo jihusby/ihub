@@ -1,4 +1,4 @@
-Ext.define("App.store.ExternalInfos", {
+Ext.define("App.store.ExternalInfo", {
     extend: "Ext.data.Store",
     requires: [
         'App.model.Info'
@@ -14,12 +14,6 @@ Ext.define("App.store.ExternalInfos", {
                 rootProperty: 'items'
             }
         }
-//        listeners: {
-//            load: function(){
-//                return saveContentFromExternal("Infos", "ExternalInfos");
-//            }
-//        }
-        
     }
 
 });

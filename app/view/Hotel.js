@@ -1,17 +1,25 @@
-Ext.define("App.view.Homepage", {
+Ext.define("App.view.Hotel", {
     extend: 'Ext.navigation.View',
-    xtype: 'homepage',
+    xtype: 'hotel',
+    faen: 'Hotel',
     requires: [
+        'App.store.Hotel',
+        'App.model.Hotel',
         'Ext.TitleBar'
     ],
 
     config: {
+        faen: 'FAEN',
         scrollable: true,
         items: [
             {
                 title: 'Rica Nidelven',
                 maxWidth: 750,
                 xtype: 'dataview',
+                faen: 'ARGH',
+                config: {
+                    faen: 'HELLER'
+                },
                 items: [
                     {
                         xtype: 'button',
@@ -29,14 +37,18 @@ Ext.define("App.view.Homepage", {
                     '<div class="textBlock">',
                     '<div class="header">{item1}</div>',
                     '<div class="contentText">{item2}</div>',
-                    '<div class="contentText">{item3}</div>',
-                    '<div class="footer">{item4}</div></div>'
+                    '<div class="contentText">{item3}</div></div>'
                 ],
 
-                store: "Hotels",
-                fields: ['id', 'item0', 'item1', 'item2', 'item3', 'item4', 'item5'] 
+                store: "Hotel",
+                fields: ['id', 'item0', 'item1', 'item2', 'item3'] 
             }
-        ]
-    }
+        ],
+        listeners: {
+            painted: function(){
+                this.fireEvent('paintedEvent');
+            }
+        }
 
+    }
 });

@@ -2,7 +2,7 @@ Ext.define("App.view.Travel", {
     extend: 'Ext.navigation.View',
     xtype: 'travel',
     requires: [
-        'App.store.Travels',
+        'App.store.Travel',
         'App.model.Travel',
         'Ext.TitleBar'
     ],
@@ -35,11 +35,16 @@ Ext.define("App.view.Travel", {
                     '</div>'
                 ],
 
-                store: "Travels",
-                fields: ['id', 'item0', 'item1', 'item2']
-        }]
-    }
+                store: "Travel",
+                fields: ['id', 'item0', 'item1', 'item2', 'item3']
+        }],
     
+        listeners: {
+            painted: function(){
+                this.fireEvent('paintedEvent');
+            }
+        }
+    }
 });
 
 function showPopupMap(image, title){

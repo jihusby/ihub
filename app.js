@@ -3,7 +3,7 @@ Ext.application({
 
     views: [
         'Main',
-        'Homepage',
+        'Hotel',
         'Info',
         'Travel',
         'SessionListContainer',
@@ -22,12 +22,12 @@ Ext.application({
     ],
     
     stores: [
-        'Hotels',
-        'ExternalHotels',
-        'Infos',
-        'ExternalInfos',
-        'Travels',
-        'ExternalTravels',
+        'Hotel',
+        'ExternalHotel',
+        'Info',
+        'ExternalInfo',
+        'Travel',
+        'ExternalTravel',
         'Sessions',
         'Events'
     ],

@@ -12,7 +12,9 @@ Ext.define('App.controller.Main', {
     config: {
         refs: {
             mainView: 'mainview',
+            hotel: 'hotel',
             info: 'info',
+            travel: 'travel',
             sessionListContainer: 'sessionlistcontainer',
             eventListContainer: 'eventlistcontainer'
         },
@@ -24,8 +26,14 @@ Ext.define('App.controller.Main', {
             'eventlist': {
                 disclose: 'onEventDetailCommand'
             },
+            'hotel' : {
+                paintedEvent: 'onHotelPanelPaintedCommand'
+            },
             'info' : {
-                painted: 'onInfoPaintedCommand'
+                paintedEvent: 'onInfoPanelPaintedCommand'
+            },
+            'travel' : {
+                paintedEvent: 'onTravelPanelPaintedCommand'
             }
         }
 
@@ -38,36 +46,25 @@ Ext.define('App.controller.Main', {
     launch: function() {
         this.callParent(arguments);
         var main = this.getMainView();
-        
-            
-        var pollExternalStores = function(num) {
-            var task = Ext.create('Ext.util.DelayedTask', function() {
-                Ext.getStore("ExternalInfos").load();
-                var result = "";
-                Ext.onReady(function(){
-                    result = saveContentFromExternal("Infos", "ExternalInfos");
-                });
-                setBadgeText(main.getTabBar().items.items[1], result);
-                pollExternalStores.call(this, num+1);
-                
-            }, this);
+        startPollingExternalStores(main);    
 
-            task.delay(3000);
-        };
-
-        pollExternalStores(1);
-            
-        
     },
-
+    
     init: function() {
         this.callParent(arguments);
     },
 
-    onInfoPaintedCommand: function(obj) {
-        var main = this.getMainView();
-        clearBadgeText(main.getTabBar().items.items[1]);
-        
+    onHotelPanelPaintedCommand: function() {
+        this.getMainView().getTabBar().items.items[0].setItemId("Hotel");
+        clearBadgeText(this.getMainView().getTabBar().items.items[0], this.getMainView());
+    },
+
+    onInfoPanelPaintedCommand: function() {
+        clearBadgeText(this.getMainView().getTabBar().items.items[1], this.getMainView());
+    },
+
+    onTravelPanelPaintedCommand: function() {
+        clearBadgeText(this.getMainView().getTabBar().items.items[2], this.getMainView());
     },
 
     onSessionListCommand: function() {
@@ -87,6 +84,33 @@ Ext.define('App.controller.Main', {
     }
 });
 
+function startPollingExternalStores(main){
+    var pollExternalStores = function(main) {
+        var task = Ext.create('Ext.util.DelayedTask', function() {
+            this.pollStore(main, "Hotel", 0);
+            this.pollStore(main, "Info", 1);
+            this.pollStore(main, "Travel", 2);
+            pollExternalStores.call(this, main);
+
+        }, this);
+
+        task.delay(4000);
+    };
+
+    pollExternalStores(main);
+}
+
+function pollStore(main, store, num) {
+    Ext.getStore("External"+store).load();
+    var result = false;
+    Ext.onReady(function(){
+        console.log("polling " + store);
+        result = saveContentFromExternal(store, "External"+store);
+    });
+    setBadgeText(main.getTabBar().items.items[num], result);
+}
+
+
 function setBadgeText(item, updated) {
     if(updated){
         console.log("setBadgeText:" + updated + " on " + item.id);
@@ -94,7 +118,9 @@ function setBadgeText(item, updated) {
     }
 }
 function clearBadgeText(item) {
-    item.setBadgeText("");
+    if(item){
+        item.setBadgeText("");
+    }
 }
 
 function getSessionDetail(record) {

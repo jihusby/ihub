@@ -8,16 +8,11 @@ Ext.define("App.view.Main", {
         tabBarPosition: 'bottom',
         defaults: {
             layout: 'card'
-            /*layout: {
-                type: 'auto',
-                align: 'stretch'
-            }*/
-            
         },
 
         items: [
             {
-                id: 'home',
+                id: 'Hotel',
                 title: 'Rica',
                 iconCls: 'home',
                 onInitialize: function () {
@@ -30,7 +25,7 @@ Ext.define("App.view.Main", {
                 },
                 items: [
                     {
-                        xtype: 'homepage'
+                        xtype: 'hotel'
                     }
                     
                 ]
@@ -43,9 +38,6 @@ Ext.define("App.view.Main", {
                     activate : function() {
                         setMainWindow(1);
                     }
-//                    painted: function(obj){
-//                            this.fireEvent('painted', obj);
-//                    }
                 },
                 items: [
                     {
@@ -117,7 +109,12 @@ Ext.define('App.Tabfix', {
 });
 
 function setMainWindow(elementIndex){
-    if(parent.document.getElementById("hotel")!==null) {
+    
+    /* FIXME: Admin/refresh doesn't work now!
+     * 
+     */
+    
+    if(parent.document.getElementById("motherf")!==null) {
         var elements = new Array("hotel", "info", "travel", "agenda", "favorites");
         for(var i=elements.length-1; i>=0; i--) {
             var value = elements[i];
@@ -133,9 +130,4 @@ function setMainWindow(elementIndex){
             }
         }
     }
-}
-
-function testing(object) {
-    object.setBadgeText("FAEN");
-    console.log("----info----");
 }
