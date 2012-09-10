@@ -4,7 +4,7 @@ Ext.define("App.store.Info", {
         "Ext.data.proxy.LocalStorage"
     ],
     config: {
-        model: "App.model.Info",
+        model: "App.model.ViewContent",
         autoLoad: true,
         proxy: {
             type: 'localstorage',

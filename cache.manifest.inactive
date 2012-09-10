@@ -30,13 +30,12 @@ app/store/Info.js
 app/store/Travel.js
 app/store/Events.js
 app/store/Sessions.js
-app/model/Hotel.js
-app/model/Info.js
-app/model/Travel.js
+app/model/ViewContent.js
 app/model/Event.js
 app/model/Session.js
 resources/css/app.css
 resources/script/utils.js
+resources/script/templates.js
 resources/icons/star_color_small.png
 resources/icons/star_gray_small.png
 resources/images/rica_480x320.png

@@ -1,4 +1,4 @@
-Ext.define("App.model.Hotel", {
+Ext.define("App.model.ViewContent", {
     extend: "Ext.data.Model",
     
     config: {

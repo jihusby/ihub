@@ -1,10 +1,10 @@
 Ext.define("App.store.ExternalTravel", {
     extend: "Ext.data.Store",
     requires: [
-        'App.model.Travel'
+        'App.model.ViewContent'
     ],
     config: {
-        model: "App.model.Travel",
+        model: "App.model.ViewContent",
         autoLoad: true,
         proxy: {
             type: 'ajax',

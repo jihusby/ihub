@@ -1,10 +1,10 @@
 Ext.define("App.store.ExternalInfo", {
     extend: "Ext.data.Store",
     requires: [
-        'App.model.Info'
+        'App.model.ViewContent'
     ],
     config: {
-        model: "App.model.Info",
+        model: "App.model.ViewContent",
         autoLoad: true,
         proxy: {
             type: 'ajax',

@@ -14,9 +14,7 @@ Ext.application({
     ],
     
     models: [
-        'Hotel',
-        'Info',
-        'Travel',
+        'ViewContent',
         'Session',
         'Event'
     ],

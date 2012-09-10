@@ -4,7 +4,7 @@ Ext.define("App.store.Travel", {
         "Ext.data.proxy.LocalStorage"
     ],
     config: {
-        model: "App.model.Travel",
+        model: "App.model.ViewContent",
         autoLoad: true,
         proxy: {
             type: 'localstorage',

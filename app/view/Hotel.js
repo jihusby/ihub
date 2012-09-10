@@ -1,25 +1,20 @@
 Ext.define("App.view.Hotel", {
     extend: 'Ext.navigation.View',
     xtype: 'hotel',
-    faen: 'Hotel',
     requires: [
         'App.store.Hotel',
-        'App.model.Hotel',
+        'App.model.ViewContent',
         'Ext.TitleBar'
     ],
 
     config: {
-        faen: 'FAEN',
+        model: "App.model.ViewContent",
         scrollable: true,
         items: [
             {
                 title: 'Rica Nidelven',
                 maxWidth: 750,
                 xtype: 'dataview',
-                faen: 'ARGH',
-                config: {
-                    faen: 'HELLER'
-                },
                 items: [
                     {
                         xtype: 'button',

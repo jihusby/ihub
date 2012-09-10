@@ -3,11 +3,12 @@ Ext.define("App.view.Travel", {
     xtype: 'travel',
     requires: [
         'App.store.Travel',
-        'App.model.Travel',
+        'App.model.ViewContent',
         'Ext.TitleBar'
     ],
 
     config: {
+        model: "App.model.ViewContent",
         scrollable: true,
         items: [
             {

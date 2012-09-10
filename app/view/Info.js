@@ -3,11 +3,12 @@ Ext.define("App.view.Info", {
     xtype: 'info',
     requires: [
         'App.store.Info',
-        'App.model.Info',
+        'App.model.ViewContent',
         'Ext.TitleBar'
     ],
     
     config: {
+        model: "App.model.ViewContent",
         scrollable: true,
         items: [
             {
