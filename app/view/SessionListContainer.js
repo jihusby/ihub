@@ -11,6 +11,11 @@ Ext.define("App.view.SessionListContainer", {
     config: {
         items: [{
                 xtype: 'sessionlist'
-        }]
+        }],
+        listeners: {
+            painted: function(){
+                this.fireEvent('paintedEvent');
+            }
+        }
     }
 });

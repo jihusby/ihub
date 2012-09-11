@@ -34,6 +34,9 @@ Ext.define('App.controller.Main', {
             },
             'travel' : {
                 paintedEvent: 'onTravelPanelPaintedCommand'
+            },
+            'sessionlistcontainer' : {
+                paintedEvent: 'onSessionPanelPaintedCommand'
             }
         }
 
@@ -46,8 +49,8 @@ Ext.define('App.controller.Main', {
     launch: function() {
         this.callParent(arguments);
         var main = this.getMainView();
-        startPollingExternalStores(main);    
-
+        startPollingExternalStores(main);
+        Ext.getStore("AttendingListElement").load();
     },
     
     init: function() {
@@ -65,6 +68,10 @@ Ext.define('App.controller.Main', {
 
     onTravelPanelPaintedCommand: function() {
         clearBadgeText(this.getMainView().getTabBar().items.items[2], this.getMainView());
+    },
+
+    onSessionPanelPaintedCommand: function() {
+        clearBadgeText(this.getMainView().getTabBar().items.items[3], this.getMainView());
     },
 
     onSessionListCommand: function() {
@@ -90,6 +97,7 @@ function startPollingExternalStores(main){
             this.pollStore(main, "Hotel", 0);
             this.pollStore(main, "Info", 1);
             this.pollStore(main, "Travel", 2);
+            this.pollStore(main, "ListElement", 3);
             pollExternalStores.call(this, main);
 
         }, this);
@@ -102,6 +110,7 @@ function startPollingExternalStores(main){
 
 function pollStore(main, store, num) {
     Ext.getStore("External"+store).load();
+    Ext.getStore(store).load();
     var result = false;
     Ext.onReady(function(){
         console.log("polling " + store);

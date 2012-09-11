@@ -11,3 +11,4 @@ function logEvent(event, message) {
     console.log("description: " + event.data.description);
     console.log("leaf: " + event.data.leaf);
 }
+

@@ -18,8 +18,10 @@ function getEventDetailTemplate() {
 }
 
 function getSessionListTemplate() {
-    return '<input class="x-list-star" id="img{id}" type="image" src="resources/icons/star_gray_small.png" onClick="saveSessionDetail(\'{id}\');" onLoad="setImageSource({id});" />'+
+    //return '<input class="x-list-star" type="image" id="img{id}" src="resources/icons/star_gray_small.png" onClick="saveSessionDetail(\'{id}\');" onLoad="setImageSource({id});" />'+
+    return '<input class="x-list-star" type="image" id="img{id}" src="resources/icons/star_gray_small.png" onClick="saveSessionDetail(\'{id}\');" />'+
                 '<image id="img2{id}" src="resources/icons/star_gray_small.png" onLoad="setImageSource({id});" style="display:none;" />'+
+                '<input type="button" onClick="saveSessionDetail(\'{id}\');" value="Add" />'+
                 '<div class="x-list-content">'+
                 '<div class="list-item-title">{name}</div>'+
                 '<div class="list-item-description">{startTime} - {speaker}</div>'+

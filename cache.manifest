@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# # # # # # # # Manifest version 0.016
+# # # # # # # # # # Manifest version 0.020
 
 # Explicitly cached 'master entries'.
 CACHE:
@@ -11,7 +11,7 @@ sdk/microloader/production.js
 sdk/resources/css/sencha-touch.css
 sdk/src/event/Dispatcher.js
 app-all.js
-sdk/microloader/development.js
+# sdk/microloader/development.js
 resources/css/add2home.css
 resources/script/add2home.js
 app/controller/Main.js
@@ -28,14 +28,17 @@ app/view/Travel.js
 app/store/Hotel.js
 app/store/Info.js
 app/store/Travel.js
-app/store/Events.js
-app/store/Sessions.js
+app/store/ListElement.js
+app/store/AttendingListElement.js
 app/model/ViewContent.js
+app/model/ListElement.js
 app/model/Event.js
 app/model/Session.js
 resources/css/app.css
 resources/script/utils.js
 resources/script/templates.js
+resources/icons/star_color.png
+resources/icons/star_gray.png
 resources/icons/star_color_small.png
 resources/icons/star_gray_small.png
 resources/images/rica_480x320.png

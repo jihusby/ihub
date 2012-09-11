@@ -14,7 +14,7 @@ Ext.define('App.view.SessionDetail', {
 });
 
 function saveSessionDetail(id) {
-    
+    console.log("saveSessionDetail invoked");
     var hasAddedToEventList = toggleSession(id);
     setListButtonText(hasAddedToEventList);
     setImageSource(id);

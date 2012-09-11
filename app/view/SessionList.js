@@ -3,13 +3,13 @@ Ext.define("App.view.SessionList", {
     xtype: 'sessionlist',
 
     requires: [
-        'App.store.Sessions',
-        'App.model.Session'
+        'App.store.ListElement',
+        'App.model.ListElement'
     ],
 
     config: {
-        store: 'Sessions',
-        title: 'Agenda',
+        store: 'ListElement',
+        title: 'Agenda 2.0',
         loadingText: "Henter agenda...",
         scrollable: 'vertical',
         indexBar: false,
