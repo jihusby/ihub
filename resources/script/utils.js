@@ -2,31 +2,8 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function getUniqueEventId() {
-    return (new Date().getTime() + (getRandomInt(0, 100)).toString());
-
-}
-
 function getTimeFromTimestamp(d) {
     return (d.getHours()>9? d.getHours(): "0"+ d.getHours()) + ":" + (d.getMinutes()>9? d.getMinutes(): "0"+ d.getMinutes());
-}
-
-function getEventFromSession(session) {
-    return getListElementCopy(session);
-//    var event = Ext.create("App.model.Event", {
-//        externalId: session.data.id,
-//        dateCreated: session.data.dateCreated,
-//        place: session.data.place,
-//        start: session.data.start,
-//        timestamp: session.data.timestamp,
-//        startTime: session.data.startTime,
-//        endTime: session.data.endTime,
-//        name: session.data.name,
-//        speaker: session.data.speaker,
-//        ingress: session.data.ingress,
-//        description: session.data.description
-//    });
-//    return event;
 }
 
 function toggleSession(id) {
@@ -43,7 +20,7 @@ function addItem(currentSessionId) {
     if ((null == Ext.getStore("AttendingListElement").findRecord('externalId', currentSessionId)) &&
             (null != Ext.getStore("ListElement").findRecord('id', currentSessionId))) {
         var eventStore = Ext.getStore("AttendingListElement");
-        eventStore.add(getEventFromSession(Ext.getStore("ListElement").findRecord('id', currentSessionId)));
+        eventStore.add(getListElementCopy(Ext.getStore("ListElement").findRecord('id', currentSessionId)));
         eventStore.sync();
         eventStore.sort([
             {property: 'timestamp', direction: 'ASC'}
@@ -162,9 +139,6 @@ function removeItem(id){
 }
 
 function isEventSaved(id) {
-    console.log("Is this shit saved? id is " + id);
-    console.log(Ext.getStore("AttendingListElement").findRecord('externalId', id));
-    console.log(Ext.getStore("AttendingListElement").findRecord('externalId', id) != null);
     return (Ext.getStore("AttendingListElement").findRecord('externalId', id) != null);
 }
 

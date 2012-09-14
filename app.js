@@ -15,9 +15,7 @@ Ext.application({
     
     models: [
         'ViewContent',
-        'ListElement',
-        'Session',
-        'Event'
+        'ListElement'
     ],
     
     stores: [
@@ -29,8 +27,7 @@ Ext.application({
         'ExternalTravel',
         'ListElement',
         'ExternalListElement',
-        'AttendingListElement',
-        'Events'
+        'AttendingListElement'
     ],
     
     controllers: [
