@@ -164,3 +164,10 @@ td {
     color: #782069;
     font-size: 16pt;
 }
+
+.activeDay {
+    background-color: #FFFFFF;
+}
+.passiveDay {
+    background-color: #449944;
+}

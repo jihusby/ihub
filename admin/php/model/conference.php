@@ -14,7 +14,6 @@ class conference {
     function get_conferenceDayAt($index){
         return $this->conferenceDays[$index];
     }
-    
 }
 
 ?>

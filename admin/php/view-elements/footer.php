@@ -73,7 +73,31 @@
             }
         }
     }
-    
+
+    function setConferenceDay(elementIndex){
+        if(document.getElementById("hotel")!==null) {
+            
+            
+            for(var i=3; i>=0; i--) {
+//                document.getElementById("tab"+i).style.display = "none";
+//                document.getElementById("tab"+i).enabled = "false";
+                var tabId= "tab"+i;
+                var mainId = "main"+i;
+//                document.write("tabId is " + tabId);
+                document.getElementById(tabId).className = "passiveDay";
+                document.getElementById(mainId).style.display = "none";
+            }    
+            if(elementIndex >= 0) {
+                var tabId= "tab"+elementIndex;
+                var mainId = "main"+elementIndex;
+//                document.getElementById("tab"+elementIndex).style.display = "block";
+//                document.getElementById("tab"+elementIndex).enabled = "true";
+                document.getElementById(tabId).className = "activeDay";
+                document.getElementById(mainId).style.display = "block";
+            }
+        }
+    }
+
     
 </script>
 
