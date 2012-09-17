@@ -1,61 +1,39 @@
 
-function showElement(elementIndex){
-    //var elements = new Array("hotel", "info", "travel", "agenda", "favorites");
-    var elements = new Array("hotel", "info", "travel", "agenda");
-    for(var i=elements.length-1; i>=0; i--) {
-	var value = elements[i];
-        document.getElementById(value).style.display = "none";
-        document.getElementById(value).enabled = "false";
-        document.forms[i].disabled=true;
-    }    
-    document.forms[elementIndex].disabled=false;
-    document.getElementById(elements[elementIndex]).style.display = "block";
-}
+var ELEMENTS = (function() {
+     var elements = [
+         'hotel',
+         'info',
+         'travel',
+         'agenda'
+     ];
 
-function updateFrame(source){
-    if (window.frames && window.frames.iFrame) {
-        window.frames.iFrame.location.href = source;
-    }    
-}
+     return {
+        get: function(index) { return elements[index] }
+    };
+})();
 
-function saveForm() {
-    document.getElementById('submit_btn').click();
-}
+var VIEW_ELEMENTS = (function() {
+     var viewElements = 3;
 
-function getParameterString(form, meta) {
-    var parameters = new Array();
-    var parameterString = '?meta='+meta;
-    for(var i=0; i<form.elements.length-1; i++) {
-        parameters[i] = $("input#" + meta + i+"").val() ? 
-            $("input#" + meta + i+"").val() : 
-            $("textarea#" + meta + i+"").val();
-        parameterString += "&item"+i+"="+parameters[i];
-    }
-    return parameterString;
-}
+     return {
+        get: function() { return viewElements; }
+    };
+})();
+
 
 $(function() { 
   $('.error').hide();  
   $(".button").click(function() {  
     var dataString = "";
-    if(document.forms[0].disabled!==true){
-        dataString = getParameterString(document.forms[1], "hotel");
+    for(var i=0; i<VIEW_ELEMENTS.get(); i++){
+        if(document.forms[i].disabled!==true){
+            dataString = getParameterString(document.forms[i], ELEMENTS.get(i));
+        }
     }
-
-    else if(document.forms[1].disabled!==true){
-        dataString = getParameterString(document.forms[1], "info");
-        document.getElementById("infomap").href = "../../resources/images/maps/"+$("input#infomap").val();
-    }
-
-    else if(document.forms[2].disabled!==true){
-        dataString = getParameterString(document.forms[2], "travel");
-        document.getElementById("travelmap").href = "../../resources/images/maps/"+$("input#travelmap").val();
-    }
-
-    else if(document.forms[3].disabled!==true){
+    if(document.forms[3].disabled!==true){
         var totalSessionCount = $("input#totalSessionCount").val();
         dataString = '?meta=agenda';
-        for(var i=0; i<totalSessionCount; i++) {
+        for(i=0; i<totalSessionCount; i++) {
 
             $('.error').hide();  
             id = $("input#id"+i).val();  
@@ -126,3 +104,26 @@ $(function() {
       
   });  
 });
+
+
+function updateFrame(source){
+    if (window.frames && window.frames.iFrame) {
+        window.frames.iFrame.location.href = source;
+    }    
+}
+
+function saveForm() {
+    document.getElementById('submit_btn').click();
+}
+
+function getParameterString(form, meta) {
+    var parameters = new Array();
+    var parameterString = '?meta='+meta;
+    for(var i=0; i<form.elements.length-1; i++) {
+        parameters[i] = $("input#item" + meta + i).val() ? 
+            $("input#item" + meta + i).val() : 
+            $("textarea#item" + meta + i).val();
+        parameterString += "&item"+i+"="+parameters[i];
+    }
+    return parameterString;
+}

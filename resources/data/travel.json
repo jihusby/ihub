@@ -1,10 +1,8 @@
+{"items": [
 {
-    "items": [
-        {"id": "1",
-        "item0": "1",
-        "item1": "Oppdatert reiseinformasjon 1",
-        "item2": "Tog: Taxi fra sentralstasjonen tar 5.3 minutter.<br><br>Fly: Flybussen stopper ved alle de største hotellene i byen, inkludert Rica Nidelven.<br><br>Båt: Det tar ca 10 minutter å gå til Rica Nidelven fra pirterminalen. ",
-        "item3": ""
-        }
-    ]
-}
+"id": "1",
+"item0": "1",
+"item1": "Reiseinformasjon",
+"item2": "Tog: Taxi fra sentralstasjonen tar 5.3 minutter.<br><br>Fly: Flybussen stopper ved alle de største hotellene i byen, inkludert Rica Nidelven.<br><br>Båt: Det tar ca 10 minutter å gå til Rica Nidelven fra pirterminalen. ",
+"item3": ""}
+]}

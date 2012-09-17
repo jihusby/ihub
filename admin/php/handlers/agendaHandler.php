@@ -48,6 +48,7 @@ class agendaHandler implements genericContentHandler {
         $fullTime = "";
         foreach ($postData as $key => $value){
             if($key!=="?meta" && $key!=="tab" && strpos($key, "btn") === false){
+                print_r($value);
                 if(strpos($key, "id") !== false ){ // New session
                     $num++;
                     if(!$firstChild){
