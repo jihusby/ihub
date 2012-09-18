@@ -114,7 +114,7 @@ function setMainWindow(elementIndex){
      * 
      */
     
-    if(parent.document.getElementById("motherf")!==null) {
+    if(parent.document.getElementById("hotel")!==null) {
         var elements = new Array("hotel", "info", "travel", "agenda", "favorites");
         for(var i=elements.length-1; i>=0; i--) {
             var value = elements[i];

@@ -10,13 +10,13 @@
             },
             "files": [
                 {
-                    "clsName": "Ext.event.Controller",
-                    "name": "Controller.js",
+                    "clsName": "Ext.event.ListenerStack",
+                    "name": "ListenerStack.js",
                     "path": "sdk/src/event/"
                 },
                 {
-                    "clsName": "Ext.event.ListenerStack",
-                    "name": "ListenerStack.js",
+                    "clsName": "Ext.event.Controller",
+                    "name": "Controller.js",
                     "path": "sdk/src/event/"
                 },
                 {
@@ -60,13 +60,13 @@
                     "path": "sdk/src/"
                 },
                 {
-                    "clsName": "Ext.util.Filter",
-                    "name": "Filter.js",
+                    "clsName": "Ext.util.Sorter",
+                    "name": "Sorter.js",
                     "path": "sdk/src/util/"
                 },
                 {
-                    "clsName": "Ext.util.Sorter",
-                    "name": "Sorter.js",
+                    "clsName": "Ext.util.Filter",
+                    "name": "Filter.js",
                     "path": "sdk/src/util/"
                 },
                 {
@@ -145,16 +145,6 @@
                     "path": "sdk/src/fx/animation/"
                 },
                 {
-                    "clsName": "Ext.fx.animation.Fade",
-                    "name": "Fade.js",
-                    "path": "sdk/src/fx/animation/"
-                },
-                {
-                    "clsName": "Ext.fx.animation.FadeOut",
-                    "name": "FadeOut.js",
-                    "path": "sdk/src/fx/animation/"
-                },
-                {
                     "clsName": "Ext.fx.animation.Flip",
                     "name": "Flip.js",
                     "path": "sdk/src/fx/animation/"
@@ -167,6 +157,16 @@
                 {
                     "clsName": "Ext.fx.animation.PopOut",
                     "name": "PopOut.js",
+                    "path": "sdk/src/fx/animation/"
+                },
+                {
+                    "clsName": "Ext.fx.animation.Fade",
+                    "name": "Fade.js",
+                    "path": "sdk/src/fx/animation/"
+                },
+                {
+                    "clsName": "Ext.fx.animation.FadeOut",
+                    "name": "FadeOut.js",
                     "path": "sdk/src/fx/animation/"
                 },
                 {
@@ -195,13 +195,13 @@
                     "path": "sdk/src/layout/"
                 },
                 {
-                    "clsName": "Ext.layout.HBox",
-                    "name": "HBox.js",
+                    "clsName": "Ext.layout.VBox",
+                    "name": "VBox.js",
                     "path": "sdk/src/layout/"
                 },
                 {
-                    "clsName": "Ext.layout.VBox",
-                    "name": "VBox.js",
+                    "clsName": "Ext.layout.HBox",
+                    "name": "HBox.js",
                     "path": "sdk/src/layout/"
                 },
                 {
@@ -275,6 +275,11 @@
                     "path": "sdk/src/fx/layout/card/"
                 },
                 {
+                    "clsName": "Ext.fx.layout.card.Pop",
+                    "name": "Pop.js",
+                    "path": "sdk/src/fx/layout/card/"
+                },
+                {
                     "clsName": "Ext.fx.layout.card.Fade",
                     "name": "Fade.js",
                     "path": "sdk/src/fx/layout/card/"
@@ -282,11 +287,6 @@
                 {
                     "clsName": "Ext.fx.layout.card.Flip",
                     "name": "Flip.js",
-                    "path": "sdk/src/fx/layout/card/"
-                },
-                {
-                    "clsName": "Ext.fx.layout.card.Pop",
-                    "name": "Pop.js",
                     "path": "sdk/src/fx/layout/card/"
                 },
                 {
@@ -375,6 +375,16 @@
                     "path": "sdk/src/"
                 },
                 {
+                    "clsName": "Ext.field.Input",
+                    "name": "Input.js",
+                    "path": "sdk/src/field/"
+                },
+                {
+                    "clsName": "Ext.field.TextAreaInput",
+                    "name": "TextAreaInput.js",
+                    "path": "sdk/src/field/"
+                },
+                {
                     "clsName": "Ext.Mask",
                     "name": "Mask.js",
                     "path": "sdk/src/"
@@ -385,11 +395,6 @@
                     "path": "sdk/src/"
                 },
                 {
-                    "clsName": "Ext.field.Input",
-                    "name": "Input.js",
-                    "path": "sdk/src/field/"
-                },
-                {
                     "clsName": "Ext.field.Field",
                     "name": "Field.js",
                     "path": "sdk/src/field/"
@@ -397,11 +402,6 @@
                 {
                     "clsName": "Ext.field.Text",
                     "name": "Text.js",
-                    "path": "sdk/src/field/"
-                },
-                {
-                    "clsName": "Ext.field.TextAreaInput",
-                    "name": "TextAreaInput.js",
                     "path": "sdk/src/field/"
                 },
                 {
@@ -710,11 +710,6 @@
                     "path": "sdk/src/util/"
                 },
                 {
-                    "clsName": "Ext.data.SortTypes",
-                    "name": "SortTypes.js",
-                    "path": "sdk/src/data/"
-                },
-                {
                     "clsName": "Ext.mixin.Sortable",
                     "name": "Sortable.js",
                     "path": "sdk/src/mixin/"
@@ -723,6 +718,11 @@
                     "clsName": "Ext.mixin.Filterable",
                     "name": "Filterable.js",
                     "path": "sdk/src/mixin/"
+                },
+                {
+                    "clsName": "Ext.data.SortTypes",
+                    "name": "SortTypes.js",
+                    "path": "sdk/src/data/"
                 },
                 {
                     "clsName": "Ext.util.Inflector",
@@ -925,11 +925,6 @@
                     "path": "app/model/"
                 },
                 {
-                    "clsName": "App.model.Session",
-                    "name": "Session.js",
-                    "path": "app/model/"
-                },
-                {
                     "clsName": "Ext.data.proxy.Client",
                     "name": "Client.js",
                     "path": "sdk/src/data/proxy/"
@@ -1010,11 +1005,6 @@
                     "path": "app/store/"
                 },
                 {
-                    "clsName": "App.store.Events",
-                    "name": "Events.js",
-                    "path": "app/store/"
-                },
-                {
                     "clsName": "Ext.data.Validations",
                     "name": "Validations.js",
                     "path": "sdk/src/data/"
@@ -1053,11 +1043,6 @@
                     "clsName": "App.store.ExternalListElement",
                     "name": "ExternalListElement.js",
                     "path": "app/store/"
-                },
-                {
-                    "clsName": "App.model.Event",
-                    "name": "Event.js",
-                    "path": "app/model/"
                 },
                 {
                     "clsName": "Ext.util.DelayedTask",

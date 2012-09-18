@@ -1,0 +1,57 @@
+CACHE MANIFEST
+# # # # # # # # # # # Manifest version 0.022
+
+# Explicitly cached 'master entries'.
+CACHE:
+index-debug.html
+sdk/sencha-touch.js
+sdk/microloader/production.js
+sdk/resources/css/sencha-touch.css
+sdk/src/event/Dispatcher.js
+app-all.js
+sdk/microloader/development.js
+resources/css/add2home.css
+resources/script/add2home.js
+app/controller/Main.js
+app/view/EventList.js
+app/view/EventListContainer.js
+app/view/Hotel.js
+app/view/Info.js
+app/view/Main.js
+app/view/Offline.js
+app/view/SessionDetail.js
+app/view/SessionList.js
+app/view/SessionListContainer.js
+app/view/Travel.js
+app/store/Hotel.js
+app/store/Info.js
+app/store/Travel.js
+app/store/ListElement.js
+app/store/AttendingListElement.js
+app/model/ViewContent.js
+app/model/ListElement.js
+resources/css/app.css
+resources/script/utils.js
+resources/script/templates.js
+resources/icons/star_color.png
+resources/icons/star_gray.png
+resources/icons/star_color_small.png
+resources/icons/star_gray_small.png
+resources/images/rica_480x320.png
+resources/loading/Default.png
+resources/images/maps/map.jpg
+resources/images/maps/areamap.jpg
+resources/images/maps/Gråkallen.jpg
+resources/images/maps/Møllenberg.jpg
+resources/images/maps/Ringve.jpg
+resources/images/maps/Torget.jpg
+
+# Resources that require the user to be online.
+NETWORK:
+app/store/ExternalInfos.js
+resources/data/agenda.json
+resources/data/hotel.json
+resources/data/info.json
+resources/data/travel.json
+
+# FALLBACK:
