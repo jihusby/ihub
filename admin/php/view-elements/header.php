@@ -5,9 +5,7 @@
 	<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
 	<meta name="viewport" content="width=device-width">
 	
-        <link rel="stylesheet" type="text/css" href="../resources/css/reset.css" />
 	<link rel="stylesheet" type="text/css" href="../resources/css/styling.css" />
-	<link rel="stylesheet" type="text/css" href="../resources/css/functionality.css" />            
         <link rel="stylesheet" type="text/css" href="../resources/css/admin.css">
          
          <script src="utils/javascript/calendar/scripts.js" type="text/javascript"></script>

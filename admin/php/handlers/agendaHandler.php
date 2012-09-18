@@ -15,24 +15,22 @@ class agendaHandler implements genericContentHandler {
     
     public function getPageContentFromJSON($json) {
         $result = "";
+        $active = "activeDay";
         $result = $result . '<div class="mainCol" id="agenda" style="display: none">';
         $result = $result . '<div id="agenda_form">';
-        $result = $result . '<form name="agenda" id="agenda" action="" disabled>';
+        $result = $result . '<form name="agenda" id="agenda" action="" disabled><table class="tabHeader"><tr>';
         foreach ($json as $key => $value){
             $conference = $this->getConferenceObject($value);
-            $result = $result . '<div class="tabHeader">';
             $numConferenceDays = sizeof($conference->get_conferenceDays());
             for($i=0; $i<$numConferenceDays; $i++) {
-                print_r("result is " . $i);
-                $result = $result . '<div onClick="setConferenceDay(\''.$i.'\');" class="passiveDay" id="tab'.$i.'" name="tab'.$i.'">';
-                print_r("result is " . $i);
-                $result = $result . '<a onClick="setConferenceDay(\''.$i.'\');">Dag ' . ($i+1);
-                print_r("result is " . $i);
-                $result = $result . '</a></div>';
+                $result = $result . '<td onClick="setConferenceDay(\''.$i.'\', \''.$numConferenceDays.'\');" class="'.$active.'" id="tab'.$i.'" name="tab'.$i.'">';
+                $active = "passiveDay";
+                $result = $result . '<a onClick="setConferenceDay(\''.$i.'\', \''.$numConferenceDays.'\');">Dag ' . ($i+1);
+                $result = $result . '</a></td>';
             }
-            $result = $result . $this->getFormattedConference($conference);
             
-            $result = $result . '</div>';
+            $result = $result . "</tr></table>";
+            $result = $result . $this->getFormattedConference($conference);
         }
         $result = $result . '<input type="hidden" name="totalSessionCount" id="totalSessionCount" value="'.$this->totalSessionCount.'" />';
         $result = $result . '<input type="submit" name="submit" class="button" id="submit_btn" value="Send" style="display:none;" />';
@@ -40,37 +38,6 @@ class agendaHandler implements genericContentHandler {
 
         return $result;
     }
-    
-    
-//    public function getPageContentFromJSON($json) {
-//        $result = "";
-//        $result = $result . '<div class="mainCol" id="agenda" style="display: none">';
-//        $result = $result . '<div id="agenda_form">';
-//        $result = $result . '<form name="agenda" id="agenda" action="" disabled>';
-//        $tabs = array ("A","B","C","D");
-//        $checked = "checked";
-//        foreach ($json as $key => $value){
-//            $conference = $this->getConferenceObject($value);
-//            
-//            $result = $result . '<section class="tab-area tabs-checked">';
-//            $numConferenceDays = sizeof($conference->get_conferenceDays());
-//            for($i=0; $i<$numConferenceDays; $i++) {
-//                $result = $result . '<input '.$checked.' class="radio" type="radio" name="tab" id="tab-'.$tabs[$i].'" />';
-//                $checked = "";
-//            }
-//            for($i=0; $i<$numConferenceDays; $i++) {
-//               $result = $result . '<label class="tab-link" for="tab-'.$tabs[$i].'">Dag '.($i+1).'</label>';
-//            }
-//            $result = $result . $this->getFormattedConference($conference);
-//            
-//            $result = $result . '</section>';
-//        }
-//        $result = $result . '<input type="hidden" name="totalSessionCount" id="totalSessionCount" value="'.$this->totalSessionCount.'" />';
-//        $result = $result . '<input type="submit" name="submit" class="button" id="submit_btn" value="Send" style="display:none;" />';
-//        $result = $result . '</form></div></div>';
-//
-//        return $result;
-//    }
     
     public function getJSONFromPostData($postData) {
         $json = "{\n\"items\": [\n";
@@ -115,12 +82,13 @@ class agendaHandler implements genericContentHandler {
     
     private function getFormattedConference($conference){
         $counter = 0;
+        $display = "block";
         for($i=0; $i<sizeof($conference->get_conferenceDays()); $i++){
             $numOfSessions = sizeof($conference->get_conferenceDayAt($i)->get_sessions());
             $conferenceDay = $conference->get_conferenceDayAt($i); 
 
-            $result = $result . '<div id="main'.$i.'" style="height: '.($numOfSessions*275).'px">';
-            
+            $result = $result . '<div id="main'.$i.'" style="height: '.($numOfSessions*300).'px; display: '.$display.';" class="mainSubColWithTabs">';
+            $display = "none";
             for($u=0; $u<sizeof($conferenceDay->get_sessions()); $u++){
                 $session = $conferenceDay->get_SessionAt($u);
                 $result = $result . $this->getFormattedSession($session, $counter);
@@ -181,7 +149,7 @@ class agendaHandler implements genericContentHandler {
     
     private function getFormattedSession($session, $sessionCounter){
         $result = $result . formElementUtils::getHiddenField('id'.$sessionCounter, $session->get_id());
-        $result = $result . "<table>";
+        $result = $result . "<table class='session'>";
         $result = $result . formElementUtils::getLabel("start".$sessionCounter, "Tidspunkt") . formElementUtils::getTextField("start".$sessionCounter, "stdSmallField", $session->get_start()) . "<a href='javascript:viewcalendar(\"start".$sessionCounter."\")'><img src='../resources/images/calendar.png' style='width:22px; height:22px; vertical-align:text-bottom;'></a>&nbsp;";
         $result = $result . formElementUtils::getTextField("startTime".$sessionCounter, "stdSmallField", $session->get_startTime()) . "";
         $result = $result . formElementUtils::getTextField("endTime".$sessionCounter, "stdSmallField", $session->get_endTime()) . "</td></tr>";

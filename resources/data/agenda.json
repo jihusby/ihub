@@ -130,17 +130,17 @@
 "description": "Vi oppsummerer",
 "place": "Møllenberg"
 },
+
 {
 "id": "11",
 "start": "12.09.2012",
 "startTime": "09:00",
-"timestamp": "1397314432400",
+"timestamp": "1347400832400",
 "endTime": "09:45",
 "name": "Debrief",
 "speaker": "Skomaker Andersen",
 "ingress": "Ingressen",
 "description": "Teksten",
 "place": "Møllenberg"}
-
 ]
 }
