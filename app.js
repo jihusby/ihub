@@ -25,9 +25,9 @@ Ext.application({
         'ExternalInfo',
         'Travel',
         'ExternalTravel',
-        'ListElement',
-        'ExternalListElement',
-        'AttendingListElement'
+        'Session',
+        'ExternalSession',
+        'AttendingSession'
     ],
     
     controllers: [

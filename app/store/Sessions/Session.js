@@ -1,4 +1,4 @@
-Ext.define("App.store.AttendingListElement", {
+Ext.define("App.store.Sessions.Session", {
     extend: "Ext.data.Store",
     requires: [
         "Ext.data.proxy.LocalStorage"
@@ -8,7 +8,7 @@ Ext.define("App.store.AttendingListElement", {
         autoLoad: true,
         proxy: {
             type: 'localstorage',
-            id: 'attendinglistelement-app-store'
+            id: 'session-app-store'
         },
         sorters: [
             {property: 'timestamp', direction: 'ASC'}

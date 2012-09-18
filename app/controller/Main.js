@@ -50,7 +50,7 @@ Ext.define('App.controller.Main', {
         this.callParent(arguments);
         var main = this.getMainView();
         startPollingExternalStores(main);
-        Ext.getStore("AttendingListElement").load();
+        Ext.getStore("AttendingSession").load();
     },
     
     init: function() {
@@ -97,7 +97,7 @@ function startPollingExternalStores(main){
             this.pollStore(main, "Hotel", 0);
             this.pollStore(main, "Info", 1);
             this.pollStore(main, "Travel", 2);
-            this.pollStore(main, "ListElement", 3);
+            this.pollStore(main, "Session", 3);
             pollExternalStores.call(this, main);
 
         }, this);
@@ -113,7 +113,6 @@ function pollStore(main, store, num) {
     Ext.getStore(store).load();
     var result = false;
     Ext.onReady(function(){
-        console.log("polling " + store);
         result = saveContentFromExternal(store, "External"+store);
     });
     setBadgeText(main.getTabBar().items.items[num], result);
@@ -122,8 +121,7 @@ function pollStore(main, store, num) {
 
 function setBadgeText(item, updated) {
     if(updated){
-        console.log("setBadgeText:" + updated + " on " + item.id);
-        item.setBadgeText("NB!");
+        item.setBadgeText("1");
     }
 }
 function clearBadgeText(item) {

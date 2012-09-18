@@ -1,22 +1,27 @@
-Ext.define("App.store.ListElement", {
+Ext.define("App.store.Sessions.ExternalSession", {
     extend: "Ext.data.Store",
     requires: [
-        "Ext.data.proxy.LocalStorage"
+        'App.model.ListElement'
     ],
     config: {
         model: "App.model.ListElement",
         autoLoad: true,
         proxy: {
-            type: 'localstorage',
-            id: 'listelement-app-store'
+            type: 'ajax',
+            url: 'resources/data/agenda.json',
+            reader: {
+                type: 'json',
+                rootProperty: 'items'
+            }
         },
         sorters: [
-            {property: 'timestamp', direction: 'ASC'}
+            {property: 'start', direction: 'ASC'},
+            {property: 'startTime', direction: 'ASC'}
     ],
 
         grouper: {
             sortProperty: [
-                "timestamp"
+                "start", "startTime"
             ],
                 
             direction: "ASC",

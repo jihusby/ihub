@@ -3,12 +3,12 @@ Ext.define("App.view.EventList", {
     xtype: 'eventlist',
 
     requires: [
-        'App.store.AttendingListElement',
+        'App.store.Sessions.AttendingSession',
         'App.model.ListElement'
     ],
 
     config: {
-        store: 'AttendingListElement',
+        store: 'AttendingSession',
         title: 'Min huskeliste',
         loadingText: "Henter huskeliste...",
         scrollable: 'vertical',

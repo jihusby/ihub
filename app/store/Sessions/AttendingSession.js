@@ -1,27 +1,22 @@
-Ext.define("App.store.ExternalListElement", {
+Ext.define("App.store.Sessions.AttendingSession", {
     extend: "Ext.data.Store",
     requires: [
-        'App.model.ListElement'
+        "Ext.data.proxy.LocalStorage"
     ],
     config: {
         model: "App.model.ListElement",
         autoLoad: true,
         proxy: {
-            type: 'ajax',
-            url: 'resources/data/agenda.json',
-            reader: {
-                type: 'json',
-                rootProperty: 'items'
-            }
+            type: 'localstorage',
+            id: 'attendingsession-app-store'
         },
         sorters: [
-            {property: 'start', direction: 'ASC'},
-            {property: 'startTime', direction: 'ASC'}
+            {property: 'timestamp', direction: 'ASC'}
     ],
 
         grouper: {
             sortProperty: [
-                "start", "startTime"
+                "timestamp"
             ],
                 
             direction: "ASC",

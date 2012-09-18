@@ -17,10 +17,10 @@ function toggleSession(id) {
 }
 
 function addItem(currentSessionId) {
-    if ((null == Ext.getStore("AttendingListElement").findRecord('externalId', currentSessionId)) &&
-            (null != Ext.getStore("ListElement").findRecord('id', currentSessionId))) {
-        var eventStore = Ext.getStore("AttendingListElement");
-        eventStore.add(getListElementCopy(Ext.getStore("ListElement").findRecord('id', currentSessionId)));
+    if ((null == Ext.getStore("AttendingSession").findRecord('externalId', currentSessionId)) &&
+            (null != Ext.getStore("Session").findRecord('id', currentSessionId))) {
+        var eventStore = Ext.getStore("AttendingSession");
+        eventStore.add(getListElementCopy(Ext.getStore("Session").findRecord('id', currentSessionId)));
         eventStore.sync();
         eventStore.sort([
             {property: 'timestamp', direction: 'ASC'}
@@ -32,7 +32,7 @@ function saveContentFromExternal(localStoreName, externalStoreName) {
     
     var result = false;
     if(Ext.getStore(externalStoreName).getCount()>0){
-        if(localStoreName === "ListElement"){
+        if(localStoreName === "Session"){
             result = saveListObjects(localStoreName);
         }else{
             result = saveContentObject(Ext.getStore(externalStoreName).findRecord('id', 1), localStoreName);
@@ -127,7 +127,7 @@ function getListElementCopy(element) {
 
 
 function removeItem(id){
-    var eventStore = Ext.getStore("AttendingListElement");
+    var eventStore = Ext.getStore("AttendingSession");
     var record = eventStore.findRecord('externalId', id)
     if(record){
         eventStore.remove(record);
@@ -139,7 +139,7 @@ function removeItem(id){
 }
 
 function isEventSaved(id) {
-    return (Ext.getStore("AttendingListElement").findRecord('externalId', id) != null);
+    return (Ext.getStore("AttendingSession").findRecord('externalId', id) != null);
 }
 
 function isUpcomingEvent(node){

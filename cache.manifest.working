@@ -26,8 +26,8 @@ app/view/Travel.js
 app/store/Hotel.js
 app/store/Info.js
 app/store/Travel.js
-app/store/ListElement.js
-app/store/AttendingListElement.js
+app/store/Sessions/Session.js
+app/store/Sessions/AttendingSession.js
 app/model/ViewContent.js
 app/model/ListElement.js
 resources/css/app.css
