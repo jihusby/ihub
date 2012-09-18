@@ -25,9 +25,11 @@ Ext.application({
         'ExternalInfo',
         'Travel',
         'ExternalTravel',
-        'Session',
-        'ExternalSession',
-        'AttendingSession'
+        'Sessions.Session',
+        'Sessions.ExternalSession',
+        'Sessions.AttendingSession',
+        'Links.ExternalLink',
+        'Links.Link',
     ],
     
     controllers: [
