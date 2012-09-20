@@ -5,6 +5,7 @@ Ext.define('App.controller.Main', {
     requires: [
         'App.view.SessionDetail',
         'App.view.SessionList',
+        'App.view.SponsorList',
         'App.view.Main',
         'App.view.Info',
     ],
@@ -16,7 +17,8 @@ Ext.define('App.controller.Main', {
             info: 'info',
             travel: 'travel',
             sessionListContainer: 'sessionlistcontainer',
-            eventListContainer: 'eventlistcontainer'
+            eventListContainer: 'eventlistcontainer',
+            sponsorListContainer: 'sponsorlistcontainer'
         },
 
         control: {
@@ -37,6 +39,9 @@ Ext.define('App.controller.Main', {
             },
             'sessionlistcontainer' : {
                 paintedEvent: 'onSessionPanelPaintedCommand'
+            },
+            'sponsorlistcontainer' : {
+                paintedEvent: 'onSponsorPanelPaintedCommand'
             }
         }
 
@@ -74,6 +79,10 @@ Ext.define('App.controller.Main', {
         clearBadgeText(this.getMainView().getTabBar().items.items[3], this.getMainView());
     },
 
+    onSponsorPanelPaintedCommand: function() {
+        clearBadgeText(this.getMainView().getTabBar().items.items[5], this.getMainView());
+    },
+
     onSessionListCommand: function() {
         Ext.Viewport.animateActiveItem(this.getMainView(), this.slideRightTransition);
     },
@@ -98,6 +107,7 @@ function startPollingExternalStores(main){
             this.pollStore(main, "Info", 1);
             this.pollStore(main, "Travel", 2);
             this.pollStore(main, "Session", 3);
+            this.pollStore(main, "Sponsor", 5);
             pollExternalStores.call(this, main);
 
         }, this);

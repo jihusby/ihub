@@ -1,4 +1,4 @@
-Ext.define("App.store.Links.ExternalLink", {
+Ext.define("App.store.Sponsors.ExternalSponsor", {
     extend: "Ext.data.Store",
     requires: [
         'App.model.LinkElement'
@@ -8,7 +8,7 @@ Ext.define("App.store.Links.ExternalLink", {
         autoLoad: true,
         proxy: {
             type: 'ajax',
-            url: 'resources/data/links.json',
+            url: 'resources/data/sponsors.json',
             reader: {
                 type: 'json',
                 rootProperty: 'items'

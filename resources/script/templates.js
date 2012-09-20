@@ -29,6 +29,19 @@ function getSessionListTemplate() {
                 '</div>';
 }
 
+function getSponsorListTemplate() {
+    return '<div class="x-list-content" onClick="{longUrl}"><a href="{longUrl}"><img src="resources/images/links/icon-{icon}.png"></a>' +
+//                '<div class="x-list-content" style="border: 1px solid blue">'+
+                '<div class="x-list-content">'+
+                '<div class="textBlock"><a href="{longUrl}">{title}</a></div>' + 
+//                '<table class="sponsorElement" style="width:100%"><tr>' + 
+//                '<td width="1"><a href="{longUrl}"><img src="resources/images/links/icon-{icon}.png"></a></td>' + 
+//                '<td><div class="list-item-title"><a href="{longUrl}">{title}</a></div>' + 
+                '<div class="list-item-description">{description}</div>'+
+//                '</td></tr></table>' +
+                '</div>';
+}
+
 function getSessionDetailTemplate(btnText) {
     return '<input value="'+btnText+'" id="btn" class="buttonWide" type="button" onClick="saveSessionDetail({id});" />' + 
                 '<input class="buttonWide" type="button" onClick="showPopupMap(\'{place}.jpg\', \'{place}\').show();" value="{place}" />'+

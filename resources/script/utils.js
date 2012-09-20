@@ -29,11 +29,13 @@ function addItem(currentSessionId) {
 }
 
 function saveContentFromExternal(localStoreName, externalStoreName) {
-    
+    console.log("saveContentFromExternal");
     var result = false;
     if(Ext.getStore(externalStoreName).getCount()>0){
         if(localStoreName === "Session"){
             result = saveListObjects(localStoreName);
+        }else if(localStoreName === "Sponsor") {
+            result = saveLinkObjects(localStoreName);
         }else{
             result = saveContentObject(Ext.getStore(externalStoreName).findRecord('id', 1), localStoreName);
         }
@@ -75,6 +77,25 @@ function saveListObjects(objectName){
     return result;
 }
 
+function saveLinkObjects(objectName){
+    var localStore = Ext.getStore(objectName);
+    var externalStore = Ext.getStore("External"+objectName);
+    var result = false;
+    externalStore.each(function(record,idx){
+        var localRecord = localStore.findRecord('externalId', record.get('id'));
+        if(!isLinkElementEqual(localRecord, record)){
+            if(localRecord){
+                localStore.remove(localRecord);
+                localStore.sync();
+            }
+            localStore.add(getLinkElementCopy(record));
+            localStore.sync();
+            console.log("saveLinkObject: " + record);
+            result = true;
+        }
+    });
+    return result;
+}
 
 function isRecordEqual(record1, record2){
     if(record1 && record2){
@@ -109,6 +130,16 @@ function isListElementEqual(record1, record2){
     return false;
 }
 
+function isLinkElementEqual(record1, record2){
+    if(record1 && record2){
+        return record1.data.title === record2.data.title &&
+            record1.data.description === record2.data.description &&
+            record1.data.shortUrl === record2.data.shortUrl &&
+            record1.data.longUrl === record2.data.longUrl;
+    }
+    return false;
+}
+
 function getListElementCopy(element) {
     return Ext.create("App.model.ListElement", {
         externalId: element.data.id,
@@ -125,6 +156,17 @@ function getListElementCopy(element) {
     });
 }
 
+function getLinkElementCopy(element) {
+    return Ext.create("App.model.LinkElement", {
+        externalId: element.data.id,
+        dateCreated: element.data.dateCreated,
+        title: element.data.title,
+        description: element.data.description,
+        longUrl: element.data.longUrl,
+        shortUrl: element.data.shortUrl,
+        icon: element.data.icon
+    });
+}
 
 function removeItem(id){
     var eventStore = Ext.getStore("AttendingSession");

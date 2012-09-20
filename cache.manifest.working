@@ -28,6 +28,7 @@ app/store/Info.js
 app/store/Travel.js
 app/store/Sessions/Session.js
 app/store/Sessions/AttendingSession.js
+app/store/Sponsors/Sponsor.js
 app/model/ViewContent.js
 app/model/ListElement.js
 resources/css/app.css

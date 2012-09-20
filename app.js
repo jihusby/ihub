@@ -11,11 +11,15 @@ Ext.application({
         'SessionDetail',
         'EventListContainer',
         'EventList',
+        'SponsorListContainer',
+        'SponsorList',
+        
     ],
     
     models: [
         'ViewContent',
-        'ListElement'
+        'ListElement',
+        'LinkElement'
     ],
     
     stores: [
@@ -28,8 +32,8 @@ Ext.application({
         'Sessions.Session',
         'Sessions.ExternalSession',
         'Sessions.AttendingSession',
-        'Links.ExternalLink',
-        'Links.Link',
+        'Sponsors.ExternalSponsor',
+        'Sponsors.Sponsor',
     ],
     
     controllers: [

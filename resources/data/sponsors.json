@@ -1,0 +1,22 @@
+{
+"items": [
+
+{
+"id": "1",
+"title": "Facebook",
+"description": "Her møtes vi!",
+"longUrl": "http://www.facebook.com",
+"shortUrl": "fb.com",
+"icon": "Facebook"
+},
+{
+"id": "2",
+"title": "Linkedin",
+"description": "Her møtes vi også!",
+"longUrl": "http://www.linkedin.com",
+"shortUrl": "linkedin.com",
+"icon": "Linkedin"
+}
+
+]
+}

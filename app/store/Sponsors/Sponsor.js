@@ -1,4 +1,4 @@
-Ext.define("App.store.Links.Link", {
+Ext.define("App.store.Sponsors.Sponsor", {
     extend: "Ext.data.Store",
     requires: [
         "Ext.data.proxy.LocalStorage"
@@ -8,7 +8,7 @@ Ext.define("App.store.Links.Link", {
         autoLoad: true,
         proxy: {
             type: 'localstorage',
-            id: 'link-app-store'
+            id: 'sponsor-app-store'
         },
         sorters: [
             {property: 'timestamp', direction: 'ASC'}

@@ -46,21 +46,21 @@ Ext.define("App.view.Main", {
                 ]
             },
 
-            {
-                id: 'travel',
-                title: 'Reiseinfo',
-                iconCls: 'search',
-                listeners: {
-                    activate : function() {
-                        setMainWindow(2);
-                    }
-                },
-                items: [
-                    {
-                        xtype: 'travel'
-                    }
-                ]
-            },
+//            {
+//                id: 'travel',
+//                title: 'Reiseinfo',
+//                iconCls: 'search',
+//                listeners: {
+//                    activate : function() {
+//                        setMainWindow(2);
+//                    }
+//                },
+//                items: [
+//                    {
+//                        xtype: 'travel'
+//                    }
+//                ]
+//            },
 
             {
                 id: 'agenda',
@@ -92,7 +92,24 @@ Ext.define("App.view.Main", {
                         xtype: 'eventlistcontainer'
                     }
                 ]
-            }            
+            },
+
+            {
+                id: 'sponsorlist',
+                title: 'Sponsorer',
+                iconCls: 'team',
+                listeners: {
+                    activate : function() {
+                        setMainWindow(5);
+                    }
+                },
+                items: [
+                    {
+                        xtype: 'sponsorlistcontainer'
+                    }
+                ]
+            }
+
         ]
     }
 });
