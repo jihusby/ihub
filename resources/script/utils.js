@@ -1,7 +1,3 @@
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function getTimeFromTimestamp(d) {
     return (d.getHours()>9? d.getHours(): "0"+ d.getHours()) + ":" + (d.getMinutes()>9? d.getMinutes(): "0"+ d.getMinutes());
 }
@@ -36,6 +32,14 @@ function saveContentFromExternal(localStoreName, externalStoreName) {
             result = saveListObjects(localStoreName);
         }else if(localStoreName === "Sponsor") {
             result = saveLinkObjects(localStoreName);
+        }else if(localStoreName === "Info") {
+            console.log("checking info");
+//            var store = new Store();
+            store.localStore = "Info";
+            store.externalStore = "ExternalInfo";
+            var record = Ext.getStore(externalStoreName).findRecord('id', 1);
+            result = store.saveRecordToLocalStore;
+            console.log("result is " + result);
         }else{
             result = saveContentObject(Ext.getStore(externalStoreName).findRecord('id', 1), localStoreName);
         }
