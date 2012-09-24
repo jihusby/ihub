@@ -24,153 +24,113 @@ function addItem(currentSessionId) {
     }
 }
 
-function saveContentFromExternal(localStoreName, externalStoreName) {
-    console.log("saveContentFromExternal");
+function saveContentFromExternal(storeName) {
     var result = false;
-    if(Ext.getStore(externalStoreName).getCount()>0){
-        if(localStoreName === "Session"){
-            result = saveListObjects(localStoreName);
-        }else if(localStoreName === "Sponsor") {
-            result = saveLinkObjects(localStoreName);
-        }else if(localStoreName === "Info") {
-            console.log("checking info");
-//            var store = new Store();
-            store.localStore = "Info";
-            store.externalStore = "ExternalInfo";
-            var record = Ext.getStore(externalStoreName).findRecord('id', 1);
-            result = store.saveRecordToLocalStore;
-            console.log("result is " + result);
+    if(Ext.getStore("External" + storeName).getCount()>0){ // External store exists
+        var storeManager = new StoreManager();
+        storeManager.store = storeName;
+        if(storeName === "Session"){
+            storeManager.recordType = "App.model.ListElement";
+        }else if(storeName === "Sponsor") {
+            storeManager.recordType = "App.model.LinkElement";
         }else{
-            result = saveContentObject(Ext.getStore(externalStoreName).findRecord('id', 1), localStoreName);
+            storeManager.recordType = "App.model.ViewContent";
         }
+        result = storeManager.saveRecordToLocalStore();
     }
     return result;
 }
 
-function saveContentObject(obj, objectName){
-    var localStore = Ext.getStore(objectName);
-    var localRecord = localStore.findRecord('item0', "1");
-    var externalStore = Ext.getStore("External"+objectName);
-    var externalRecord = externalStore.findRecord('item0', "1");
-    var result = false;
-    if(!isRecordEqual(localRecord, externalRecord)){
-        localStore.removeAll();
-        localStore.add(getRecordCopy(obj, objectName));
-        localStore.sync();
-        result = true;
-    }
-    return result;
-}
-
-function saveListObjects(objectName){
-    var localStore = Ext.getStore(objectName);
-    var externalStore = Ext.getStore("External"+objectName);
-    var result = false;
-    externalStore.each(function(record,idx){
-        var localRecord = localStore.findRecord('externalId', record.get('id'));
-        if(!isListElementEqual(localRecord, record)){
-            if(localRecord){
-                localStore.remove(localRecord);
-                localStore.sync();
-            }
-            localStore.add(getListElementCopy(record));
-            localStore.sync();
-            result = true;
-        }
-    });
-    return result;
-}
-
-function saveLinkObjects(objectName){
-    var localStore = Ext.getStore(objectName);
-    var externalStore = Ext.getStore("External"+objectName);
-    var result = false;
-    externalStore.each(function(record,idx){
-        var localRecord = localStore.findRecord('externalId', record.get('id'));
-        if(!isLinkElementEqual(localRecord, record)){
-            if(localRecord){
-                localStore.remove(localRecord);
-                localStore.sync();
-            }
-            localStore.add(getLinkElementCopy(record));
-            localStore.sync();
-            console.log("saveLinkObject: " + record);
-            result = true;
-        }
-    });
-    return result;
-}
-
-function isRecordEqual(record1, record2){
-    if(record1 && record2){
-        return record1.data.item0 === record1.data.item0 &&
-            record1.data.item1 === record2.data.item1 &&
-            record1.data.item2 === record2.data.item2 &&
-            record1.data.item3 === record2.data.item3;
-    }
-    return false;
-}
-
-function getRecordCopy(record, type) {
-    return Ext.create("App.model.ViewContent", {
-        item0: record.data.item0,
-        item1: record.data.item1,
-        item2: record.data.item2,
-        item3: record.data.item3
-    });
-}
-
-function isListElementEqual(record1, record2){
-    if(record1 && record2){
-        return record1.data.place === record2.data.place &&
-            record1.data.start === record2.data.start &&
-            record1.data.startTime === record2.data.startTime &&
-            record1.data.endTime === record2.data.endTime &&
-            record1.data.name === record2.data.name &&
-            record1.data.speaker === record2.data.speaker &&
-            record1.data.ingress === record2.data.ingress &&
-            record1.data.description === record2.data.description;
-    }
-    return false;
-}
-
-function isLinkElementEqual(record1, record2){
-    if(record1 && record2){
-        return record1.data.title === record2.data.title &&
-            record1.data.description === record2.data.description &&
-            record1.data.shortUrl === record2.data.shortUrl &&
-            record1.data.longUrl === record2.data.longUrl;
-    }
-    return false;
-}
-
-function getListElementCopy(element) {
-    return Ext.create("App.model.ListElement", {
-        externalId: element.data.id,
-        dateCreated: element.data.dateCreated,
-        place: element.data.place,
-        start: element.data.start,
-        timestamp: element.data.timestamp,
-        startTime: element.data.startTime,
-        endTime: element.data.endTime,
-        name: element.data.name,
-        speaker: element.data.speaker,
-        ingress: element.data.ingress,
-        description: element.data.description
-    });
-}
-
-function getLinkElementCopy(element) {
-    return Ext.create("App.model.LinkElement", {
-        externalId: element.data.id,
-        dateCreated: element.data.dateCreated,
-        title: element.data.title,
-        description: element.data.description,
-        longUrl: element.data.longUrl,
-        shortUrl: element.data.shortUrl,
-        icon: element.data.icon
-    });
-}
+//function saveListObjects(objectName){
+//    var localStore = Ext.getStore(objectName);
+//    var externalStore = Ext.getStore("External"+objectName);
+//    var result = false;
+//    externalStore.each(function(record,idx){
+//        var localRecord = localStore.findRecord('externalId', record.get('id'));
+//        if(!isListElementEqual(localRecord, record)){
+//            if(localRecord){
+//                localStore.remove(localRecord);
+//                localStore.sync();
+//            }
+//            localStore.add(getListElementCopy(record));
+//            localStore.sync();
+//            result = true;
+//        }
+//    });
+//    return result;
+//}
+//
+//function saveLinkObjects(objectName){
+//    var localStore = Ext.getStore(objectName);
+//    var externalStore = Ext.getStore("External"+objectName);
+//    var result = false;
+//    externalStore.each(function(record,idx){
+//        var localRecord = localStore.findRecord('externalId', record.get('id'));
+//        if(!isLinkElementEqual(localRecord, record)){
+//            if(localRecord){
+//                localStore.remove(localRecord);
+//                localStore.sync();
+//            }
+//            localStore.add(getLinkElementCopy(record));
+//            localStore.sync();
+//            console.log("saveLinkObject: " + record);
+//            result = true;
+//        }
+//    });
+//    return result;
+//}
+//
+//function isListElementEqual(record1, record2){
+//    if(record1 && record2){
+//        return record1.data.place === record2.data.place &&
+//            record1.data.start === record2.data.start &&
+//            record1.data.startTime === record2.data.startTime &&
+//            record1.data.endTime === record2.data.endTime &&
+//            record1.data.name === record2.data.name &&
+//            record1.data.speaker === record2.data.speaker &&
+//            record1.data.ingress === record2.data.ingress &&
+//            record1.data.description === record2.data.description;
+//    }
+//    return false;
+//}
+//
+//function isLinkElementEqual(record1, record2){
+//    if(record1 && record2){
+//        return record1.data.title === record2.data.title &&
+//            record1.data.description === record2.data.description &&
+//            record1.data.shortUrl === record2.data.shortUrl &&
+//            record1.data.longUrl === record2.data.longUrl;
+//    }
+//    return false;
+//}
+//
+//function getListElementCopy(element) {
+//    return Ext.create("App.model.ListElement", {
+//        externalId: element.data.id,
+//        dateCreated: element.data.dateCreated,
+//        place: element.data.place,
+//        start: element.data.start,
+//        timestamp: element.data.timestamp,
+//        startTime: element.data.startTime,
+//        endTime: element.data.endTime,
+//        name: element.data.name,
+//        speaker: element.data.speaker,
+//        ingress: element.data.ingress,
+//        description: element.data.description
+//    });
+//}
+//
+//function getLinkElementCopy(element) {
+//    return Ext.create("App.model.LinkElement", {
+//        externalId: element.data.id,
+//        dateCreated: element.data.dateCreated,
+//        title: element.data.title,
+//        description: element.data.description,
+//        longUrl: element.data.longUrl,
+//        shortUrl: element.data.shortUrl,
+//        icon: element.data.icon
+//    });
+//}
 
 function removeItem(id){
     var eventStore = Ext.getStore("AttendingSession");

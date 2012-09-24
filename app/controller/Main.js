@@ -118,12 +118,12 @@ function startPollingExternalStores(main){
     pollExternalStores(main);
 }
 
-function pollStore(main, store, num) {
-    Ext.getStore("External"+store).load();
-    Ext.getStore(store).load();
+function pollStore(main, storeName, num) {
+    Ext.getStore("External"+storeName).load();
+    Ext.getStore(storeName).load();
     var result = false;
     Ext.onReady(function(){
-        result = saveContentFromExternal(store, "External"+store);
+        result = saveContentFromExternal(storeName);
     });
     setBadgeText(main.getTabBar().items.items[num], result);
 }
