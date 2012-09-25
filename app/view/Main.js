@@ -46,21 +46,21 @@ Ext.define("App.view.Main", {
                 ]
             },
 
-//            {
-//                id: 'travel',
-//                title: 'Reiseinfo',
-//                iconCls: 'search',
-//                listeners: {
-//                    activate : function() {
-//                        setMainWindow(2);
-//                    }
-//                },
-//                items: [
-//                    {
-//                        xtype: 'travel'
-//                    }
-//                ]
-//            },
+            {
+                id: 'travel',
+                title: 'Reiseinfo',
+                iconCls: 'search',
+                listeners: {
+                    activate : function() {
+                        setMainWindow(2);
+                    }
+                },
+                items: [
+                    {
+                        xtype: 'travel'
+                    }
+                ]
+            },
 
             {
                 id: 'agenda',
@@ -132,7 +132,8 @@ function setMainWindow(elementIndex){
      */
     
     if(parent.document.getElementById("hotel")!==null) {
-        var elements = new Array("hotel", "info", "travel", "agenda", "favorites");
+        //var elements = new Array("hotel", "info", "travel", "agenda", "favorites");
+        var elements = new Array("hotel", "info", "agenda", "favorites");
         for(var i=elements.length-1; i>=0; i--) {
             var value = elements[i];
             parent.document.getElementById(value).style.display = "none";
